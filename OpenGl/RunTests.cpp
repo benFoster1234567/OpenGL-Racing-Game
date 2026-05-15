@@ -1,5 +1,3 @@
-
-
 #ifdef ENABLE_TESTS
 #include "Tester.h"
 
