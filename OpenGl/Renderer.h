@@ -5,6 +5,11 @@
 #include "Material.h"
 #include "ShaderProgram.h"
 #include <map>
+#include <string>
+#include <vector>
+#include "MeshData.h"
+#include "Texture.h"
+#include <GL/glew.h>
 
 struct RenderCommand
 {

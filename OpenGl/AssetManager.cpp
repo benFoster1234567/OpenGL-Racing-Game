@@ -1,12 +1,5 @@
 #include "AssetManager.h"
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include "Material.h"
-#include "Mesh.h"
-#include "Shader.h"
-#include "Texture.h"
+
 
 std::optional<MeshData*> 
 AssetManager::getMesh(const std::string& name) const

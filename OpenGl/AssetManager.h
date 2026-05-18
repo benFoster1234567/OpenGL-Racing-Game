@@ -1,11 +1,9 @@
-
-
+#pragma once
 #include <unordered_map>
 #include <string>
 #include <memory>
 #include <optional>
-
-#include "Mesh.h"
+#include "MeshData.h"
 #include "Material.h"
 #include "Shader.h"
 #include "Patterns.h"

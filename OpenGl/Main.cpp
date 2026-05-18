@@ -19,20 +19,9 @@
 #include <stddef.h>
 #include <stdio.h>
 
-typedef struct Vertex
-{
-    glm::vec2 pos;
-    glm::vec3 col;
-} Vertex;
 
-static const Vertex vertices[3] =
-{
-    { { -0.6f, -0.4f }, { 1.f, 0.f, 0.f } },
-    { {  0.6f, -0.4f }, { 0.f, 1.f, 0.f } },
-    { {   0.f,  0.6f }, { 0.f, 0.f, 1.f } }
-};
-
-static const char* vertex_shader_text =
+static const char* 
+vertex_shader_text =
 "#version 330\n"
 "uniform mat4 MVP;\n"
 "in vec3 vCol;\n"
@@ -95,10 +84,10 @@ int main(void)
 
     // NOTE: OpenGL error checks have been omitted for brevity
 
-    GLuint vertex_buffer;
-    glGenBuffers(1, &vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    //GLuint vertex_buffer;
+    //glGenBuffers(1, &vertex_buffer);
+    //glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     const GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
@@ -117,15 +106,15 @@ int main(void)
     const GLint vpos_location = glGetAttribLocation(program, "vPos");
     const GLint vcol_location = glGetAttribLocation(program, "vCol");
 
-    GLuint vertex_array;
-    glGenVertexArrays(1, &vertex_array);
-    glBindVertexArray(vertex_array);
-    glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
-        sizeof(Vertex), (void*)offsetof(Vertex, pos));
-    glEnableVertexAttribArray(vcol_location);
-    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
-        sizeof(Vertex), (void*)offsetof(Vertex, col));
+    //GLuint vertex_array;
+    //glGenVertexArrays(1, &vertex_array);
+    //glBindVertexArray(vertex_array);
+    //glEnableVertexAttribArray(vpos_location);
+    //glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
+    //    sizeof(Vertex), (void*)offsetof(Vertex, pos));
+    //glEnableVertexAttribArray(vcol_location);
+    //glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
+    //    sizeof(Vertex), (void*)offsetof(Vertex, col));
 
     while (!glfwWindowShouldClose(window))
     {
@@ -142,9 +131,9 @@ int main(void)
         mvp = p * m; // compute MVP before uploading
 
         glUseProgram(program);
-        glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (GLfloat*)&mvp[0]);
-        glBindVertexArray(vertex_array);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (GLfloat*)&mvp[0]);
+        //glBindVertexArray(vertex_array);
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

@@ -8,9 +8,9 @@ class ShaderProgram
 public:
 	std::string getName() const { return name; }
 
-	void use() const { glUseProgram(Id) };
+	void use() const { glUseProgram(Id);  };
 
-	void loadShader(const std::string& vertexFilename, const std::string& fragmentFileName);
+	void loadShader(const std::string& Filename, const std::string& fragmentFileName);
 
 	GLuint getId() const { return Id; }
 

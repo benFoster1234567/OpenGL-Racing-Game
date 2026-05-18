@@ -17,9 +17,10 @@ struct Vertex
 
 class MeshData
 {
+private:
 public:
 	MeshData() = default;
-	MeshData() = default;
+	~MeshData() = default;
 	std::string name;
 	std::vector<Vertex> vertices;
 };

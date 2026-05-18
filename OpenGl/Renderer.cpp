@@ -18,9 +18,9 @@ void Renderer::submit(Entity entity)
 	renderQueue.push_back(RenderCommand{
 		.shader = &shaders[entity.shaderFileName],
 		.mesh = &gpuMeshes[entity.mesh],
-		.diffuse = &gpuTextures[entity.texture],
-		.normal = &gpuTextures[entity.normalMap],
-		.material = entity.material.shaderSettings,
+		.diffuse = &gpuTextures[entity.material->diffuse],
+		.normal = &gpuTextures[entity.material->normal],
+		.material = entity.material->shaderSettings,
 		.transform = &entity.transform
 		});
 }

@@ -1,7 +1,12 @@
 #include "EntityBuilder.h"
+#include <utility>
+#include <stdexcept>
+#include "MeshData.h"
+#include <memory>
+#include "Entity.h"
 
 
-Mesh EntityBuilder::parseMesh(const std::string& objFilePath)
+MeshData EntityBuilder::parseMesh(const std::string& objFilePath)
 {
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
@@ -12,54 +17,53 @@ Mesh EntityBuilder::parseMesh(const std::string& objFilePath)
 		throw std::runtime_error(warn + err);
 	}
 
-    std::vector<Vertex> vertexData; 
-    for (const auto& shape : shapes) {
-        for (const auto& index : shape.mesh.indices) {
+	std::vector<Vertex> vertexData;
+	for (const auto& shape : shapes) {
+		for (const auto& index : shape.mesh.indices) {
 
 			glm::vec2 texCoords(0.0f);
 			glm::vec3 normal(0.0f);
 
-            glm::vec3 position(
-                attrib.vertices[3 * index.vertex_index + 0],
-                attrib.vertices[3 * index.vertex_index + 1],
-                attrib.vertices[3 * index.vertex_index + 2]
+			glm::vec3 position(
+				attrib.vertices[3 * index.vertex_index + 0],
+				attrib.vertices[3 * index.vertex_index + 1],
+				attrib.vertices[3 * index.vertex_index + 2]
 			);
 
-            if (index.normal_index >= 0) {
+			if (index.normal_index >= 0) {
 				normal.x = attrib.normals[3 * index.normal_index + 0];
 				normal.y = attrib.normals[3 * index.normal_index + 1];
 				normal.z = attrib.normals[3 * index.normal_index + 2];
-            }
+			}
 
-            if (index.texcoord_index >= 0) {
+			if (index.texcoord_index >= 0) {
 				texCoords.x = attrib.texcoords[2 * index.texcoord_index + 0];
 				texCoords.y = attrib.texcoords[2 * index.texcoord_index + 1];
-            }
+			}
 
 			vertexData.emplace_back(position, texCoords, normal);
-        }
-    }
+		}
+	}
 
-	Mesh newMesh{};
-	newMesh.vertices = std::move(vertexData);
+	MeshData newMesh{};
+	newMesh.vertices = vertexData;
 
 	return newMesh;
 }
 
-std::shared_ptr<Mesh> EntityBuilder::getOrLoadMesh(const std::string& objFilePath, const std::string& objName)
+MeshData* EntityBuilder::getOrLoadMesh(const std::string& objFilePath, const std::string& objName)
 {
 	auto existingMesh = AssetManager::getInstance().getMesh(objName);
 	if (existingMesh.has_value()) {
 		return existingMesh.value();
 	}
-	std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(parseMesh(objFilePath));
-	AssetManager::getInstance().addMesh(objName, mesh);
-	return mesh;
+	AssetManager::getInstance().addMesh(objName, std::make_unique<MeshData>(parseMesh(objFilePath)));
+	return AssetManager::getInstance().getMesh(objName).value();
 }
 
 
 
-Entity EntityBuilder::buildEntity(const std::string& objFilePath, const std::string& objName, std::shared_ptr<Material> material)
+Entity EntityBuilder::buildEntity(const std::string& objFilePath, const std::string& objName, Material* material)
 {
 	return 	Entity(getOrLoadMesh(objFilePath, objName), material);
 }
