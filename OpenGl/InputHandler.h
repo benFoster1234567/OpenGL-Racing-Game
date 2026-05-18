@@ -70,8 +70,11 @@ private:
 	KeyCode lastKeyPressed{ KeyCode::None };
 	KeyCode lastKeyReleased{ KeyCode::None };
 
-	typename std::map<KeyCode, EventDispatcher<>>::iterator getOrCreateEd(KeyCode key, std::map<KeyCode, EventDispatcher<>>& map);
-	typename std::map<Control, EventDispatcher<>>::iterator getOrCreateEd(Control key, std::map<Control, EventDispatcher<>>& map);
+	typename std::map<KeyCode, EventDispatcher<>>::iterator 
+	getOrCreateEd(KeyCode key, std::map<KeyCode, EventDispatcher<>>& map);
+	
+	typename std::map<Control, EventDispatcher<>>::iterator 
+	getOrCreateEd(Control key, std::map<Control, EventDispatcher<>>& map);
 
 	std::map<Control, EventDispatcher<>> m_onControlPressed;
 	std::map<Control, EventDispatcher<>> m_onControlReleased;

@@ -1,6 +1,9 @@
 #pragma once
-
+#include <iostream>
+#include <string>
 #include <GL/glew.h>
+#include <GL/freeglut.h>
+#include <glm/common.hpp>	
 #include <glm/mat4x4.hpp>
 #include <vector>
 
@@ -14,16 +17,9 @@ struct Vertex
 
 class MeshData
 {
-private:
-	GLuint VBO = 0, VAO = 0, EBO = 0;
-	std::vector<Vertex> vertices;
-	//std::vector<unsigned int> indices;
-	friend class EntityBuilder;
-
 public:
 	MeshData() = default;
-	
-	void GenBuffers();
-	void draw();
-
+	MeshData() = default;
+	std::string name;
+	std::vector<Vertex> vertices;
 };
