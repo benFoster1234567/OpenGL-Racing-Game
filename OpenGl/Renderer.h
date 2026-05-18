@@ -3,10 +3,12 @@
 #include "GPUMesh.h"
 #include "GPUTexture.h"
 #include "Material.h"
+#include "ShaderProgram.h"
 #include <map>
 
 struct RenderCommand
 {
+	ShaderProgram* shader;
 	GpuMesh* mesh;
 	GpuTexture* diffuse;
 	GpuTexture* normal;
@@ -19,8 +21,14 @@ class Renderer
 private:
 	std::map<MeshData*, GpuMesh> gpuMeshes{};
 	std::map<Texture*, GpuTexture> gpuTextures{};
+	std::map<std::string, ShaderProgram> shaders;
+
 	std::vector<RenderCommand> renderQueue{};
+
+	void sendMaterialToShader(MaterialInfo m, GLuint shaderId);
+	void sendTransformToShader(Transform* t, GLuint shaderId);
 public:
+	
 	void submit(Entity entity);
 	void flush();
 

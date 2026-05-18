@@ -22,7 +22,10 @@ public:
 	
 	Transform transform{};
 	
-	std::shared_ptr<Texture> texture;
-	std::optional<std::shared_ptr<Texture>> normalMap;
-	std::shared_ptr<MeshData> mesh;
+	std::string shaderFileName;
+
+	Texture* texture;
+	Texture* normalMap;
+	MeshData* mesh;
+	Material material;
 };
