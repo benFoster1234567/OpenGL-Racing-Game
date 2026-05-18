@@ -13,15 +13,18 @@ struct MaterialInfo
 class Material
 {
 public:
-	std::string name;
+	Material(std::string fileName);
 
-	std::shared_ptr<Texture> texture;
-	std::shared_ptr<Texture> normalMap;
-	std::shared_ptr<Shader> shader;
+	~Material() = default;
 
+	std::string getName() const { return name; }
+
+	std::string shaderName;
+
+	Texture* diffuse;
+	Texture* normal;
 	MaterialInfo shaderSettings;
 
 private:
-
-	
+	std::string name;
 };

@@ -1,75 +1,78 @@
 #include "AssetManager.h"
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include "Material.h"
+#include "Mesh.h"
+#include "Shader.h"
+#include "Texture.h"
 
-std::optional<std::shared_ptr<Mesh>> 
+std::optional<MeshData*> 
 AssetManager::getMesh(const std::string& name) const
 {
 	auto it = meshMap.find(name);
 	if (it != meshMap.end())
 	{
-		return std::optional<std::shared_ptr<Mesh>>(it->second);
+		return std::optional<MeshData*>(it->second.get());
 	}
 	return std::nullopt;
 }
 
-std::optional<std::shared_ptr<Material>> 
+std::optional<Material*> 
 AssetManager::getMaterial(const std::string& name) const
 {
 	auto it = materialMap.find(name);
 	if (it != materialMap.end())
 	{
-		return std::optional<std::shared_ptr<Material>>(it->second);
+		return std::optional<Material*>(it->second.get());
 	}
 	return std::nullopt;
 }
 
-std::optional<std::shared_ptr<Shader>> 
+std::optional<Shader*> 
 AssetManager::getShader(const std::string& name) const
 {
 	auto it = shaderMap.find(name);
 	if (it != shaderMap.end())
 	{
-		return std::optional<std::shared_ptr<Shader>>(it->second);
+		return std::optional<Shader*>(it->second.get());
 	}
 	return std::nullopt;
 }
 
-std::optional<std::shared_ptr<Texture>> 
+std::optional<Texture*> 
 AssetManager::getTexture(const std::string& name) const
 {
 	auto it = textureMap.find(name);
 	if (it != textureMap.end())
 	{
-		return std::optional<std::shared_ptr<Texture>>(it->second);
+		return std::optional<Texture*>(it->second.get());
 	}
 	return std::nullopt;
 }
 
 void 
-AssetManager::addMesh(const std::string& name, std::shared_ptr<Mesh> mesh)
+AssetManager::addMesh(const std::string& name, std::unique_ptr<MeshData> mesh)
 {
-	meshMap[name] = mesh;
+	meshMap[name] = std::move(mesh);
 }
 
 void 
-AssetManager::addMaterial(const std::string& name, std::shared_ptr<Material> material)
+AssetManager::addMaterial(const std::string& name, std::unique_ptr<Material> material)
 {
-	textureMap[material->texture->GetName()] = material->texture;
-	if (material->normalMap)
-	{
-		textureMap[material->normalMap->GetName()] = material->normalMap;
-	}
-	materialMap[name] = material;
+	materialMap[name] = std::move(material);
+}
+
+void
+AssetManager::addShader(const std::string& name, std::unique_ptr<Shader> shader)
+{
+	shaderMap[name] = std::move(shader);
 }
 
 void 
-AssetManager::addShader(const std::string& name, std::shared_ptr<Shader> shader)
+AssetManager::addTexture(const std::string& name, std::unique_ptr<Texture> texture)
 {
-	shaderMap[name] = shader;
-}
-
-void 
-AssetManager::addTexture(const std::string& name, std::shared_ptr<Texture> texture)
-{
-	textureMap[name] = texture;
+	textureMap[name] = std::move(texture);
 }
 

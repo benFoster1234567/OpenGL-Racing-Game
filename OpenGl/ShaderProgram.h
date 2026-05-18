@@ -6,12 +6,17 @@
 class ShaderProgram
 {
 public:
-	std::string name;
-	void use();
-	void loadShader(std::string fileName);
-	GLuint getId();
+	std::string getName() const { return name; }
+
+	void use() const { glUseProgram(Id) };
+
+	void loadShader(const std::string& vertexFilename, const std::string& fragmentFileName);
+
+	GLuint getId() const { return Id; }
 
 private:
 	GLuint Id;
+	std::string name;
+
 
 };

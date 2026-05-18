@@ -7,7 +7,7 @@ class GpuTexture
 {
 private:
 public:
-	std::shared_ptr<Texture> texture;
+	Texture* texture;
 	GLuint id;
 	void bind();
 };
