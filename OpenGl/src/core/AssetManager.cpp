@@ -1,5 +1,6 @@
-#include "AssetManager.h"
+#include "core/assets/AssetManager.h"
 
+using namespace Engine::Core;
 
 std::optional<MeshData*> 
 AssetManager::getMesh(const std::string& name) const
@@ -12,13 +13,13 @@ AssetManager::getMesh(const std::string& name) const
 	return std::nullopt;
 }
 
-std::optional<Material*> 
+std::optional<MaterialData*> 
 AssetManager::getMaterial(const std::string& name) const
 {
 	auto it = materialMap.find(name);
 	if (it != materialMap.end())
 	{
-		return std::optional<Material*>(it->second.get());
+		return std::optional<MaterialData*>(it->second.get());
 	}
 	return std::nullopt;
 }
@@ -34,13 +35,13 @@ AssetManager::getShader(const std::string& name) const
 	return std::nullopt;
 }
 
-std::optional<Texture*> 
+std::optional<TextureData*> 
 AssetManager::getTexture(const std::string& name) const
 {
 	auto it = textureMap.find(name);
 	if (it != textureMap.end())
 	{
-		return std::optional<Texture*>(it->second.get());
+		return std::optional<TextureData*>(it->second.get());
 	}
 	return std::nullopt;
 }
@@ -52,7 +53,7 @@ AssetManager::addMesh(const std::string& name, std::unique_ptr<MeshData> mesh)
 }
 
 void 
-AssetManager::addMaterial(const std::string& name, std::unique_ptr<Material> material)
+AssetManager::addMaterial(const std::string& name, std::unique_ptr<MaterialData> material)
 {
 	materialMap[name] = std::move(material);
 }
@@ -64,7 +65,7 @@ AssetManager::addShader(const std::string& name, std::unique_ptr<Shader> shader)
 }
 
 void 
-AssetManager::addTexture(const std::string& name, std::unique_ptr<Texture> texture)
+AssetManager::addTexture(const std::string& name, std::unique_ptr<TextureData> texture)
 {
 	textureMap[name] = std::move(texture);
 }

@@ -1,4 +1,6 @@
-#include "InputHandler.h"
+#include "core/input/InputHandler.h"
+
+using namespace Engine::Core;
 
 InputHandler::InputHandler(KeyboardMappings keymaps)
 {

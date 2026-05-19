@@ -1,10 +1,11 @@
-#include "EntityBuilder.h"
+#include "core/ecs/EntityBuilder.h"
 #include <utility>
 #include <stdexcept>
-#include "MeshData.h"
+#include "core/assets/MeshData.h"
 #include <memory>
-#include "Entity.h"
+#include "core/ecs/Entity.h"
 
+using namespace Engine::Core;
 
 MeshData EntityBuilder::parseMesh(const std::string& objFilePath)
 {
@@ -63,7 +64,7 @@ MeshData* EntityBuilder::getOrLoadMesh(const std::string& objFilePath, const std
 
 
 
-Entity EntityBuilder::buildEntity(const std::string& objFilePath, const std::string& objName, Material* material)
+Entity EntityBuilder::buildEntity(const std::string& objFilePath, const std::string& objName, MaterialData* material)
 {
 	return 	Entity(getOrLoadMesh(objFilePath, objName), material);
 }

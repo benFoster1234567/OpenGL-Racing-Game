@@ -1,4 +1,4 @@
-#include "Renderer.h"
+#include "infra/renderer/Renderer.h"
 
 void Renderer::sendMaterialToShader(MaterialInfo m, GLuint shaderId)
 {
@@ -16,7 +16,6 @@ void Renderer::sendTransformToShader(Transform* t, GLuint shaderId)
 void Renderer::submit(Entity entity)
 {
 	renderQueue.push_back(RenderCommand{
-		.shader = &shaders[entity.shaderFileName],
 		.mesh = &gpuMeshes[entity.mesh],
 		.diffuse = &gpuTextures[entity.material->diffuse],
 		.normal = &gpuTextures[entity.material->normal],
@@ -30,10 +29,9 @@ void Renderer::flush()
 	if (renderQueue.empty()) return;
 	for (const auto& cmd : renderQueue)
 	{
-		cmd.shader->use();
 		cmd.diffuse->bind();
 		
-		sendMaterialToShader(cmd.material, cmd.shader->getId());
-		sendTransformToShader(cmd.transform, cmd.shader->getId());
+		//sendMaterialToShader(cmd.material, cmd.shader->getId());
+		//sendTransformToShader(cmd.transform, cmd.shader->getId());
 	}
 }

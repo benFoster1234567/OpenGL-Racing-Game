@@ -4,7 +4,7 @@
 #define BUILD
 #include <iostream>
 
-#include "Entity.h"
+#include "core/ecs/Entity.h"
 #include <GL/glew.h>
 #define GLAD_GL_IMPLEMENTATION
 #define GLFW_INCLUDE_NONE
@@ -51,6 +51,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+    
+
 }
 
 int main(void)

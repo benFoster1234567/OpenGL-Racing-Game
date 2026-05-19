@@ -1,9 +1,9 @@
 #pragma once
-#include "MeshData.h"
-#include "Controller.h"
-#include "Texture.h"
+#include "core/assets/MeshData.h"
+#include "core/input/Controller.h"
+#include "core/assets/TextureData.h"
 #include <glm/mat4x4.hpp>
-#include "Material.h"
+#include "core/assets/MaterialData.h"
 
 
 struct Transform
@@ -18,7 +18,7 @@ class Entity
 public:
 	Entity() = default;
 
-	Entity(MeshData* mesh, Material* material) : mesh(mesh), material(material) {};
+	Entity(MeshData* mesh, MaterialData* material) : mesh(mesh), material(material) {};
 
 	std::unique_ptr<Controller> controller;
 	
@@ -27,5 +27,5 @@ public:
 	std::string shaderFileName;
 
 	MeshData* mesh;
-	Material* material;
+	MaterialData* material;
 };

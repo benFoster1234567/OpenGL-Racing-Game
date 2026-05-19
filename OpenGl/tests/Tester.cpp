@@ -1,7 +1,7 @@
 #include "Tester.h"
 
 namespace Tester {
-
+	using namespace Engine::Core;
 	void printSuccessMessage(bool success, const std::string& successMsg, const std::string& failureMsg, std::ostream& out)
 	{
 		out << (success ? successMsg : failureMsg) << "\n";
@@ -16,7 +16,7 @@ namespace Tester {
 	bool testInputHandler()
 	{
 		auto p = [](std::string s) {std::cout << s << "\n"; };
-		KeyboardMappings km{};
+		Engine::Core::KeyboardMappings km{};
 		InputHandler ih{ };
 		p("Running Tests");
 		ih.bindControlPressed(Control::TurnLeft, [p]() {p("left"); });

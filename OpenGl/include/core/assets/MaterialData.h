@@ -1,6 +1,6 @@
 #pragma once
 #include <glm/mat4x4.hpp>
-#include "Texture.h"
+#include "core/assets/TextureData.h"
 
 struct MaterialInfo
 {
@@ -10,19 +10,19 @@ struct MaterialInfo
 
 };
 
-class Material
+class MaterialData
 {
 public:
-	Material(std::string fileName);
+	MaterialData(std::string fileName);
 
-	~Material() = default;
+	~MaterialData() = default;
 
 	std::string getName() const { return name; }
 
 	std::string shaderName;
 
-	Texture* diffuse;
-	Texture* normal;
+	TextureData* diffuse;
+	TextureData* normal;
 	MaterialInfo shaderSettings;
 
 private:

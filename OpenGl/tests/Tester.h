@@ -1,6 +1,7 @@
 #pragma once
-#include "EventDispatcher.h"
-#include "InputHandler.h"
+#include "core/events/EventDispatcher.h"
+#include "core/input/InputHandler.h"
+
 #include <iostream>
 #include <string>
 

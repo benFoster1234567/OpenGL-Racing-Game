@@ -15,88 +15,103 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Tester.cpp">
+    <ClCompile Include="tests\Tester.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InputHandler.cpp">
+    <ClCompile Include="src\core\InputHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RunTests.cpp">
+    <ClCompile Include="tests\RunTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Controller.cpp">
+    <ClCompile Include="src\core\Controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Entity.cpp">
+    <ClCompile Include="src\core\Entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer.cpp">
+    <ClCompile Include="src\infrastructure\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderProgram.cpp">
+    <ClCompile Include="src\infrastructure\ShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AssetManager.cpp">
+    <ClCompile Include="src\core\AssetManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GPUTexture.cpp">
+    <ClCompile Include="src\infrastructure\GPUTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EntityBuilder.cpp">
+    <ClCompile Include="src\core\EntityBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\infrastructure\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Tester.h">
+    <ClInclude Include="tests\Tester.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AssetManager.h">
+    <ClInclude Include="include\core\assets\AssetManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Controller.h">
+    <ClInclude Include="include\core\input\Controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Entity.h">
+    <ClInclude Include="include\core\ecs\Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EventDispatcher.h">
+    <ClInclude Include="include\core\events\EventDispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InputHandler.h">
+    <ClInclude Include="include\core\input\InputHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Keys.h">
+    <ClInclude Include="include\core\input\Keys.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer.h">
+    <ClInclude Include="include\infra\renderer\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GPUTexture.h">
+    <ClInclude Include="include\infra\GPUTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderProgram.h">
+    <ClInclude Include="include\infra\ShaderProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GPUMesh.h">
+    <ClInclude Include="include\infra\GPUMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MeshData.h">
+    <ClInclude Include="include\core\assets\MeshData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Material.h">
+    <ClInclude Include="include\core\assets\MaterialData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
+    <ClInclude Include="include\core\assets\TextureData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EntityBuilder.h">
+    <ClInclude Include="include\core\ecs\EntityBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Patterns.h">
+    <ClInclude Include="include\core\Patterns.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\infra\GlfwKeyHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\app\Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\engine\Engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="layout.txt" />
   </ItemGroup>
 </Project>

@@ -1,19 +1,20 @@
 #pragma once
-#include "Entity.h"
-#include "GPUMesh.h"
-#include "GPUTexture.h"
-#include "Material.h"
-#include "ShaderProgram.h"
+#include "core/ecs/Entity.h"
+#include "infra/GPUMesh.h"
+#include "infra/GPUTexture.h"
+#include "core/assets/MaterialData.h"
+
 #include <map>
 #include <string>
 #include <vector>
-#include "MeshData.h"
-#include "Texture.h"
+#include "core/assets/MeshData.h"
+#include "core/assets/TextureData.h"
+
 #include <GL/glew.h>
 
 struct RenderCommand
 {
-	ShaderProgram* shader;
+
 	GpuMesh* mesh;
 	GpuTexture* diffuse;
 	GpuTexture* normal;
@@ -25,8 +26,8 @@ class Renderer
 {
 private:
 	std::map<MeshData*, GpuMesh> gpuMeshes{};
-	std::map<Texture*, GpuTexture> gpuTextures{};
-	std::map<std::string, ShaderProgram> shaders;
+	std::map<TextureData*, GpuTexture> gpuTextures{};
+	
 
 	std::vector<RenderCommand> renderQueue{};
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "MeshData.h"
+#include "core/assets/MeshData.h"
 
 class GpuMesh
 {

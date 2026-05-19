@@ -1,13 +1,13 @@
 #pragma once
 #include <GL/glew.h>
-#include "Texture.h"
+#include "core/assets/TextureData.h"
 #include <memory>
 
 class GpuTexture
 {
 private:
 public:
-	Texture* texture;
+	TextureData* texture;
 	GLuint id;
 	void bind();
 };

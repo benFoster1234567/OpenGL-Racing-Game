@@ -105,6 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,35 +128,42 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AssetManager.cpp" />
-    <ClCompile Include="Controller.cpp" />
-    <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="EntityBuilder.cpp" />
-    <ClCompile Include="GPUTexture.cpp" />
-    <ClCompile Include="InputHandler.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="RunTests.cpp" />
-    <ClCompile Include="ShaderProgram.cpp" />
-    <ClCompile Include="Tester.cpp" />
+    <ClCompile Include="src\core\AssetManager.cpp" />
+    <ClCompile Include="src\core\Controller.cpp" />
+    <ClCompile Include="src\core\Entity.cpp" />
+    <ClCompile Include="src\core\EntityBuilder.cpp" />
+    <ClCompile Include="src\infrastructure\GPUTexture.cpp" />
+    <ClCompile Include="src\core\InputHandler.cpp" />
+    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\infrastructure\Window.cpp" />
+    <ClCompile Include="src\infrastructure\Renderer.cpp" />
+    <ClCompile Include="tests\RunTests.cpp" />
+    <ClCompile Include="src\infrastructure\ShaderProgram.cpp" />
+    <ClCompile Include="tests\Tester.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AssetManager.h" />
-    <ClInclude Include="Entity.h" />
-    <ClInclude Include="EntityBuilder.h" />
-    <ClInclude Include="EventDispatcher.h" />
-    <ClInclude Include="Controller.h" />
-    <ClInclude Include="GPUMesh.h" />
-    <ClInclude Include="GPUTexture.h" />
-    <ClInclude Include="InputHandler.h" />
-    <ClInclude Include="Keys.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="MeshData.h" />
-    <ClInclude Include="Patterns.h" />
-    <ClInclude Include="Renderer.h" />
-    <ClInclude Include="ShaderProgram.h" />
-    <ClInclude Include="Tester.h" />
-    <ClInclude Include="Texture.h" />
+    <ClInclude Include="include\core\assets\AssetManager.h" />
+    <ClInclude Include="include\core\ecs\Entity.h" />
+    <ClInclude Include="include\core\ecs\EntityBuilder.h" />
+    <ClInclude Include="include\core\engine\Engine.h" />
+    <ClInclude Include="include\core\events\EventDispatcher.h" />
+    <ClInclude Include="include\core\input\Controller.h" />
+    <ClInclude Include="include\infra\GlfwKeyHandler.h" />
+    <ClInclude Include="include\infra\GPUMesh.h" />
+    <ClInclude Include="include\infra\GPUTexture.h" />
+    <ClInclude Include="include\core\input\InputHandler.h" />
+    <ClInclude Include="include\core\input\Keys.h" />
+    <ClInclude Include="include\core\assets\MaterialData.h" />
+    <ClInclude Include="include\core\assets\MeshData.h" />
+    <ClInclude Include="include\core\Patterns.h" />
+    <ClInclude Include="include\infra\app\Window.h" />
+    <ClInclude Include="include\infra\renderer\Renderer.h" />
+    <ClInclude Include="include\infra\ShaderProgram.h" />
+    <ClInclude Include="tests\Tester.h" />
+    <ClInclude Include="include\core\assets\TextureData.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="layout.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
