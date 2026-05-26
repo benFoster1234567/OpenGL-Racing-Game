@@ -7,20 +7,23 @@
 #include <glm/mat4x4.hpp>
 #include <vector>
 
-struct Vertex
+namespace Engine::Core
 {
-	glm::vec3 position;
-	glm::vec2 texCoords;
-	glm::vec3 normal;
-};
+	struct Vertex
+	{
+		glm::vec3 position;
+		glm::vec2 texCoords;
+		glm::vec3 normal;
+	};
 
 
-class MeshData
-{
-private:
-public:
-	MeshData() = default;
-	~MeshData() = default;
-	std::string name;
-	std::vector<Vertex> vertices;
-};
+	class MeshData
+	{
+	private:
+	public:
+		MeshData() = default;
+		~MeshData() = default;
+		std::string name;
+		std::vector<Vertex> vertices;
+	};
+}

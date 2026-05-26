@@ -3,17 +3,21 @@
 
 #include <string>
 
-class TextureData
+namespace Engine::Core 
 {
-private:
-	std::string type;
-	std::string path;
-public :
-	TextureData();
 
-	std::string getType() const { return type; }
-	std::string getPath() const { return path; }
-	std::string getName() const { return path.substr(path.find_last_of("/\\") + 1); }
+	class TextureData
+	{
+	private:
+		std::string type{};
+		std::string path{};
+	public:
+		TextureData() = default;
 
-};
+		std::string getType() const { return type; }
+		std::string getPath() const { return path; }
+		std::string getName() const { return path.substr(path.find_last_of("/\\") + 1); }
+
+	};
+}
 

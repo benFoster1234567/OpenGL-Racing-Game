@@ -128,12 +128,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\core\AssetPipeline.cpp" />
     <ClCompile Include="src\core\AssetManager.cpp" />
     <ClCompile Include="src\core\Controller.cpp" />
     <ClCompile Include="src\core\Entity.cpp" />
     <ClCompile Include="src\core\EntityBuilder.cpp" />
     <ClCompile Include="src\infrastructure\GPUTexture.cpp" />
     <ClCompile Include="src\core\InputHandler.cpp" />
+    <ClCompile Include="src\infrastructure\KeyLookup.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\infrastructure\Window.cpp" />
     <ClCompile Include="src\infrastructure\Renderer.cpp" />
@@ -142,12 +144,17 @@
     <ClCompile Include="tests\Tester.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\core\assets\AssetPipeline.h" />
     <ClInclude Include="include\core\assets\AssetManager.h" />
+    <ClInclude Include="include\core\assets\ShaderData.h" />
     <ClInclude Include="include\core\ecs\Entity.h" />
     <ClInclude Include="include\core\ecs\EntityBuilder.h" />
     <ClInclude Include="include\core\engine\Engine.h" />
     <ClInclude Include="include\core\events\EventDispatcher.h" />
     <ClInclude Include="include\core\input\Controller.h" />
+    <ClInclude Include="include\infra\engine\Application.h" />
+    <ClInclude Include="include\infra\engine\AssetImportFuncs.h" />
+    <ClInclude Include="include\infra\engine\KeyLookup.h" />
     <ClInclude Include="include\infra\GlfwKeyHandler.h" />
     <ClInclude Include="include\infra\GPUMesh.h" />
     <ClInclude Include="include\infra\GPUTexture.h" />

@@ -2,29 +2,34 @@
 #include <glm/mat4x4.hpp>
 #include "core/assets/TextureData.h"
 
-struct MaterialInfo
+namespace Engine::Core 
 {
-	glm::vec4 diffuse;
-	glm::vec4 ambient;
-	glm::vec4 specular;
 
-};
+	struct MaterialInfo
+	{
+		glm::vec4 diffuse{};
+		glm::vec4 ambient{};
+		glm::vec4 specular{};
 
-class MaterialData
-{
-public:
-	MaterialData(std::string fileName);
+	};
 
-	~MaterialData() = default;
+	class MaterialData
+	{
+	public:
+		MaterialData() = default;
+		MaterialData(std::string fileName);
 
-	std::string getName() const { return name; }
+		~MaterialData() = default;
 
-	std::string shaderName;
+		std::string getName() const { return name; }
 
-	TextureData* diffuse;
-	TextureData* normal;
-	MaterialInfo shaderSettings;
+		std::string shaderName;
 
-private:
-	std::string name;
-};
+		TextureData* diffuse{ nullptr };
+		TextureData* normal{ nullptr };
+		MaterialInfo materialSettings{};
+
+	private:
+		std::string name;
+	};
+}

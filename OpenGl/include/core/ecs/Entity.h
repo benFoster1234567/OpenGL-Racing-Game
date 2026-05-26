@@ -1,31 +1,37 @@
 #pragma once
-#include "core/assets/MeshData.h"
+//#include "core/assets/MeshData.h"
 #include "core/input/Controller.h"
-#include "core/assets/TextureData.h"
+//#include "core/assets/TextureData.h"
 #include <glm/mat4x4.hpp>
-#include "core/assets/MaterialData.h"
+//#include "core/assets/MaterialData.h"
 
-
-struct Transform
+namespace Engine::Core
 {
-	glm::mat4 pos{};
-	glm::mat4 rot{};
-	glm::mat4 scale{};
-};
+	class MeshData;
+	class MaterialData;
 
-class Entity
-{
-public:
-	Entity() = default;
+	struct Transform
+	{
+		glm::mat4 pos{};
+		glm::mat4 rot{};
+		glm::mat4 scale{};
+	};
 
-	Entity(MeshData* mesh, MaterialData* material) : mesh(mesh), material(material) {};
+	class Entity
+	{
+	public:
+		Entity() = default;
+		Entity(MeshData* mesh, MaterialData* material) : mesh(mesh), material(material) {};
+		~Entity() = default;
 
-	std::unique_ptr<Controller> controller;
-	
-	Transform transform{};
-	
-	std::string shaderFileName;
+		std::unique_ptr<Controller> controller;
 
-	MeshData* mesh;
-	MaterialData* material;
-};
+		Transform transform{};
+
+		std::string shaderFileName;
+
+		MeshData* mesh;
+		MaterialData* material;
+	};
+
+}

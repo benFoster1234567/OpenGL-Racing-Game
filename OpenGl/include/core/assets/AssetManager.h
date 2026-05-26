@@ -3,12 +3,16 @@
 #include <string>
 #include <memory>
 #include <optional>
-#include "MeshData.h"
-#include "core/Patterns.h"
-#include "core/assets/MaterialData.h"
-#include "Shader.h"
 
-namespace Engine::Core {
+#include "core/Patterns.h"
+
+namespace Engine::Core 
+{
+
+	class MeshData;
+	class MaterialData;
+	class TextureData;
+	class Shader;
 
 	class AssetManager : public Patterns::Singleton<AssetManager>
 	{
@@ -19,10 +23,11 @@ namespace Engine::Core {
 		std::unordered_map<std::string, std::unique_ptr<Shader>> shaderMap{};
 
 		friend class EntityBuilder;
+		friend class AssetPipeline;
 
 	public:
 		AssetManager() = default;
-
+		~AssetManager();
 
 		// Retrieves a mesh by name. Returns nullopt if the mesh is not found
 		std::optional<MeshData*> getMesh(const std::string& name) const;

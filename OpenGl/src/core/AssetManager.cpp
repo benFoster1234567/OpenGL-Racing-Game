@@ -1,8 +1,14 @@
 #include "core/assets/AssetManager.h"
+#include "core/assets/MeshData.h"
+#include "core/Patterns.h"
+#include "core/assets/MaterialData.h"
+#include "Shader.h"
 
 using namespace Engine::Core;
 
-std::optional<MeshData*> 
+Engine::Core::AssetManager::~AssetManager() = default;
+
+std::optional<MeshData*>
 AssetManager::getMesh(const std::string& name) const
 {
 	auto it = meshMap.find(name);
@@ -45,6 +51,7 @@ AssetManager::getTexture(const std::string& name) const
 	}
 	return std::nullopt;
 }
+
 
 void 
 AssetManager::addMesh(const std::string& name, std::unique_ptr<MeshData> mesh)
