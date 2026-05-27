@@ -2,7 +2,7 @@
 #include "core/assets/MeshData.h"
 #include "core/Patterns.h"
 #include "core/assets/MaterialData.h"
-#include "Shader.h"
+#include "core/assets/ShaderData.h"
 
 using namespace Engine::Core;
 
@@ -30,13 +30,13 @@ AssetManager::getMaterial(const std::string& name) const
 	return std::nullopt;
 }
 
-std::optional<Shader*> 
+std::optional<ShaderData*>
 AssetManager::getShader(const std::string& name) const
 {
 	auto it = shaderMap.find(name);
 	if (it != shaderMap.end())
 	{
-		return std::optional<Shader*>(it->second.get());
+		return std::optional<ShaderData*>(it->second.get());
 	}
 	return std::nullopt;
 }
@@ -66,7 +66,7 @@ AssetManager::addMaterial(const std::string& name, std::unique_ptr<MaterialData>
 }
 
 void
-AssetManager::addShader(const std::string& name, std::unique_ptr<Shader> shader)
+AssetManager::addShader(const std::string& name, std::unique_ptr<ShaderData> shader)
 {
 	shaderMap[name] = std::move(shader);
 }

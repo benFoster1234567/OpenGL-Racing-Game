@@ -1,7 +1,7 @@
 #pragma once
 #include "core/ecs/Entity.h"
-#include "infra/GPUMesh.h"
-#include "infra/GPUTexture.h"
+#include "infra/renderer/assets/GPUMesh.h"
+#include "infra/renderer/assets/GPUTexture.h"
 #include "core/assets/MaterialData.h"
 
 #include <map>
@@ -9,33 +9,37 @@
 #include <vector>
 #include "core/assets/MeshData.h"
 #include "core/assets/TextureData.h"
+#include "core/assets/MaterialData.h"
 
 #include <GL/glew.h>
 
-struct RenderCommand
+namespace Engine::Infra 
 {
 
-	GpuMesh* mesh;
-	GpuTexture* diffuse;
-	GpuTexture* normal;
-	MaterialInfo material;
-	Transform* transform;
-};
+	struct RenderCommand
+	{
+		GpuTexture* diffuse;
+		GpuTexture* normal;
+		GpuMesh* mesh;
+		Core::MaterialData* material;
+		Core::Transform* transform;
+	};
 
-class Renderer
-{
-private:
-	std::map<MeshData*, GpuMesh> gpuMeshes{};
-	std::map<TextureData*, GpuTexture> gpuTextures{};
-	
+	class Renderer
+	{
+	private:
+		std::map<Core::MeshData*, GpuMesh> gpuMeshes{};
+		std::map<Core::TextureData*, GpuTexture> gpuTextures{};
 
-	std::vector<RenderCommand> renderQueue{};
 
-	void sendMaterialToShader(MaterialInfo m, GLuint shaderId);
-	void sendTransformToShader(Transform* t, GLuint shaderId);
-public:
-	
-	void submit(Entity entity);
-	void flush();
+		std::vector<RenderCommand> renderQueue{};
 
-};
+		void sendMaterialToShader(Core::MaterialInfo m, GLuint shaderId);
+		void sendTransformToShader(Core::Transform* t, GLuint shaderId);
+	public:
+
+		void submit(Core::Entity entity);
+		void flush(); //renders all in render queue and then clears it.
+
+	};
+}

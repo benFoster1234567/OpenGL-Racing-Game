@@ -3,7 +3,7 @@
 #include <string>
 
 
-class ShaderProgram
+class GpuShader
 {
 public:
 	std::string getName() const { return name; }

@@ -21,7 +21,15 @@ namespace Engine::Core
 		Tab = 41,
 		Space = 42,
 		Enter = 43,
-		Any = 44
+		Escape = 44,
+		Backspace = 45,
+		LeftShift = 46,
+		RightShift = 47,
+		LeftCtrl = 48,
+		RightCtrl = 49,
+		LeftAlt = 50,
+		RightAlt = 51,
+		Any = 52
 
 	};
 

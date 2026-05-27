@@ -1,13 +1,11 @@
-#include "core/ecs/EntityBuilder.h"
+#include "infra/engine/ImportFuncs.h"
 #include <utility>
 #include <stdexcept>
 #include "core/assets/MeshData.h"
 #include <memory>
-#include "core/ecs/Entity.h"
+#include "tiny_obj_loader.h"
 
-using namespace Engine::Core;
-
-MeshData EntityBuilder::parseMesh(const std::string& objFilePath)
+Engine::Core::MeshData Engine::Infra::ImportFuncs::importMeshData(const std::string& path, const std::string& name)
 {
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
@@ -18,7 +16,7 @@ MeshData EntityBuilder::parseMesh(const std::string& objFilePath)
 		throw std::runtime_error(warn + err);
 	}
 
-	std::vector<Vertex> vertexData;
+	std::vector<Engine::Core::Vertex> vertexData;
 	for (const auto& shape : shapes) {
 		for (const auto& index : shape.mesh.indices) {
 
@@ -46,27 +44,7 @@ MeshData EntityBuilder::parseMesh(const std::string& objFilePath)
 		}
 	}
 
-	MeshData newMesh{};
+	Engine::Core::MeshData newMesh{};
 	newMesh.vertices = vertexData;
-
 	return newMesh;
 }
-
-MeshData* EntityBuilder::getOrLoadMesh(const std::string& objFilePath, const std::string& objName)
-{
-	auto existingMesh = AssetManager::getInstance().getMesh(objName);
-	if (existingMesh.has_value()) {
-		return existingMesh.value();
-	}
-	AssetManager::getInstance().addMesh(objName, std::make_unique<MeshData>(parseMesh(objFilePath)));
-	return AssetManager::getInstance().getMesh(objName).value();
-}
-
-
-
-Entity EntityBuilder::buildEntity(const std::string& objFilePath, const std::string& objName, MaterialData* material)
-{
-	return 	Entity(getOrLoadMesh(objFilePath, objName), material);
-}
-
-

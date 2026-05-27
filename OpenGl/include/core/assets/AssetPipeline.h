@@ -12,6 +12,7 @@
 #include "ShaderData.h"
 
 #include <variant>
+#include <optional>
 
 namespace Engine::Core {
 
@@ -45,9 +46,9 @@ namespace Engine::Core {
 		void registerImportCallback(std::function<std::unique_ptr<T>(const std::string&, const std::string&)> func)
 		{
 			import[typeid(T)] = [func](const std::string& path, const std::string& name) -> AssetVariant
-				{
-					return AssetVariant(func(path));
-				}
+			{
+				return AssetVariant(func(path, name));
+			};
 		}
 
 		std::optional<AssetVariant> processCommand(ImportCommand cmd) const

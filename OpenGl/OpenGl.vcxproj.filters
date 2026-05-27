@@ -27,34 +27,46 @@
     <ClCompile Include="tests\RunTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\Controller.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\core\Entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\infrastructure\Renderer.cpp">
+    <ClCompile Include="src\infrastructure\renderer\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\infrastructure\ShaderProgram.cpp">
+    <ClCompile Include="src\infrastructure\renderer\assets\GpuShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\core\AssetManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\infrastructure\GPUTexture.cpp">
+    <ClCompile Include="src\infrastructure\renderer\assets\GPUTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\EntityBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\infrastructure\Window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\IAssetImporter.cpp">
+    <ClCompile Include="src\infrastructure\app\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\core\AssetPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\infrastructure\engine\KeyLookup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\infrastructure\app\GlfwKeyHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\infrastructure\app\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\infrastructure\renderer\assets\ImportFuncs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\infrastructure\renderer\assets\GPUMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\EntityManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,7 +77,7 @@
     <ClInclude Include="include\core\assets\AssetManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\input\Controller.h">
+    <ClInclude Include="include\core\ecs\EntityController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\core\ecs\Entity.h">
@@ -83,13 +95,13 @@
     <ClInclude Include="include\infra\renderer\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\infra\GPUTexture.h">
+    <ClInclude Include="include\infra\renderer\assets\GPUTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\infra\ShaderProgram.h">
+    <ClInclude Include="include\infra\renderer\assets\GpuShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\infra\GPUMesh.h">
+    <ClInclude Include="include\infra\renderer\assets\GPUMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\core\assets\MeshData.h">
@@ -101,13 +113,10 @@
     <ClInclude Include="include\core\assets\TextureData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\ecs\EntityBuilder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\core\Patterns.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\infra\GlfwKeyHandler.h">
+    <ClInclude Include="include\infra\app\GlfwKeyHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\infra\app\Window.h">
@@ -120,6 +129,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\core\assets\ShaderData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\app\Application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\engine\ImportFuncs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\ecs\EntityManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\engine\CameraInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

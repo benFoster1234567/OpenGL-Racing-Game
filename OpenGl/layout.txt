@@ -1,57 +1,72 @@
-MyGameEngine/
-│
-├── build/                                 # Ephemeral build artifacts (add to .gitignore)
-├── external/                              # Third-party source libraries (e.g., GLFW, glad, glm)
-│
-├── include/                               # ALL PUBLIC HEADER FILES (.h / .hpp)
-│   ├── core/                              # THE BRAIN: Zero external framework/library dependencies
-│   │   ├── assets/
-│   │   │   └── AssetManager.h             # Holds maps of unique_ptrs to raw data
-│   │   ├── ecs/
-│   │   │   ├── Entity.h                   # Composed of pure data components
-│   │   │   └── EntityBuilder.h            # Builder pattern to assemble entities safely
-│   │   ├── engine/
-│   │   │   └── Engine.h                   # Core coordinator (entities, assets, input updates)
-│   │   ├── events/
-│   │   │   └── EventDispatcher.h          # Engine-wide Observer pattern subject
-│   │   ├── input/
-│   │   │   ├── KeyCodes.h                 # Custom, engine-agnostic enum keys
-│   │   │   ├── KeyBindings.h              # Maps actions to custom keycodes
-│   │   │   └── InputHandler.h             # Tracks active engine key states
-│   │   ├── physics/
-│   │   │   ├── PhysicsData.h              # Position, velocity, acceleration vectors
-│   │   │   └── Transform.h                # 4x4 matrix implementation
-│   │   └── renderer/
-│   │       ├── MeshData.h                 # Raw geometry buffers (vertices/indices)
-│   │       ├── MaterialData.h             # Material properties/parameters
-│   │       └── ShaderData.h               # Plain text/string representations of shaders
-│   │
-│   └── infrastructure/                     # THE SHELL: Direct dependencies on hardware & libraries
-│       └── infra/
-│           ├── app/
-│           │   ├── Application.h          # Composition root (bootstraps Window, Renderer, Engine)
-│           │   └── Window.h               # Wraps GLFW, window states, native handles, OS context
-│           ├── input/
-│           │   └── WindowInputBridge.h    # Listens to GLFW callbacks; maps to Core InputHandler
-│           ├── physics/
-│           │   └── CollisionBridge.h      # Concrete physics execution loop / library link
-│           └── renderer/
-│               └── GpuRenderer.h          # Wraps OpenGL (takes Core data, issues draw calls)
-│
-└── src/                                   # ALL SOURCE IMPLEMENTATION FILES (.cpp)
-    ├── main.cpp                           # Absolute entry point; just boots the Application
-    │
-    ├── core/                              # Mirror matching .cpp files for your Core headers
-    │   ├── assets/ AssetManager.cpp
-    │   ├── ecs/ Entity.cpp, EntityBuilder.cpp
-    │   ├── engine/ Engine.cpp
-    │   ├── events/ EventDispatcher.cpp
-    │   ├── input/ InputHandler.cpp, KeyBindings.cpp
-    │   ├── physics/ Transform.cpp
-    │   └── renderer/ (Empty if data structures use header-only defaults)
-    │
-    └── infrastructure/                    # Mirror matching .cpp files for your Infra headers
-        ├── app/ Application.cpp, Window.cpp
-        ├── input/ WindowInputBridge.cpp
-        ├── physics/ CollisionBridge.cpp
-        └── renderer/ GpuRenderer.cpp
+.
+└── Layout/
+    ├── include/
+    │   ├── core/
+    │   │   ├── assets/
+    │   │   │   ├── AssetManager.h
+    │   │   │   ├── AssetPipeline.h
+    │   │   │   ├── MeshData.h
+    │   │   │   ├── TextureData.h
+    │   │   │   ├── MaterialData.h
+    │   │   │   └── ShaderData.h
+    │   │   ├── ecs/
+    │   │   │   ├── Entity.h
+    │   │   │   ├── EntityManager.h
+    │   │   │   └── EntityController.h
+    │   │   ├── engine/
+    │   │   │   └── Engine.h
+    │   │   ├── events/
+    │   │   │   ├── EventDispatcher.h
+    │   │   ├── input/
+    │   │   │   └── InputHandler.h
+    │   │   └── physics/
+    │   │       └── CollisionBehavior.h
+    │   └── infra/
+    │       ├── app/
+    │       │   ├── Application.h
+    │       │   ├── GlfwKeyHandler.h
+    │       │   └── Window.h
+    │       ├── engine/
+    │       │   ├── AssetImportFuncs.h
+    │       │   └── KeyLookup.h
+    │       └── renderer/
+    │           ├── Renderer.h
+    │           └── assets/
+    │               ├── GpuTexture.h
+    │               ├── GpuShader.h
+    │               └── GpuMesh.h
+    └── src/
+        ├── core/
+        │   └── assets/
+        │       ├── AssetManager.cpp
+        │       ├── AssetPipeline.cpp
+        │       ├── MeshData.cpp
+        │       ├── TextureData.cpp
+        │       ├── MaterialData.cpp
+        │       ├── ShaderData.cpp
+        │       ├── ecs/
+        │       │   ├── Entity.cpp
+        │       │   ├── EntityManager.cpp
+        │       │   └── EntityController.cpp
+        │       ├── engine/
+        │       │   └── Engine.cpp
+        │       ├── events/
+        │       │   ├── EventDispatcher.cpp
+        │       ├── input/
+        │       │   └── InputHandler.cpp
+        │       └── physics/
+        │           └── CollisionBehavior.cpp
+        └── infra/
+            ├── app/
+            │   ├── Application.cpp
+            │   ├── GlfwKeyHandler.cpp
+            │   └── Window.cpp
+            ├── engine/
+            │   ├── AssetImportFuncs.cpp
+            │   └── KeyLookup.cpp
+            └── renderer/
+                ├── Renderer.cpp
+                └── asset/
+                    ├── GpuTexture.cpp
+                    ├── GpuShader.cpp
+                    └── GpuMesh.cpp
