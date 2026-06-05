@@ -7,6 +7,7 @@
 #include "core/ecs/Entity.h"
 #include "infra/app/GlfwKeyHandler.h"
 #include "core/engine/Engine.h"
+#include "infra/engine/DebugConsoleUI.h"
 namespace Engine::Infra
 {
 
@@ -16,15 +17,16 @@ namespace Engine::Infra
 		Infra::Renderer renderer;
 		Engine::Core::Engine engine;
 		Infra::GlfwKeyHandler keyHandler;
-
-		Window window{ 720, 480, "OpenGL Window", nullptr, nullptr };
+		std::unique_ptr<DebugConsoleUi> debugConsoleUi;
+		std::unique_ptr<Window> window;
 	public:
 
-		Application() = default;
+		Application();
 		~Application() = default;
 		
 		Core::AssetPipeline assetPipeline;
-
+		
+		void setupDebugCommands();
 		void setupImportCallbacks();
 		void importAssets();
 

@@ -37,7 +37,7 @@ namespace Engine::Infra
 		void sendMaterialToShader(Core::MaterialInfo m, GLuint shaderId);
 		void sendTransformToShader(Core::Transform* t, GLuint shaderId);
 	public:
-
+		void clearColor();
 		void submit(Core::Entity entity);
 		void flush(); //renders all in render queue and then clears it.
 

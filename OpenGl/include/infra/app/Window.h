@@ -17,6 +17,8 @@ namespace Engine::Infra
 		friend class DebugConsoleUi;
     public:
         Window(int width, int height, const char* windowTitle, GLFWmonitor* monitor, GLFWwindow* share);
+		Window(const Window&) = default;
+		Window(Window&&) = default;
         ~Window();
         GLFWwindow* glfwWindow;
         bool closeApplication{ false };
@@ -44,7 +46,14 @@ namespace Engine::Infra
 		void swapBuffers() const { glfwSwapBuffers(glfwWindow); }
         bool shouldClose() const { return closeApplication || glfwWindowShouldClose(glfwWindow); }
         void onKey(int key, int scancode, int action, int mods);
-        void destroyWindow() { glfwDestroyWindow(glfwWindow); }
+        void destroyWindow() 
+        { 
+            glfwDestroyWindow(glfwWindow); 
+        }
+		void terminateGlfw() const
+		{
+			glfwTerminate();
+		}
     };
 
 }
