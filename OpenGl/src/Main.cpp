@@ -15,7 +15,6 @@ int main()
 	Engine::Infra::Application app{};
 	app.setupDebugCommands();
 	app.run();
-
     return 0;
 }
 

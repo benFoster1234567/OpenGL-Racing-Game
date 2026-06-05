@@ -24,14 +24,15 @@ void Engine::Infra::Application::setupDebugCommands()
 void Engine::Infra::Application::setupImportCallbacks()
 {
 	engine.getAssetImporter().registerImportCallback<Core::MeshData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::MeshData>
-		{
-			return std::make_unique<Core::MeshData>(Infra::ImportFuncs::importMeshData(path, name));
-		});
+	{
+		return std::make_unique<Core::MeshData>(Infra::ImportFuncs::importMeshData(path, name));
+	});
 }
 
 void Engine::Infra::Application::importAssets()
 {
-
+	engine.getAssetImporter().submit<Core::MeshData>("bunny.obj", "bunny");
+	engine.createAssetManager();
 }
 
 void Engine::Infra::Application::setupInput()
@@ -46,6 +47,7 @@ void Engine::Infra::Application::updateRenderQueue()
 
 void Engine::Infra::Application::run()
 {
+
     while (!window->shouldClose())
     {
 		renderer.clearColor();
@@ -55,4 +57,5 @@ void Engine::Infra::Application::run()
         window->swapBuffers();
         window->pollEvents();
     }
+	window->terminateGlfw();
 }

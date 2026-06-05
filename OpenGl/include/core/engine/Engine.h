@@ -21,8 +21,12 @@ namespace Engine::Core
 		~Engine() = default;
 
 		AssetPipeline& getAssetImporter();
-		
+
+		//called after imports are submitted to asset pipeline, creates asset manager and loads it with imported assets
+		void createAssetManager();
+
 		void entityRenderLogic(Entity entity);
+
 
 	};
 }
