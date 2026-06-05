@@ -13,13 +13,13 @@ namespace Engine::Infra
         size_t height = 480;
 
         const char* windowTitle;
-        GLFWwindow* glfwWindow;
         bool closeApplication{ false };
         Engine::Core::EventDispatcher<int, int, int, int> keyPressedDispatcher;
-
+		friend class DebugConsoleUi;
     public:
         Window(int width, int height, const char* windowTitle, GLFWmonitor* monitor, GLFWwindow* share);
         ~Window();
+        GLFWwindow* glfwWindow;
 
         void submitKeyCallback(std::function<void(int, int, int, int)> callback);
 
@@ -34,6 +34,13 @@ namespace Engine::Infra
             }
         }
 
+
+		void updateViewport() const
+		{
+			int w, h;
+			glfwGetFramebufferSize(glfwWindow, &w, &h);
+			glViewport(0, 0, w, h);
+		}
 		void swapBuffers() const { glfwSwapBuffers(glfwWindow); }
         bool shouldClose() const { return closeApplication || glfwWindowShouldClose(glfwWindow); }
         void onKey(int key, int scancode, int action, int mods);

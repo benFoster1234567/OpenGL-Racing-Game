@@ -79,50 +79,50 @@ namespace Patterns
 
 	};
 
-	struct ICommand
-	{
-		virtual void execute() = 0;
-		virtual void undo() = 0;
-		virtual ~ICommand() = default;
-	};
+	//struct ICommand
+	//{
+	//	virtual void execute() = 0;
+	//	virtual void undo() = 0;
+	//	virtual ~ICommand() = default;
+	//};
 
 
 
-	template<typename T = ICommand>
-	class CommandManager
-	{
-	private:
-		std::stack<std::unique_ptr<T>> undoStack;
-		std::stack<std::unique_ptr<T>> redoStack;
+	//template<typename T = ICommand>
+	//class CommandManager
+	//{
+	//private:
+	//	std::stack<std::unique_ptr<T>> undoStack;
+	//	std::stack<std::unique_ptr<T>> redoStack;
 
-	public:
-		void executeCommand(std::unique_ptr<T> cmd)
-		{
-			cmd->execute();
-			undoStack.push(std::move(cmd));
-			//purge redo stack
-			for (; !redoStack.empty(); redoStack.pop());
-		}
+	//public:
+	//	void executeCommand(std::unique_ptr<T> cmd)
+	//	{
+	//		cmd->execute();
+	//		undoStack.push(std::move(cmd));
+	//		//purge redo stack
+	//		for (; !redoStack.empty(); redoStack.pop());
+	//	}
 
-		void undo()
-		{
-			if (undoStack.empty()) return;
-			auto c = std::move(undoStack.top());
-			undoStack.pop();
-			c->undo();
-			redoStack.push(std::move(c));
-		}
+	//	void undo()
+	//	{
+	//		if (undoStack.empty()) return;
+	//		auto c = std::move(undoStack.top());
+	//		undoStack.pop();
+	//		c->undo();
+	//		redoStack.push(std::move(c));
+	//	}
 
-		void redo()
-		{
-			if (redoStack.empty()) return;
-			auto c = std::move(redoStack.top());
-			redoStack.pop();
-			c->execute();
-			undoStack.push(std::move(c));
-		}
+	//	void redo()
+	//	{
+	//		if (redoStack.empty()) return;
+	//		auto c = std::move(redoStack.top());
+	//		redoStack.pop();
+	//		c->execute();
+	//		undoStack.push(std::move(c));
+	//	}
 
-	};
+	//};
 
 	template<typename T>
 	class IComparable

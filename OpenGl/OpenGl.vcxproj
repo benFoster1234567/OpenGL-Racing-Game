@@ -131,6 +131,7 @@
     <ClCompile Include="src\core\Engine.cpp" />
     <ClCompile Include="src\core\EntityManager.cpp" />
     <ClCompile Include="src\infrastructure\app\Application.cpp" />
+    <ClCompile Include="src\infrastructure\engine\DebugConsoleUI.cpp" />
     <ClCompile Include="src\infrastructure\renderer\assets\GPUMesh.cpp" />
     <ClCompile Include="src\infrastructure\renderer\assets\ImportFuncs.cpp" />
     <ClCompile Include="src\infrastructure\app\GlfwKeyHandler.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="include\core\ecs\EntityController.h" />
     <ClInclude Include="include\infra\app\Application.h" />
     <ClInclude Include="include\infra\engine\CameraInfo.h" />
+    <ClInclude Include="include\infra\engine\DebugConsoleUI.h" />
     <ClInclude Include="include\infra\engine\ImportFuncs.h" />
     <ClInclude Include="include\infra\app\GlfwKeyHandler.h" />
     <ClInclude Include="include\infra\renderer\assets\GPUMesh.h" />
