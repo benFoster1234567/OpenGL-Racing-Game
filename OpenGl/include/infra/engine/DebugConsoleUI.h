@@ -70,7 +70,8 @@ namespace Engine::Infra
 
 		std::string execute(const std::vector<std::string>& inputArgs) override
 		{
-			if (inputArgs.size() != sizeof...(Args)) {
+			if (inputArgs.size() != sizeof...(Args)) 
+			{
 				throw std::runtime_error("Incorrect number of arguments provided to command: " + name);
 			}
 
@@ -110,10 +111,9 @@ namespace Engine::Infra
 	private:
 		void queueUiDraw();
 		DebugConsole debugConsole;
+		char commandBuffer[256]{};
 	public:
 		DebugConsoleUi(Window& window, const std::string& gl_version = "#version 430");
-		
-
 
 		~DebugConsoleUi() = default;
 
@@ -121,7 +121,12 @@ namespace Engine::Infra
 
 		void prepareFrame();
 		void render();
-
-
+		void executeCommand() { debugConsole.executeCommand(commandBuffer); }
+		
+		template <typename... Args>
+		void registerCommand(const std::string& name, std::function<std::string(Args...)> func)
+		{
+			debugConsole.registerCommand<Args...>(name, func);
+		}
 	};
 }

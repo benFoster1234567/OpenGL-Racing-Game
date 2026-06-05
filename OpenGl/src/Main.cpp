@@ -1,4 +1,4 @@
-#define ENABLE_TESTS
+//#define ENABLE_TESTS
 #ifndef ENABLE_TESTS
 
 #include <GL/glew.h>
@@ -18,22 +18,22 @@ int main()
 
     Engine::Infra::Window myWindow(w, h, "Test Window", monitor, nullptr);
 	Engine::Infra::DebugConsoleUi debugConsoleUi(myWindow, "#version 430");
+	
+    std::function <std::string()> exitFunc = [&myWindow]() 
+    {
+        myWindow.closeApplication = true;
+        return "Exiting..."; 
+    };
+
+    debugConsoleUi.registerCommand<>("exit", exitFunc);
 
     while (!myWindow.shouldClose())
     {
-
-
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        
-        
-        
-        debugConsoleUi.prepareFrame();
+        glClear(GL_COLOR_BUFFER_BIT);      
         myWindow.updateViewport();
-        glClear(GL_COLOR_BUFFER_BIT);
-        debugConsoleUi.render();
-
+        debugConsoleUi.prepareFrame();     
+        debugConsoleUi.render();           
         myWindow.swapBuffers();
         myWindow.pollEvents();
     }

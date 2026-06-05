@@ -1,4 +1,4 @@
-#define ENABLE_TESTS
+//#define ENABLE_TESTS
 
 #ifdef ENABLE_TESTS
 #include "Tester.h"

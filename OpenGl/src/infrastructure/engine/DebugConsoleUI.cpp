@@ -1,8 +1,30 @@
 #include "infra/engine/DebugConsoleUI.h"
+#include <iostream>
 
 void Engine::Infra::DebugConsoleUi::queueUiDraw()
 {
-    ImGui::ShowDemoWindow();
+	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_Always);
+	ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+	
+	if (ImGui::InputText("##input", commandBuffer, sizeof(commandBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
+	{
+
+		try
+		{
+			std::string result = debugConsole.executeCommand(commandBuffer);
+			std::cout << "Command result: " << result << std::endl;
+		}
+		catch (const std::exception& e)
+		{
+			std::cerr << "Error executing command: " << e.what() << std::endl;
+		}
+		memset(commandBuffer, 0, sizeof(commandBuffer));
+		ImGui::SetKeyboardFocusHere(-1);
+
+	}
+
+	ImGui::End();
 }
 
 Engine::Infra::DebugConsoleUi::DebugConsoleUi(Window& window, const std::string& gl_version)
@@ -12,10 +34,13 @@ Engine::Infra::DebugConsoleUi::DebugConsoleUi(Window& window, const std::string&
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window.glfwWindow, true);
     ImGui_ImplOpenGL3_Init(gl_version.c_str());
+	assembleCommands();
 }
 
 void Engine::Infra::DebugConsoleUi::assembleCommands()
 {
+	std::function <std::string(int, int)> func = [](int x, int y) { return std::to_string(x + y); };
+	debugConsole.registerCommand<int, int>("add", func);
 }
 
 void Engine::Infra::DebugConsoleUi::prepareFrame()
