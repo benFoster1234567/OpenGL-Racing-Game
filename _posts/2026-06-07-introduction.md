@@ -8,7 +8,7 @@ Hi, my name is Benjamin Foster, and welcome to the first devlog of my motorcycle
 From Humble Beginnings:
 ======================
 
-My game began with me wanting to create a Tron clone, but it quickly evolved into me wanting to create a motorcycle racing game with physics and more nuanced collision mechanics. 
+My game began with me wanting to create a Tron clone, but it quickly evolved into me wanting to create a motorcycle racing game with simple physics and more nuanced collision mechanics. 
 
 The intitial design of my project was to separate the core game logic from the physics libraries, rendering library, and the window library. These core mechanics would live in the core, while OpenGl would be wrapped in its own renderer class. Glfw would be wrapped in its own window class, and a physics library would be wrapped in its own class, acting as a service, where everytime a collision occurs, the physics service would send the collision data to the entity class, which would react to it. There would also need to be raycasting, which would likely also be wrapped. As someone who has never used a C++ physics library before, I decided to sidebar this until I had a working renderer to visualize the ways different objects interacted. So I essentially created this layout tree diagram using an online tool:
 ```
@@ -110,7 +110,7 @@ The AssetPipeline is responsible for importing the objects. This is a point of f
 
 Where I'm at now: Creating a Window
 ===================================
-After finishing my initial iteration of the imput system, I moved on to the window system. Multiple sources on the internet recommended GLFW as the go-to window library for game development. Having used freeglut for my college classes, I found GLFW to be much better due to it's simplicity and how it offered more freedom than glut. I liked how it also allowed the user to implement a game loop instead of relying on the timers from glut. So after wrapping glfw in its own window class, I was able to easily render a blank window. I used the glfw example in the docs to do this.
+After finishing my initial iteration of the input system, I moved on to the window system. Multiple sources on the internet recommended GLFW as the go-to window library for game development. Having used freeglut for my college classes, I found GLFW to be much better due to it's simplicity and how it offered more freedom than glut. I liked how it also allowed the user to implement a game loop instead of relying on the timers from glut. So after wrapping glfw in its own window class, I was able to easily render a blank window. I used the glfw example in the docs to do this.
 
 I recently added a debugger console and a command system which maps a list of strings to function arguments and allows me as the programmer to register methods into the debug console that I can call from the debug console. The first command added was exit, which just closes the program. 
 
