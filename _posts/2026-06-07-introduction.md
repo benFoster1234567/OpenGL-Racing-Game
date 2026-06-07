@@ -3,7 +3,7 @@ layout: post
 title: "Devlog 01: Where We Are and Where We're Going!"
 date: 2026-06-07
 ---
-Hi, my name is Benjamin Foster, and welcome to the first devlog of my motorcycle racing game. I am a soon-to-be computer science graduate, and the purpose of this project is to have fun, gain experience designing software, and to get better with C++ and OpenGL.
+Hi, welcome to the first devlog of my motorcycle racing game. I am a soon-to-be computer science graduate, and the purpose of this project is to have fun, gain experience designing software, and to get better with C++ and OpenGL.
 
 From Humble Beginnings:
 ======================
