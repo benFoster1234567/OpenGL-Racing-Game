@@ -11,7 +11,7 @@ From Humble Beginnings:
 My game began with me wanting to create a Tron clone, but it quickly evolved into me wanting to create a motorcycle racing game with physics and more nuanced collision mechanics. 
 
 The intitial design of my project was to separate the core game logic from the physics libraries, rendering library, and the window library. These core mechanics would live in the core, while OpenGl would be wrapped in its own renderer class. Glfw would be wrapped in its own window class, and a physics library would be wrapped in its own class, acting as a service, where everytime a collision occurs, the physics service would send the collision data to the entity class, which would react to it. There would also need to be raycasting, which would likely also be wrapped. As someone who has never used a C++ physics library before, I decided to sidebar this until I had a working renderer to visualize the ways different objects interacted. So I essentially created this layout tree diagram using an online tool:
-
+```
 My current file tree:
 .
 └── OpenGl/
@@ -85,7 +85,7 @@ My current file tree:
                     ├── GpuTexture.cpp
                     ├── GpuShader.cpp
                     └── GpuMesh.cpp
-
+```
 
 The first system I implemetnted was the input system, utilizing an event mechanism similar to C#'s action delegates. I named the subject class EventDispatcher. I wanted to be able to subscribe methods to an event designated for a key, which would be called from my window class using keyEvent.invoke. I implemented this in an InputHandler class where each key had its own event dispatcher, which was stored in multiple hash maps. We'd have one hashmap for the raw keycodes, and another for the actual controls (go left, go right, etc.). I tested this and it pretty much worked, so I decided to move on. 
 
