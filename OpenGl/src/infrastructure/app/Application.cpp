@@ -53,7 +53,7 @@ void Engine::Infra::Application::importAssets()
 
 void Engine::Infra::Application::setupInput()
 {
-	auto keyTrack = [&](Engine::Core::Control c)
+	auto keyTrack = [&](Engine::Core::Control c, Engine::Core::KeyAction a)
 		{
 			switch (c)
 			{
@@ -64,29 +64,18 @@ void Engine::Infra::Application::setupInput()
 			default:
 				std::cout << "Control Active"; break;
 			}
+
+			switch (a)
+			{
+			case Engine::Core::KeyAction::Down: std::cout << " Down"; break;
+			case Engine::Core::KeyAction::Up: std::cout << " Up"; break;
+			case Engine::Core::KeyAction::Held: std::cout << " Held"; break;
+			}
+			std::cout << "\n";
 		};
 
-	auto keyTrackPressed = [&](Engine::Core::Control c)
-		{
-			keyTrack(c);
-			std::cout << " Pressed\n";
-		};
+	engine.inputHandler.subscribeControl(keyTrack);
 
-	auto keyTrackHeld = [&](Engine::Core::Control c)
-		{
-			keyTrack(c);
-			std::cout << " Held\n";
-		};
-
-	auto keyTrackReleased = [&](Engine::Core::Control c)
-		{
-			keyTrack(c);
-			std::cout << " Released\n";
-		};
-
-	engine.inputHandler.subscribeControlPressed(keyTrackPressed);
-	engine.inputHandler.subscribeControlReleased(keyTrackReleased);
-	engine.inputHandler.subscribeControlHeld(keyTrackHeld);
 }
 
 void Engine::Infra::Application::updateRenderQueue()

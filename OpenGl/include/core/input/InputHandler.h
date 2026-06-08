@@ -62,6 +62,48 @@ namespace Engine::Core
 
 		void invokeKeyAndControl(KeyCode k, KeyAction a);
 
+		void invokeControl(Control c, KeyAction a);
+		void invokeKey(KeyCode k, KeyAction a);
+		
+		size_t subscribeKey(std::function<void(KeyCode, KeyAction)> func);
+		size_t subscribeControl(std::function<void(Control, KeyAction)> func);
+
+
+	private:
+		bool mapKeys(KeyboardMappings _km);//helper for constructor
+		KeyboardMappings km{};
+
+		std::map<KeyCode, Control> keyboardMap{};
+		std::set<KeyCode> heldKeys{};
+		std::set<Control> heldControlKey{};
+
+		EventDispatcher<KeyCode, KeyAction> keyBus{};
+		EventDispatcher<Control, KeyAction> controlBus{};
+
+		bool checkHeld(KeyCode k) const
+		{
+			return heldKeys.contains(k);
+		}
+
+		bool checkHeld(Control c) const
+		{
+			return heldControlKey.contains(c);
+		}
+
+	};
+
+/*
+	class InputHandler
+	{
+	public:
+		InputHandler() { mapKeys({}); }
+		InputHandler(KeyboardMappings keymaps);
+		InputHandler(const InputHandler&) = default;
+		InputHandler(InputHandler&&) = default;
+		~InputHandler() = default;
+
+		void invokeKeyAndControl(KeyCode k, KeyAction a);
+
 		bool invokeControlHeld(Control c);
 		bool invokeControlPressed(Control c);
 		bool invokeControlReleased(Control c);
@@ -105,49 +147,5 @@ namespace Engine::Core
 		}
 
 	};
-
-
-	/*
-	class InputHandler
-	{
-	public:
-		InputHandler() { mapKeys({}); }
-		~InputHandler() = default;
-
-		InputHandler(KeyboardMappings keymaps);
-		bool invokeKeyPressed(KeyCode key);
-		bool invokeKeyReleased(KeyCode key);
-
-		bool invokeControlPressed(Control c);
-		bool invokeControlReleased(Control c);
-
-		bool bindKeyPressed(KeyCode key, EventDispatcher<>::CallBackFunc);
-		bool bindKeyReleased(KeyCode key, EventDispatcher<>::CallBackFunc);
-		bool bindControlPressed(Control c, EventDispatcher<>::CallBackFunc);
-		bool bindControlReleased(Control c, EventDispatcher<>::CallBackFunc);
-
-
-	private:
-		bool mapKeys(KeyboardMappings km);//helper for constructor
-
-
-		std::map<Control, KeyCode> keyboardMap;
-
-		KeyCode lastKeyPressed{ KeyCode::None };
-		KeyCode lastKeyReleased{ KeyCode::None };
-
-		typename std::map<KeyCode, EventDispatcher<>>::iterator
-			getOrCreateEd(KeyCode key, std::map<KeyCode, EventDispatcher<>>& map);
-
-		typename std::map<Control, EventDispatcher<>>::iterator
-			getOrCreateEd(Control key, std::map<Control, EventDispatcher<>>& map);
-
-		std::map<Control, EventDispatcher<>> m_onControlPressed;
-		std::map<Control, EventDispatcher<>> m_onControlReleased;
-
-		std::map<KeyCode, EventDispatcher<>> m_onKeyPressed;
-		std::map<KeyCode, EventDispatcher<>> m_onKeyReleased;
-
-	};
-	*/
+*/
 };
