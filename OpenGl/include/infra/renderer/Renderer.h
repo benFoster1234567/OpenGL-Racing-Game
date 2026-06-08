@@ -2,6 +2,7 @@
 #include "core/ecs/Entity.h"
 #include "infra/renderer/assets/GPUMesh.h"
 #include "infra/renderer/assets/GPUTexture.h"
+#include "infra/renderer/assets/GpuShader.h"
 #include "core/assets/MaterialData.h"
 
 #include <map>
@@ -9,6 +10,7 @@
 #include <vector>
 #include "core/assets/MeshData.h"
 #include "core/assets/TextureData.h"
+#include "core/assets/ShaderData.h"
 #include "core/assets/MaterialData.h"
 
 #include <GL/glew.h>
@@ -18,9 +20,10 @@ namespace Engine::Infra
 
 	struct RenderCommand
 	{
+		GpuMesh* mesh;
 		GpuTexture* diffuse;
 		GpuTexture* normal;
-		GpuMesh* mesh;
+		GpuShader* shader;
 		Core::MaterialData* material;
 		Core::Transform* transform;
 	};
@@ -28,14 +31,15 @@ namespace Engine::Infra
 	class Renderer
 	{
 	private:
-		std::map<Core::MeshData*, GpuMesh> gpuMeshes{};
-		std::map<Core::TextureData*, GpuTexture> gpuTextures{};
+		std::map < Core::MeshData*, std::unique_ptr<GpuMesh>> gpuMeshes{};
+		std::map<Core::TextureData*, std::unique_ptr<GpuTexture>> gpuTextures{};
+		std::map<Core::ShaderData*, std::unique_ptr<GpuShader>> gpuShaders{};
 
 
 		std::vector<RenderCommand> renderQueue{};
 
-		void sendMaterialToShader(Core::MaterialInfo m, GLuint shaderId);
-		void sendTransformToShader(Core::Transform* t, GLuint shaderId);
+
+		void executeDraw(RenderCommand cmd);
 	public:
 		void clearColor();
 		void submit(Core::Entity entity);

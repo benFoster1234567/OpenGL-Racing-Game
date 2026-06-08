@@ -2,10 +2,14 @@
 #include <GL/glew.h>
 #include <string>
 
+#include "core/assets/ShaderData.h"
+
 
 class GpuShader
 {
 public:
+	GpuShader(Engine::Core::ShaderData* _data);
+
 	std::string getName() const { return name; }
 
 	void use() const { glUseProgram(Id);  };
@@ -17,6 +21,6 @@ public:
 private:
 	GLuint Id;
 	std::string name;
-
+	Engine::Core::ShaderData* data;
 
 };

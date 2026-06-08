@@ -23,8 +23,9 @@ namespace Engine::Core
 
 		std::string getName() const { return name; }
 
-		std::string shaderName;
+		//std::string shaderName;
 
+		ShaderData* shader{ nullptr };
 		TextureData* diffuse{ nullptr };
 		TextureData* normal{ nullptr };
 		MaterialInfo materialSettings{};
