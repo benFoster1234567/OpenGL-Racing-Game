@@ -1,6 +1,8 @@
 #pragma once
-#include <glm/mat4x4.hpp>
 #include "core/assets/TextureData.h"
+#include <string>
+#include "ShaderData.h"
+#include <glm/ext/vector_float4.hpp>
 
 namespace Engine::Core 
 {
@@ -23,7 +25,6 @@ namespace Engine::Core
 
 		std::string getName() const { return name; }
 
-		//std::string shaderName;
 
 		ShaderData* shader{ nullptr };
 		TextureData* diffuse{ nullptr };
