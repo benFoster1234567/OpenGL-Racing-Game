@@ -86,7 +86,6 @@ namespace Engine::Infra
 	{
 	private:
 		std::unordered_map<std::string, std::unique_ptr<CommandBase>> commandRegistry{};
-
 		std::vector<std::string> tokenize(const std::string& input);
 
 	public:
@@ -95,6 +94,7 @@ namespace Engine::Infra
 		DebugConsole(DebugConsole&&) = default;
 		~DebugConsole() = default;
 		std::string executeCommand(const std::string& consoleInput);
+
 
 		template <typename... Args>
 		void registerCommand(const std::string& name, std::function<std::string(Args...)> func)
@@ -121,8 +121,9 @@ namespace Engine::Infra
 
 		~DebugConsoleUi() = default;
 
-		bool lockedForKeyInput{ false };
+		bool isVisible = false;
 
+		inline void toggleVisibility() noexcept { isVisible = !isVisible; }
 		bool isKeyboardCaptured();
 		void assembleCommands();
 		void appendResults(std::string r);

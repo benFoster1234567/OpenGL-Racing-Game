@@ -14,7 +14,7 @@ namespace Engine::Infra
     {
     private:
 
-        // These are for when the window toggles fullscreen
+        // for fullscreen
         struct 
         {
             int x, y, w, h;

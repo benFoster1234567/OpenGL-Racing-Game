@@ -79,7 +79,7 @@ void Engine::Infra::Application::importAssets()
 
 void Engine::Infra::Application::setupInput()
 {
-	auto keyTrack = [&](Engine::Core::Control c, Engine::Core::KeyAction a)
+	auto ctrlTrack = [&](Engine::Core::Control c, Engine::Core::KeyAction a)
 		{
 			switch (c)
 			{
@@ -100,8 +100,17 @@ void Engine::Infra::Application::setupInput()
 			std::cout << "\n";
 		};
 
-	engine.inputHandler.subscribeControl(keyTrack);
+	auto toggleConsole = [&](Engine::Core::KeyCode k, Engine::Core::KeyAction a)
+		{
+			if (k == Engine::Core::KeyCode::BackTick && a == Engine::Core::KeyAction::Down)
+			{
+				debugConsoleUi->toggleVisibility();
+				std::cout << "Console Visibility: " << debugConsoleUi->isVisible << "\n";
+			}
+		};
 
+	engine.inputHandler.subscribeControl(ctrlTrack);
+	engine.inputHandler.subscribeKey(toggleConsole);
 }
 
 void Engine::Infra::Application::updateRenderQueue()

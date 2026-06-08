@@ -38,8 +38,8 @@ namespace Engine::Infra
 
 		std::vector<RenderCommand> renderQueue{};
 
-
-		void executeDraw(RenderCommand cmd);
+		//helper for the flush method. Sends to shader, and then executes the opengl draw command 
+		void executeDraw(RenderCommand cmd); 
 	public:
 		void clearColor();
 		void submit(Core::Entity entity);

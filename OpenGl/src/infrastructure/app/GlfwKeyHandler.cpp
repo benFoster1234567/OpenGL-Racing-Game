@@ -69,6 +69,7 @@ Engine::Infra::GlfwKeyHandler::GlfwKeyHandler()
         {GLFW_KEY_ESCAPE,     Engine::Core::KeyCode::Escape},
         {GLFW_KEY_TAB,        Engine::Core::KeyCode::Tab},
         {GLFW_KEY_BACKSPACE,  Engine::Core::KeyCode::Backspace},
+        {GLFW_KEY_GRAVE_ACCENT,Engine::Core::KeyCode::BackTick},
        //{GLFW_KEY_DELETE,     Engine::Core::KeyCode::Delete},
        //{GLFW_KEY_INSERT,     Engine::Core::KeyCode::Insert},
        //{GLFW_KEY_HOME,       Engine::Core::KeyCode::Home},

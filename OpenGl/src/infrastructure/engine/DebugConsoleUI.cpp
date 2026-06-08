@@ -3,29 +3,26 @@
 
 void Engine::Infra::DebugConsoleUi::queueUiDraw()
 {
+	if (!isVisible) return;
+
 	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_Always);
 	ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
 	
 	if (ImGui::InputText("##input", commandBuffer, sizeof(commandBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 	{
-		std::string cmdstr(commandBuffer);
-		if (cmdstr == "ToggleKeyInputMonitor") lockedForKeyInput = !lockedForKeyInput;
-		if (!lockedForKeyInput)
+		try
 		{
-			try
-			{
-				std::string result = debugConsole.executeCommand(commandBuffer);
-				std::cout << "Command result: " << result << std::endl;
-				appendResults(result);
-			}
-			catch (const std::exception& e)
-			{
-				std::cerr << "Error executing command: " << e.what() << std::endl;
-			}
-			memset(commandBuffer, 0, sizeof(commandBuffer));
-			ImGui::SetKeyboardFocusHere(-1);
+			std::string result = debugConsole.executeCommand(commandBuffer);
+			std::cout << "Command result: " << result << std::endl;
+			appendResults(result);
 		}
+		catch (const std::exception& e)
+		{
+			std::cerr << "Error executing command: " << e.what() << std::endl;
+		}
+		memset(commandBuffer, 0, sizeof(commandBuffer));
+		ImGui::SetKeyboardFocusHere(-1);
 
 	}
 
