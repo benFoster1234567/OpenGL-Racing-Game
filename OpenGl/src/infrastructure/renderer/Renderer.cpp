@@ -25,24 +25,16 @@ void Engine::Infra::Renderer::clearColor()
 
 void Engine::Infra::Renderer::submit(Core::Entity entity)
 {
-	auto meshIt = gpuMeshes.find(entity.mesh);
-	if (meshIt == gpuMeshes.end())
-	{
-		gpuMeshes.emplace(entity.mesh, GpuMesh(entity.mesh));
-		gpuMeshes[entity.mesh]->genBuffers();
-	}
+	//TODO: put this in a new setup method for importing assets
 
-	auto diffuseIt = gpuTextures.find(entity.material->diffuse);
-	if (diffuseIt == gpuTextures.end())
-		gpuTextures[entity.material->diffuse] = std::make_unique<GpuTexture>(GpuTexture(entity.material->diffuse));
+	if (!gpuMeshes.contains(entity.mesh))
+		gpuMeshes.emplace(entity.mesh, std::make_unique<GpuMesh>(entity.mesh));
 
-	auto normalIt = gpuTextures.find(entity.material->normal);
-	if (normalIt == gpuTextures.end())
-		gpuTextures[entity.material->normal] = std::make_unique<GpuTexture>(GpuTexture(entity.material->normal));
+	if (!gpuTextures.contains(entity.material->diffuse))
+		gpuTextures.emplace(entity.material->diffuse, std::make_unique<GpuTexture>(entity.material->diffuse));
 
-	auto shaderIt = gpuShaders.find(entity.material->shader);
-	if (shaderIt == gpuShaders.end())
-		gpuShaders[entity.material->shader] = std::make_unique<GpuShader>(entity.material->shader);
+	if (!gpuTextures.contains(entity.material->normal))
+		gpuTextures.emplace(entity.material->normal, std::make_unique<GpuTexture>(entity.material->normal));
 
 	RenderCommand cmd
 	{

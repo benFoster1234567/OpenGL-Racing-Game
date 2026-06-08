@@ -14,7 +14,7 @@ public:
 
 	void use() const { glUseProgram(Id);  };
 
-	void loadShader(const std::string& Filename, const std::string& fragmentFileName);
+	void loadShader(const std::string& vertexShaderFilename, const std::string& fragmentShaderFileName);
 
 	GLuint getId() const { return Id; }
 
