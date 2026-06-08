@@ -176,6 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="layout.txt" />
+    <Text Include="Notes.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -149,5 +149,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="layout.txt" />
+    <Text Include="Notes.txt" />
   </ItemGroup>
 </Project>
