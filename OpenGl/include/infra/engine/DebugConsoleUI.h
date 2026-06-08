@@ -13,6 +13,7 @@
 #include <vector>
 #include <stdexcept>
 #include <utility>
+#include <deque>
 namespace Engine::Infra
 {
 
@@ -111,6 +112,9 @@ namespace Engine::Infra
 	private:
 		void queueUiDraw();
 		DebugConsole debugConsole;
+		const int resultListMaxSize = 20;
+		std::deque<std::string> consoleResults;
+		void appendResults(std::string r);
 		char commandBuffer[256]{};
 	public:
 		DebugConsoleUi(Window& window, const std::string& gl_version = "#version 430");
@@ -121,7 +125,10 @@ namespace Engine::Infra
 
 		void prepareFrame();
 		void render();
-		void executeCommand() { debugConsole.executeCommand(commandBuffer); }
+		void executeCommand() 
+		{
+			debugConsole.executeCommand(commandBuffer); 
+		}
 		
 		template <typename... Args>
 		void registerCommand(const std::string& name, std::function<std::string(Args...)> func)

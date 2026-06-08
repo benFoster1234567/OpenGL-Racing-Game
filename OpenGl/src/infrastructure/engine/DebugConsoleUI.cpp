@@ -14,6 +14,7 @@ void Engine::Infra::DebugConsoleUi::queueUiDraw()
 		{
 			std::string result = debugConsole.executeCommand(commandBuffer);
 			std::cout << "Command result: " << result << std::endl;
+			appendResults(result);
 		}
 		catch (const std::exception& e)
 		{
@@ -24,7 +25,23 @@ void Engine::Infra::DebugConsoleUi::queueUiDraw()
 
 	}
 
+	ImGui::BeginChild("Scrolling");
+	for (const auto& s : consoleResults)
+		ImGui::TextUnformatted(s.c_str());
+	
+	ImGui::EndChild();
+
 	ImGui::End();
+}
+
+void Engine::Infra::DebugConsoleUi::appendResults(std::string r)
+{
+	if (consoleResults.size() >= resultListMaxSize)
+	{
+		consoleResults.pop_back();
+	}
+	if (r.empty() || r == "") return;
+	consoleResults.push_front(r);
 }
 
 Engine::Infra::DebugConsoleUi::DebugConsoleUi(Window& window, const std::string& gl_version)
@@ -49,6 +66,7 @@ void Engine::Infra::DebugConsoleUi::prepareFrame()
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
     queueUiDraw();
+
 	ImGui::Render();
 }
 
