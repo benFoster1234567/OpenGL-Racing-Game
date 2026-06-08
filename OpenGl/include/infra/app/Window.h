@@ -1,22 +1,41 @@
 #pragma once
-#include <map>
 
 #include <GLFW/glfw3.h>
 #include "core/events/EventDispatcher.h"
+#include <functional>
+#include <string>
+#include <GL/gl.h>
 
 namespace Engine::Infra
 {
+
+
     class alignas(16) Window
     {
     private:
+
+        // These are for when the window toggles fullscreen
+        struct 
+        {
+            int x, y, w, h;
+        } savedWindowState{ 0,0,0,0 };
+
+        void saveWindowState(int x, int y, int w, int h);
+        void saveWindowState();
+        //
+
         size_t width = 720;
         size_t height = 480;
+
+        bool isFullscreen{true};
 
         const char* windowTitle;
         Engine::Core::EventDispatcher<int, int, int, int> keyPressedDispatcher;
 		friend class DebugConsoleUi;
     public:
-        Window(int width, int height, const char* windowTitle, GLFWmonitor* monitor, GLFWwindow* share);
+
+        Window(const std::string& _windowTitle = "OpenGL Window", bool _isFullscreen = true, int _width = 1600, int _height = 900, int posX = 10, int posY = 24);
+
 		Window(const Window&) = default;
 		Window(Window&&) = default;
         ~Window();
@@ -36,6 +55,11 @@ namespace Engine::Infra
             }
         }
 
+        void setFullscreen();
+
+        void setWindowed();
+
+        void setWindowSize(int w, int h);
 
 		void updateViewport() const
 		{
@@ -43,6 +67,7 @@ namespace Engine::Infra
 			glfwGetFramebufferSize(glfwWindow, &w, &h);
 			glViewport(0, 0, w, h);
 		}
+
 		void swapBuffers() const { glfwSwapBuffers(glfwWindow); }
         bool shouldClose() const { return closeApplication || glfwWindowShouldClose(glfwWindow); }
         void onKey(int key, int scancode, int action, int mods);

@@ -1,13 +1,18 @@
 #include "infra/app/Application.h"
 #include "infra/engine/ImportFuncs.h"
+#include <functional>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <core/assets/MeshData.h>
+#include <core/input/InputHandler.h>
+#include <core/input/Keys.h>
+#include <infra/app/Window.h>
+#include <infra/engine/DebugConsoleUI.h>
 
 Engine::Infra::Application::Application()
 {
-	auto vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-	auto width = vidMode->width;
-	auto height = vidMode->height;
-	auto monitor = glfwGetPrimaryMonitor();
-	window = std::make_unique<Window>(width, height, "OpenGL Engine", monitor, nullptr);
+	window = std::make_unique<Window>("window", true);
 	setupWindowKeyCallback();
 	debugConsoleUi = std::make_unique<DebugConsoleUi>(*window);
 	setupDebugCommands();
@@ -21,6 +26,27 @@ void Engine::Infra::Application::setupDebugCommands()
         window->closeApplication = true;
         return "Exiting...";
     };
+
+	std::function <std::string()> setFullscreen = [&]()
+		{
+			window->setFullscreen();
+			return "set to fullscreen...";
+		};
+
+	std::function <std::string()> setWindowed = [&]()
+		{
+			window->setWindowed();
+			return "setting windowed";
+		};
+
+	std::function < std::string(int, int)> setWindowSize = [&](int w, int h)
+		{
+			window->setWindowSize(w, h);
+			return "window size set to : [ " + std::to_string(w) + ", " + std::to_string(h) + " ]";
+		};
+
+	debugConsoleUi->registerCommand<>("setWindowed", setWindowed);
+	debugConsoleUi->registerCommand<>("setFullscreen", setFullscreen);
 	debugConsoleUi->registerCommand<>("exit", exitFunc);
 }
 

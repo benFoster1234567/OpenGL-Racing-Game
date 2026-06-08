@@ -1,22 +1,71 @@
 #include "infra/app/Window.h"
 #include <stdexcept>
+#include <functional>
+#include <string>
+#include <GLFW/glfw3.h>
 
 using namespace Engine::Infra;
-Window::Window(int width, int height, const char* windowTitle, GLFWmonitor* monitor, GLFWwindow* share)
-	: width(width), height(height), windowTitle(windowTitle)
+
+//TODO: wrap glfw window setup inside the window class
+
+Engine::Infra::Window::Window(
+	const std::string& _windowTitle
+	, bool _isFullscreen
+	, int _width
+	, int _height
+	, int _x
+	, int _y
+)
+	: width(_width)
+	, height(_height)
+	, windowTitle(_windowTitle.c_str())
+	, isFullscreen(_isFullscreen)
 {
+	saveWindowState(_x, _y, _width, _height);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindow = glfwCreateWindow(width, height, windowTitle, monitor, share);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    if (!glfwWindow)
-    {
-        throw std::runtime_error("Failed to create GLFW window");
-    }
+	if (isFullscreen)
+	{
+		auto vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		width = vidMode->width;
+		height = vidMode->height;
+		auto monitor = glfwGetPrimaryMonitor();
+		glfwWindow = glfwCreateWindow(width, height, _windowTitle.c_str(), monitor, nullptr);
+	}
 
-    glfwMakeContextCurrent(glfwWindow);
+	else
+	{
+		glfwWindow = glfwCreateWindow(width, height, windowTitle, nullptr, nullptr);
+	}
+
+	if (!glfwWindow)
+	{
+		throw std::runtime_error("Failed to create GLFW window");
+	}
+
+	glfwMakeContextCurrent(glfwWindow);
 }
+
+
+
+void Engine::Infra::Window::saveWindowState(int x, int y, int w, int h)
+{
+	savedWindowState.x = x;
+	savedWindowState.y = y;
+	savedWindowState.h = h;
+	savedWindowState.w = w;
+}
+
+void Engine::Infra::Window::saveWindowState()
+{
+	glfwGetWindowPos(glfwWindow, &savedWindowState.x, &savedWindowState.y);
+	glfwGetWindowSize(glfwWindow, &savedWindowState.w, &savedWindowState.h);
+}
+
+
+
 
 Window::~Window()
 {
@@ -30,6 +79,38 @@ void Window::submitKeyCallback(std::function<void(int, int, int, int)> callback)
 	keyPressedDispatcher.subscribe(callback);
 	glfwSetKeyCallback(glfwWindow, glfwKeyCallback);
 	glfwSetWindowUserPointer(glfwWindow, this);
+}
+
+void Engine::Infra::Window::setFullscreen()
+{
+	isFullscreen = true;
+	glfwGetWindowPos(glfwWindow, &savedWindowState.x, &savedWindowState.y);
+	glfwGetWindowSize(glfwWindow, &savedWindowState.w, &savedWindowState.h);
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor); 
+	glfwSetWindowMonitor(glfwWindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+}
+
+void Engine::Infra::Window::setWindowed()
+{
+	isFullscreen = false;
+	glfwSetWindowMonitor(glfwWindow, nullptr, savedWindowState.x, savedWindowState.y, savedWindowState.w, savedWindowState.h, 0);
+}
+
+void Engine::Infra::Window::setWindowSize(int w, int h)
+{
+	if (isFullscreen)
+	{
+		return; //maybe fix in the future so I can change the resolution or something
+	}
+
+	else
+	{
+		glfwGetWindowPos(glfwWindow, &savedWindowState.x, &savedWindowState.y);
+		glfwGetWindowSize(glfwWindow, &savedWindowState.w, &savedWindowState.h);
+		glfwSetWindowMonitor(glfwWindow, nullptr, savedWindowState.x, savedWindowState.y, w, h, 0);
+	}
+
 }
 
 void Window::onKey(int key, int scancode, int action, int mods)
