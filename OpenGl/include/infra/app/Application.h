@@ -3,8 +3,6 @@
 #include "infra/renderer/Renderer.h"
 #include "infra/app/Window.h"
 #include "core/assets/AssetPipeline.h"
-#include "core/input/InputHandler.h"
-#include "core/ecs/Entity.h"
 #include "infra/app/GlfwKeyHandler.h"
 #include "core/engine/Engine.h"
 #include "infra/engine/DebugConsoleUI.h"
@@ -34,8 +32,6 @@ namespace Engine::Infra
 		void importAssets();
 
 		void setupInput();
-		void processInput();
-		void updateGameLogic();
 		void updateRenderQueue();
 
 		void run();
