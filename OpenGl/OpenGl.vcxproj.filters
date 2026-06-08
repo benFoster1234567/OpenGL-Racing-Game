@@ -48,9 +48,6 @@
     <ClCompile Include="src\core\AssetPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\infrastructure\engine\KeyLookup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\infrastructure\app\GlfwKeyHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

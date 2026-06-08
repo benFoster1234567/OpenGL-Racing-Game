@@ -114,15 +114,18 @@ namespace Engine::Infra
 		DebugConsole debugConsole;
 		const int resultListMaxSize = 20;
 		std::deque<std::string> consoleResults;
-		void appendResults(std::string r);
 		char commandBuffer[256]{};
+
 	public:
 		DebugConsoleUi(Window& window, const std::string& gl_version = "#version 430");
 
 		~DebugConsoleUi() = default;
 
-		void assembleCommands();
+		bool lockedForKeyInput{ false };
 
+		bool isKeyboardCaptured();
+		void assembleCommands();
+		void appendResults(std::string r);
 		void prepareFrame();
 		void render();
 		void executeCommand() 

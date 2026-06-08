@@ -140,7 +140,6 @@
     <ClCompile Include="src\core\Entity.cpp" />
     <ClCompile Include="src\infrastructure\renderer\assets\GPUTexture.cpp" />
     <ClCompile Include="src\core\InputHandler.cpp" />
-    <ClCompile Include="src\infrastructure\engine\KeyLookup.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\infrastructure\app\Window.cpp" />
     <ClCompile Include="src\infrastructure\renderer\Renderer.cpp" />

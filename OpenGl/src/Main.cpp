@@ -13,7 +13,6 @@ int main()
 {
     if (!glfwInit()) { return -1; }
 	Engine::Infra::Application app{};
-	app.setupDebugCommands();
 	app.run();
     return 0;
 }

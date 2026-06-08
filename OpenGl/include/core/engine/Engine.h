@@ -14,7 +14,6 @@ namespace Engine::Core
 		EntityManager entityManager{};
 		AssetManager assetManager{};
 		AssetPipeline assetPipeline{};
-		InputHandler inputHandler{};
 
 	public:
 		Engine() = default;
@@ -22,6 +21,7 @@ namespace Engine::Core
 
 		AssetPipeline& getAssetImporter();
 
+		InputHandler inputHandler{};
 		//called after imports are submitted to asset pipeline, creates asset manager and loads it with imported assets
 		void createAssetManager();
 

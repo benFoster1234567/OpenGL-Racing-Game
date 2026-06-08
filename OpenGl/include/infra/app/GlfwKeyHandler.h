@@ -20,6 +20,9 @@ namespace Engine::Infra
 		GlfwKeyHandler(GlfwKeyHandler&&) = delete;
 
 		Core::KeyCode getInput(int glfwKey);
+
+		Core::KeyAction getAction(int glfwAction);
+
 	};
 
 }

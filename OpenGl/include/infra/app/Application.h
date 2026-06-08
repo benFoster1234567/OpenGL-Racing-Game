@@ -29,6 +29,7 @@ namespace Engine::Infra
 		Core::AssetPipeline assetPipeline;
 		
 		void setupDebugCommands();
+		void setupWindowKeyCallback();
 		void setupImportCallbacks();
 		void importAssets();
 

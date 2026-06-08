@@ -95,3 +95,14 @@ Engine::Core::KeyCode Engine::Infra::GlfwKeyHandler::getInput(int glfwKey)
     }
     return Engine::Core::KeyCode::None;
 }
+
+Engine::Core::KeyAction Engine::Infra::GlfwKeyHandler::getAction(int glfwAction)
+{
+    switch (glfwAction)
+    {
+    case GLFW_PRESS: return Core::KeyAction::Down; break;
+    case GLFW_RELEASE: return Core::KeyAction::Up; break;
+    case GLFW_REPEAT: return Core::KeyAction::Held; break;
+    }
+    return Core::KeyAction::Up;
+}

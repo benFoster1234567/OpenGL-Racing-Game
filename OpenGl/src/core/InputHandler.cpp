@@ -4,6 +4,140 @@ using namespace Engine::Core;
 
 InputHandler::InputHandler(KeyboardMappings keymaps)
 {
+
+	mapKeys(keymaps);
+}
+
+void Engine::Core::InputHandler::invokeKeyAndControl(KeyCode k, KeyAction a)
+{
+	Control c = Control::None;
+	auto it = keyboardMap.find(k);
+	if (it != keyboardMap.end())
+	{
+		c = it->second;
+	}
+
+	switch (a)
+	{
+	case KeyAction::Down:
+		invokeKeyPressed(k);
+		invokeControlPressed(c);
+		break;
+	case KeyAction::Up:
+		invokeKeyReleased(k);
+		invokeControlReleased(c);
+		break;
+	case KeyAction::Held:
+		invokeKeyHeld(k);
+		invokeControlHeld(c);
+		break;
+	}
+}
+
+bool Engine::Core::InputHandler::invokeControlHeld(Control c)
+{
+	if (c == Control::None) return false;
+	if (heldControlKey.contains(c))
+	{
+		controlHeldEventBus.invoke(c);
+		return true;
+	}
+	return false;
+}
+
+bool Engine::Core::InputHandler::invokeControlPressed(Control c)
+{
+	if (c == Control::None) return false;
+	if (heldControlKey.contains(c)) return false;
+	controlDownEventBus.invoke(c);
+	heldControlKey.insert(c);
+	return true;
+}
+
+bool Engine::Core::InputHandler::invokeControlReleased(Control c)
+{
+	if (c == Control::None) return false;
+	if (heldControlKey.contains(c)) heldControlKey.erase(c);
+	controlUpEventBus.invoke(c);
+	return true;
+}
+
+bool Engine::Core::InputHandler::invokeKeyHeld(KeyCode k)
+{
+	if (heldKeys.contains(k))
+	{
+		keyHeldEventBus.invoke(k);
+		return true;
+	}
+	return false;
+}
+
+bool Engine::Core::InputHandler::invokeKeyPressed(KeyCode k)
+{
+	if (heldKeys.contains(k)) return false;
+	keyDownEventBus.invoke(k);
+	heldKeys.insert(k);
+	return true;
+}
+
+bool Engine::Core::InputHandler::invokeKeyReleased(KeyCode k)
+{
+	if (heldKeys.contains(k)) heldKeys.erase(k);
+	keyUpEventBus.invoke(k);
+	return true;
+}
+
+size_t Engine::Core::InputHandler::subscribeControlPressed(std::function<void(Control)> func)
+{
+	return controlDownEventBus.subscribe(func);
+}
+
+size_t Engine::Core::InputHandler::subscribeControlReleased(std::function<void(Control)> func)
+{
+	return controlUpEventBus.subscribe(func);
+}
+
+size_t Engine::Core::InputHandler::subscribeControlHeld(std::function<void(Control)> func)
+{
+	return controlHeldEventBus.subscribe(func);
+}
+
+size_t Engine::Core::InputHandler::subscribeKeyPressed(std::function<void(KeyCode)> func)
+{
+	return keyDownEventBus.subscribe(func);
+}
+
+size_t Engine::Core::InputHandler::subscribeKeyReleased(std::function<void(KeyCode)> func)
+{
+	return keyHeldEventBus.subscribe(func);
+}
+
+size_t Engine::Core::InputHandler::subscribeKeyHeld(std::function<void(KeyCode)> func)
+{
+	return keyHeldEventBus.subscribe(func);
+}
+
+
+bool InputHandler::mapKeys(KeyboardMappings _km)
+{
+	//need km for yaml support?
+	keyboardMap.insert({ _km.lookup, Control::LookUp });
+	keyboardMap.insert({ _km.lookdown, Control::LookDown });
+	keyboardMap.insert({ _km.lookleft, Control::LookLeft });
+	keyboardMap.insert({ _km.lookright, Control::LookRight });
+	keyboardMap.insert({ _km.turnleft, Control::TurnLeft });
+	keyboardMap.insert({ _km.turnright, Control::TurnRight });
+	keyboardMap.insert({ _km.acceleratepedal, Control::Accelerate });
+	keyboardMap.insert({ _km.breakpedal, Control::BreakPedal });
+	keyboardMap.insert({ _km.ebrake, Control::EBrake });
+	km = _km;
+	return true;
+}
+
+
+/*
+InputHandler::InputHandler(KeyboardMappings keymaps)
+{
 	
 	mapKeys(keymaps);
 }
@@ -100,3 +234,4 @@ InputHandler::getOrCreateEd(Control key, std::map<Control, EventDispatcher<>>& m
 	it = map.find(key);
 	return it;
 }
+*/

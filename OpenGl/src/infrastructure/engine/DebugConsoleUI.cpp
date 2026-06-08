@@ -9,19 +9,23 @@ void Engine::Infra::DebugConsoleUi::queueUiDraw()
 	
 	if (ImGui::InputText("##input", commandBuffer, sizeof(commandBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 	{
-
-		try
+		std::string cmdstr(commandBuffer);
+		if (cmdstr == "ToggleKeyInputMonitor") lockedForKeyInput = !lockedForKeyInput;
+		if (!lockedForKeyInput)
 		{
-			std::string result = debugConsole.executeCommand(commandBuffer);
-			std::cout << "Command result: " << result << std::endl;
-			appendResults(result);
+			try
+			{
+				std::string result = debugConsole.executeCommand(commandBuffer);
+				std::cout << "Command result: " << result << std::endl;
+				appendResults(result);
+			}
+			catch (const std::exception& e)
+			{
+				std::cerr << "Error executing command: " << e.what() << std::endl;
+			}
+			memset(commandBuffer, 0, sizeof(commandBuffer));
+			ImGui::SetKeyboardFocusHere(-1);
 		}
-		catch (const std::exception& e)
-		{
-			std::cerr << "Error executing command: " << e.what() << std::endl;
-		}
-		memset(commandBuffer, 0, sizeof(commandBuffer));
-		ImGui::SetKeyboardFocusHere(-1);
 
 	}
 
@@ -52,6 +56,12 @@ Engine::Infra::DebugConsoleUi::DebugConsoleUi(Window& window, const std::string&
     ImGui_ImplGlfw_InitForOpenGL(window.glfwWindow, true);
     ImGui_ImplOpenGL3_Init(gl_version.c_str());
 	assembleCommands();
+}
+
+bool Engine::Infra::DebugConsoleUi::isKeyboardCaptured()
+{
+	ImGuiIO& io = ImGui::GetIO();
+	return io.WantCaptureKeyboard;
 }
 
 void Engine::Infra::DebugConsoleUi::assembleCommands()
