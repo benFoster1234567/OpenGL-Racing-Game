@@ -32,9 +32,9 @@ void GpuShader::compileShaders()
 
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	
-	std::string shaderSrc = buildShaderString(430, "VERTEX_SHADER", data->shaderSrc);
-	std::cout << shaderSrc << "\n";
-	const char* vertSrcStr = shaderSrc.c_str();
+	std::string vertSrc = buildShaderString(430, "VERTEX_SHADER", data->shaderSrc);
+	std::cout << vertSrc << "\n";
+	const char* vertSrcStr = vertSrc.c_str();
 	glShaderSource(vertexShader, 1, &vertSrcStr, NULL);
 	glCompileShader(vertexShader);
 
@@ -46,10 +46,9 @@ void GpuShader::compileShaders()
 		std::cerr << "ERROR: Vertex Shader Compilation Failed\n" << infoLog << std::endl;
 	}
 
-	std::string fragSrc = buildShaderString(430, "FRAGMENT_SHADER", data->shaderSrc);
-
-	const char* fragSrcStr = fragSrc.c_str();
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	std::string fragSrc = buildShaderString(430, "FRAGMENT_SHADER", data->shaderSrc);
+	const char* fragSrcStr = fragSrc.c_str();
 	glShaderSource(fragmentShader, 1, &fragSrcStr, NULL);
 	glCompileShader(fragmentShader);
 

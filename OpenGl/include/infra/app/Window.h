@@ -24,8 +24,8 @@ namespace Engine::Infra
         void saveWindowState();
         //
 
-        size_t width = 0;
-        size_t height = 0;
+        int width = 0;
+        int height = 0;
 
         bool isFullscreen{true};
 
@@ -61,14 +61,13 @@ namespace Engine::Infra
 
         void setWindowSize(int w, int h);
 
-        size_t getWidth() { return this->width; };
-        size_t getHeight() { return this->height; };
+        int getWidth() { return this->width; };
+        int getHeight() { return this->height; };
 
-		void updateViewport() const
+		void updateViewport()
 		{
-			int w, h;
-			glfwGetFramebufferSize(glfwWindow, &w, &h);
-			glViewport(0, 0, w, h);
+			glfwGetFramebufferSize(glfwWindow, &width, &height);
+			glViewport(0, 0, width, height);
 		}
 
 		void swapBuffers() const { glfwSwapBuffers(glfwWindow); }

@@ -145,8 +145,11 @@ void Engine::Infra::Application::updateRenderQueue()
 
 void Engine::Infra::Application::run()
 {
-	const char* vertexShaderSource = R"glsl(
-    #version 330 core
+	
+	//test renderer with a shader...
+
+	const char* shaderSrcRaw = R"glsl(
+    #ifdef VERTEX_SHADER
 
     layout (location = 0) in vec3 aPos;
     uniform mat4 model;
@@ -155,40 +158,29 @@ void Engine::Infra::Application::run()
     void main() {
         gl_Position = projection * view * model * vec4(aPos, 1.0);
     }
-	)glsl";
+	#endif
 
-	const char* fragmentShaderSource = R"glsl(
-    #version 330 core
+	#ifdef FRAGMENT_SHADER
+    
     out vec4 FragColor;
     void main() {
         FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
     }
+
+	#endif
+		
 	)glsl";
 
-	glEnable(GL_DEPTH_TEST);
+	Core::ShaderData* shaderData = new Core::ShaderData{};
+	shaderData->name = "newestShader";
+	shaderData->shaderSrc = shaderSrcRaw;
 
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
+	std::vector<Core::ShaderData*> shaders{};
+	shaders.push_back(shaderData);
 
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
+	renderer.loadShaders(shaders);
 
-	unsigned int shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	Core::ShaderData* data = new Core::ShaderData();
-	data->name = "shader";
-
-
-	renderer.gpuShaderCache.emplace(data, std::make_unique<GpuShader>(data));
-
-	renderer.gpuShaderCache[data]->Id = shaderProgram;
+	//test renderer with a cube model...
 
 	float vertices[] = {
 		-0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
@@ -211,15 +203,16 @@ void Engine::Infra::Application::run()
 
 	renderer.loadMeshes(meshes);
 
-
+	//Create a render command...
 	RenderCommand rc
 	{
 		.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
 		.projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f),
 		.modelTransform = glm::mat4(1),
-		.shader = data,
+		.shader = shaderData,
 		.mesh = mesh 
 	};
+	
 	
 
 	float lastFrame = 0.0f;
@@ -227,6 +220,8 @@ void Engine::Infra::Application::run()
 
 	while (!window->shouldClose())
 	{
+		window->updateViewport();
+
 		float currentWidth = static_cast<float>(window->getWidth());
 		float currentHeight = static_cast<float>(window->getHeight());
 
@@ -238,12 +233,6 @@ void Engine::Infra::Application::run()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-
-
-		
-		debugConsoleUi->prepareFrame();
-
-		debugConsoleUi->render();
 
 		float currentFrame = static_cast<float>(glfwGetTime());
 		float deltaTime = currentFrame - lastFrame;
@@ -258,6 +247,9 @@ void Engine::Infra::Application::run()
 		renderer.submit(rc);
 		renderer.flush();
 
+		debugConsoleUi->prepareFrame();
+
+		debugConsoleUi->render();
 
 		window->swapBuffers();
 		window->pollEvents();
