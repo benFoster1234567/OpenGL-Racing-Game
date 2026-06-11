@@ -1,4 +1,5 @@
 #pragma once
+#include <GL/glew.h>
 #include "core/ecs/Entity.h"
 #include "infra/renderer/assets/GPUMesh.h"
 #include "infra/renderer/assets/GPUTexture.h"
@@ -8,42 +9,43 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "core/assets/MeshData.h"
-#include "core/assets/TextureData.h"
-#include "core/assets/ShaderData.h"
-#include "core/assets/MaterialData.h"
+#include "core/assets/AssetManager.h"
 
-#include <GL/glew.h>
+#include <glm/ext/matrix_float4x4.hpp>
 
 namespace Engine::Infra 
 {
-
 	struct RenderCommand
 	{
-		GpuMesh* mesh;
-		GpuTexture* diffuse;
-		GpuTexture* normal;
-		GpuShader* shader;
-		Core::MaterialData* material;
-		Core::Transform* transform;
+		glm::mat4 view;
+		glm::mat4 projection;
+		glm::mat4 modelTransform;
+		Core::ShaderData* shader;
+		Core::MeshData* mesh;
 	};
 
 	class Renderer
 	{
 	private:
-		std::map < Core::MeshData*, std::unique_ptr<GpuMesh>> gpuMeshes{};
-		std::map<Core::TextureData*, std::unique_ptr<GpuTexture>> gpuTextures{};
-		std::map<Core::ShaderData*, std::unique_ptr<GpuShader>> gpuShaders{};
+		std::vector<RenderCommand> renderQueue;
 
+		std::map<Core::MeshData*, std::unique_ptr<GpuMesh>> gpuMeshCache{};
+		std::map<Core::TextureData*, std::unique_ptr<GpuTexture>> gpuTextureCache{};
 
-		std::vector<RenderCommand> renderQueue{};
+		void cacheShader(Core::ShaderData* shaderData);
+		void cacheMesh(Core::MeshData* meshData);
 
-		//helper for the flush method. Sends to shader, and then executes the opengl draw command 
-		void executeDraw(RenderCommand cmd); 
 	public:
-		void clearColor();
-		void submit(Core::Entity entity);
-		void flush(); //renders all in render queue and then clears it.
+		Renderer() = default;
+		~Renderer() = default;
 
+		void loadMeshes(std::vector<Core::MeshData*>& meshes);
+		void loadShaders(std::vector<Core::ShaderData*>& shaders);
+		void submit(RenderCommand command);
+
+		std::map<Core::ShaderData*, std::unique_ptr<GpuShader>> gpuShaderCache{}; 
+
+		void flush();
 	};
+
 }

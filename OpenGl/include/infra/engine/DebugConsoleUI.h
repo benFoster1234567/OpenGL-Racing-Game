@@ -1,10 +1,6 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
 #include "infra/app/Window.h"
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
 #include <string>
 #include <memory>
 #include <unordered_map>
@@ -14,6 +10,10 @@
 #include <stdexcept>
 #include <utility>
 #include <deque>
+#include "ImGui.h"
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_glfw.h>
+
 namespace Engine::Infra
 {
 

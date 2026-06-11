@@ -1,15 +1,13 @@
 #pragma once
 
+#include "core/assets/AssetManager.h"
+
 #include <iostream>
 #include <string>
 #include <typeindex>
 #include <stack>
 #include <functional>
 
-#include "MeshData.h"
-#include "TextureData.h"
-#include "MaterialData.h"
-#include "ShaderData.h"
 
 #include <variant>
 #include <optional>
@@ -18,7 +16,6 @@ namespace Engine::Core {
 
 	class AssetManager;
 	
-	using AssetVariant = std::variant<std::monostate, std::unique_ptr<MeshData>, std::unique_ptr<TextureData>, std::unique_ptr<MaterialData>, std::unique_ptr<ShaderData>>;
 
 
 	struct ImportCommand
@@ -51,14 +48,8 @@ namespace Engine::Core {
 			};
 		}
 
-		std::optional<AssetVariant> processCommand(ImportCommand cmd) const
-		{
-			auto it = import.find(cmd.typeId);
-			if (it != import.end()) return (*it).second(cmd.path, cmd.assetName);
-			else return std::nullopt;
-		}
-		 
-		void loadAssetManager(AssetManager& am);
+		void processCommand(ImportCommand cmd, AssetManager& am);
+		void refreshAssetManager(AssetManager& am);
 
 	};
 

@@ -14,12 +14,12 @@ public:
 
 	void use() const { glUseProgram(Id);  };
 
-	void loadShader(const std::string& vertexShaderFilename, const std::string& fragmentShaderFileName);
+	void compileShaders();
 
 	GLuint getId() const { return Id; }
+	GLuint Id;
 
 private:
-	GLuint Id;
 	std::string name;
 	Engine::Core::ShaderData* data;
 

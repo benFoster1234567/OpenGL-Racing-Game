@@ -14,7 +14,6 @@ namespace Engine::Infra
 	{
 	private:
 		Infra::Renderer renderer;
-		Engine::Core::Engine engine;
 		Infra::GlfwKeyHandler keyHandler;
 		std::unique_ptr<DebugConsoleUi> debugConsoleUi;
 		std::unique_ptr<Window> window;
@@ -24,6 +23,7 @@ namespace Engine::Infra
 		Application();
 		~Application() = default;
 		
+		Engine::Core::Engine engine;
 		Core::AssetPipeline assetPipeline;
 		
 		void setupDebugCommands();

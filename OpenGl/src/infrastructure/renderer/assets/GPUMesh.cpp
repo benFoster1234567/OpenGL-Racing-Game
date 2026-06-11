@@ -8,24 +8,31 @@ Engine::Infra::GpuMesh::GpuMesh(Engine::Core::MeshData* meshData)
 void Engine::Infra::GpuMesh::genBuffers()
 {
 	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
 	glBindVertexArray(VAO);
 
-	glBufferData(GL_ARRAY_BUFFER, meshData->vertices.size() * sizeof(Engine::Core::Vertex), meshData->vertices.data(), GL_STATIC_DRAW);
+	if (!meshData->attributes.empty()) {
+		const auto& firstAttr = meshData->attributes[0];
+		vertexCount = static_cast<GLsizei>(firstAttr.data.size() / firstAttr.size);
+		std::cout << "vertexCount: " << vertexCount << "\n";
+	}
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Core::Vertex), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Core::Vertex), (void*)offsetof(Core::Vertex, normal));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Core::Vertex), (void*)offsetof(Core::Vertex, texCoords));
-	glEnableVertexAttribArray(2);
+	for (const auto& va : meshData->attributes)
+	{
+		GLuint VBO;
+		glGenBuffers(1, &VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, va.data.size() * sizeof(float), va.data.data() , GL_STATIC_DRAW);
+		glVertexAttribPointer(va.index, va.size, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glEnableVertexAttribArray(va.index);
+	}
 
 	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Engine::Infra::GpuMesh::draw() const
 {
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, meshData->vertices.size());
+	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 	glBindVertexArray(0);
 }

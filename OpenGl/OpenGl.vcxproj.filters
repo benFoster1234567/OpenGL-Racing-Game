@@ -69,6 +69,12 @@
     <ClCompile Include="src\infrastructure\engine\DebugConsoleUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\core\ShaderData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\MaterialData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\Tester.h">
@@ -150,5 +156,8 @@
   <ItemGroup>
     <Text Include="layout.txt" />
     <Text Include="Notes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\shader.glsl" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
 #pragma once
-
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "core/events/EventDispatcher.h"
 #include <functional>
@@ -73,9 +73,13 @@ namespace Engine::Infra
         void onKey(int key, int scancode, int action, int mods);
         void destroyWindow() 
         { 
-            glfwDestroyWindow(glfwWindow); 
+            if (glfwWindow) {
+                glfwDestroyWindow(glfwWindow);
+                glfwWindow = nullptr;
+            }
+            glfwTerminate();
         }
-		void terminateGlfw() const
+		void terminateGlfw()
 		{
 			glfwTerminate();
 		}

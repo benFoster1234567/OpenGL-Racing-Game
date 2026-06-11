@@ -6,6 +6,5 @@ Engine::Core::Entity& Engine::Core::Entity::operator=(const Engine::Core::Entity
     transform = other.transform;
     mesh = other.mesh;
     material = other.material;
-    shader = other.shader;
     return *this;
 }

@@ -10,6 +10,17 @@
 #include <infra/app/Window.h>
 #include <infra/engine/DebugConsoleUI.h>
 
+#include <vector>
+#include <iterator>
+#include <stdexcept>
+#include <core/assets/ShaderData.h>
+#include <GLFW/glfw3.h>
+//#include <glm/ext/matrix_transform.inl>
+#include <glm/ext/matrix_clip_space.inl>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/gtc/type_ptr.inl>
+#include <GL/glew.h>
+
 Engine::Infra::Application::Application()
 {
 	window = std::make_unique<Window>("window", true);
@@ -69,12 +80,26 @@ void Engine::Infra::Application::setupImportCallbacks()
 	{
 		return std::make_unique<Core::MeshData>(Infra::ImportFuncs::importMeshData(path, name));
 	});
+
+	engine.getAssetImporter().registerImportCallback<Core::ShaderData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::ShaderData>
+	{
+		return std::make_unique<Core::ShaderData>(Infra::ImportFuncs::importShaderData(path, name));
+	});
 }
 
 void Engine::Infra::Application::importAssets()
 {
-	engine.getAssetImporter().submit<Core::MeshData>("bunny.obj", "bunny");
-	engine.createAssetManager();
+	engine.getAssetImporter().submit<Core::MeshData>("assets/meshes/bunny.obj", "bunny");
+	engine.getAssetImporter().submit<Core::ShaderData>("assets/shaders/shader.glsl", "shader");
+
+	try
+	{
+		engine.createAssetManager();
+	}
+	catch (std::runtime_error& error)
+	{
+		std::cerr << "Caught an error: " << error.what() << std::endl;
+	}
 }
 
 void Engine::Infra::Application::setupInput()
@@ -120,15 +145,112 @@ void Engine::Infra::Application::updateRenderQueue()
 
 void Engine::Infra::Application::run()
 {
+	const char* vertexShaderSource = R"glsl(
+    #version 330 core
 
-    while (!window->shouldClose())
-    {
-		renderer.clearColor();
-        window->updateViewport();
-        debugConsoleUi->prepareFrame();
-        debugConsoleUi->render();
-        window->swapBuffers();
-        window->pollEvents();
+    layout (location = 0) in vec3 aPos;
+    uniform mat4 model;
+    uniform mat4 view;
+    uniform mat4 projection;
+    void main() {
+        gl_Position = projection * view * model * vec4(aPos, 1.0);
     }
+	)glsl";
+
+	const char* fragmentShaderSource = R"glsl(
+    #version 330 core
+    out vec4 FragColor;
+    void main() {
+        FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+    }
+	)glsl";
+
+	glEnable(GL_DEPTH_TEST);
+
+	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+	glCompileShader(vertexShader);
+
+	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+	glCompileShader(fragmentShader);
+
+	unsigned int shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	glLinkProgram(shaderProgram);
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+
+	Core::ShaderData* data = new Core::ShaderData();
+	data->name = "shader";
+
+
+	renderer.gpuShaderCache.emplace(data, std::make_unique<GpuShader>(data));
+
+	renderer.gpuShaderCache[data]->Id = shaderProgram;
+
+	float vertices[] = {
+		-0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f, -0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f,  0.5f,  0.5f,
+		-0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f,
+		-0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f
+	};
+
+	Core::Attribute a{ .data = std::vector<float>(std::begin(vertices), std::end(vertices)), .size = 3, .index = 0 };
+
+	std::vector<Core::Attribute> attr{};
+	attr.push_back(a);
+
+	Core::MeshData* mesh = new Core::MeshData(attr);
+
+	std::vector<Core::MeshData*> meshes{};
+	meshes.push_back(mesh);
+
+	renderer.loadMeshes(meshes);
+
+
+	RenderCommand rc
+	{
+		.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
+		.projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f),
+		.modelTransform = glm::mat4(1),
+		.shader = data,
+		.mesh = mesh 
+	};
+	
+
+	float lastFrame = 0.0f;
+	float cubeRotation = 0.0f;
+
+	while (!window->shouldClose())
+	{
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		debugConsoleUi->prepareFrame();
+
+		debugConsoleUi->render();
+
+		float currentFrame = static_cast<float>(glfwGetTime());
+		float deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+		cubeRotation += 50.0f * deltaTime;
+
+
+		glm::mat4 model(1.0f);
+		model = glm::rotate(model, glm::radians(cubeRotation), glm::vec3(0.5f, 1.0f, 0.0f));
+		rc.modelTransform = model;
+
+		renderer.submit(rc);
+		renderer.flush();
+
+
+		window->swapBuffers();
+		window->pollEvents();
+	}
+
 	window->terminateGlfw();
+
 }

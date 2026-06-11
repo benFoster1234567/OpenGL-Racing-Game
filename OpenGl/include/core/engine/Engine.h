@@ -12,10 +12,10 @@ namespace Engine::Core
 	{
 	private:
 		EntityManager entityManager{};
-		AssetManager assetManager{};
 		AssetPipeline assetPipeline{};
 
 	public:
+		AssetManager assetManager{};
 		Engine() = default;
 		~Engine() = default;
 

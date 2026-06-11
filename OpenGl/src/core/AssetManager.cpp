@@ -1,8 +1,8 @@
 #include "core/assets/AssetManager.h"
 #include "core/assets/MeshData.h"
-#include "core/Patterns.h"
 #include "core/assets/MaterialData.h"
 #include "core/assets/ShaderData.h"
+#include <variant>
 
 using namespace Engine::Core;
 
@@ -53,27 +53,5 @@ AssetManager::getTexture(const std::string& name) const
 }
 
 
-void 
-AssetManager::addMesh(const std::string& name, std::unique_ptr<MeshData> mesh)
-{
-	meshMap[name] = std::move(mesh);
-}
 
-void 
-AssetManager::addMaterial(const std::string& name, std::unique_ptr<MaterialData> material)
-{
-	materialMap[name] = std::move(material);
-}
-
-void
-AssetManager::addShader(const std::string& name, std::unique_ptr<ShaderData> shader)
-{
-	shaderMap[name] = std::move(shader);
-}
-
-void 
-AssetManager::addTexture(const std::string& name, std::unique_ptr<TextureData> texture)
-{
-	textureMap[name] = std::move(texture);
-}
 

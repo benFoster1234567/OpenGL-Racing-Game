@@ -9,25 +9,26 @@
 
 #include <memory>
 #include <string>
+#include <glm/ext/matrix_transform.hpp>
 namespace Engine::Core
 {
 	using EntityId = size_t;
 
 	struct Transform
 	{
-		glm::mat4 pos{};
-		glm::mat4 rot{};
-		glm::mat4 scale{};
+		glm::mat4 pos = glm::translate(glm::mat4(1), glm::vec3(0, 0, -1));
+		glm::mat4 rot{1};
+		glm::mat4 scale{1};
 	};
 
 	class Entity
 	{
 	private:
 		EntityId id;
-		Entity(EntityId id, MeshData* mesh, MaterialData* material) : id(id), mesh(mesh), material(material) {};
 		friend class EntityManager;
 	public:
 		Entity() = default;
+		Entity(int id, MeshData* mesh, MaterialData* material) : id(id), mesh(mesh), material(material) {};
 		Entity(const Entity& other) = default;
 
 
@@ -35,13 +36,13 @@ namespace Engine::Core
 		
 		~Entity() = default;
 
-		EntityController* controller;
+		EntityController* controller = nullptr;
 
 		Transform transform{};
 
 		MeshData* mesh;
 		MaterialData* material;
-		ShaderData* shader;
+		
 	};
 
 }

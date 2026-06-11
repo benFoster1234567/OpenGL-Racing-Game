@@ -7,8 +7,13 @@
 
 int main()
 {
-    if (!glfwInit()) { return -1; }
+
 	Engine::Infra::Application app{};
+
+
+	
+
+
 	app.run();
     return 0;
 }

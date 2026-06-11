@@ -128,6 +128,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\core\MaterialData.cpp" />
+    <ClCompile Include="src\core\ShaderData.cpp" />
     <ClCompile Include="src\core\Engine.cpp" />
     <ClCompile Include="src\core\EntityManager.cpp" />
     <ClCompile Include="src\infrastructure\app\Application.cpp" />
@@ -177,6 +179,9 @@
   <ItemGroup>
     <Text Include="layout.txt" />
     <Text Include="Notes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\shader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

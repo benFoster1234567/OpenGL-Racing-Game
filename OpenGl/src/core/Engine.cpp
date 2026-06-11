@@ -7,5 +7,5 @@ Engine::Core::AssetPipeline& Engine::Core::Engine::getAssetImporter()
 
 void Engine::Core::Engine::createAssetManager()
 {
-	assetPipeline.loadAssetManager(assetManager);
+	assetPipeline.refreshAssetManager(assetManager);
 }

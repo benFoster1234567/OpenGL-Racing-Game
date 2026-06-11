@@ -3,10 +3,9 @@
 #include <functional>
 #include <string>
 #include <GLFW/glfw3.h>
+#include <iostream>
 
 using namespace Engine::Infra;
-
-//TODO: wrap glfw window setup inside the window class
 
 Engine::Infra::Window::Window(
 	const std::string& _windowTitle
@@ -22,6 +21,13 @@ Engine::Infra::Window::Window(
 	, isFullscreen(_isFullscreen)
 {
 	saveWindowState(_x, _y, _width, _height);
+	
+	if (!glfwInit())
+	{
+		throw std::runtime_error("Failed to initialize GLFW");
+	}
+
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -44,8 +50,15 @@ Engine::Infra::Window::Window(
 	{
 		throw std::runtime_error("Failed to create GLFW window");
 	}
-
 	glfwMakeContextCurrent(glfwWindow);
+	glewExperimental = GL_TRUE;
+
+	GLenum err = glewInit();
+	if (err != GLEW_OK) {
+		std::cerr << "GLEW Initialization Failed: " << glewGetErrorString(err) << "\n";
+		return;
+	}
+
 }
 
 

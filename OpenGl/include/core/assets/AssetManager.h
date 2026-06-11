@@ -4,15 +4,22 @@
 #include <memory>
 #include <optional>
 
+#include "MeshData.h"
+#include "TextureData.h"
+#include "MaterialData.h"
+#include "ShaderData.h"
+
+
 #include "core/Patterns.h"
+#include <utility>
+#include <variant>
+#include <algorithm>
+
 
 namespace Engine::Core 
 {
+	using AssetVariant = std::variant<std::monostate, std::unique_ptr<MeshData>, std::unique_ptr<TextureData>, std::unique_ptr<MaterialData>, std::unique_ptr<ShaderData>>;
 
-	class MeshData;
-	class MaterialData;
-	class TextureData;
-	class ShaderData;
 
 	class AssetManager : public Patterns::Singleton<AssetManager>
 	{
@@ -22,7 +29,6 @@ namespace Engine::Core
 		std::unordered_map<std::string, std::unique_ptr<TextureData>> textureMap{};
 		std::unordered_map<std::string, std::unique_ptr<ShaderData>> shaderMap{};
 
-		friend class EntityBuilder;
 		friend class AssetPipeline;
 
 	public:
@@ -35,11 +41,28 @@ namespace Engine::Core
 		std::optional<ShaderData*> getShader(const std::string& name) const;
 		std::optional<TextureData*> getTexture(const std::string& name) const;
 
+		void addAsset(const std::string& name, AssetVariant&& asset)
+		{
+			std::visit([this, &name](auto&& arg)
+			{
+				using T = std::decay_t <decltype(arg)>; //find asset type
 
-		void addMesh(const std::string& name, std::unique_ptr<MeshData> mesh);
-		void addMaterial(const std::string& name, std::unique_ptr<MaterialData> material);
-		void addShader(const std::string& name, std::unique_ptr<ShaderData> shader);
-		void addTexture(const std::string& name, std::unique_ptr<TextureData> texture);
+				if constexpr(std::is_same_v < T, std::unique_ptr<MeshData>>)
+				{
+					meshMap[name] = std::move(arg);
+				}
+
+				if constexpr (std::is_same_v<T, std::unique_ptr<ShaderData>>)
+				{
+					shaderMap[name] = std::move(arg);
+				}
+
+			}, std::move(asset));
+
+
+		}
+		
+
 
 	};
 
