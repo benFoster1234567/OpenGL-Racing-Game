@@ -227,8 +227,20 @@ void Engine::Infra::Application::run()
 
 	while (!window->shouldClose())
 	{
+		float currentWidth = static_cast<float>(window->getWidth());
+		float currentHeight = static_cast<float>(window->getHeight());
+
+		if (currentHeight == 0) currentHeight = 1.0f;
+
+		rc.projection = glm::perspective(glm::radians(45.0f), currentWidth / currentHeight, 0.1f, 100.0f);
+
+
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+
+
+		
 		debugConsoleUi->prepareFrame();
 
 		debugConsoleUi->render();

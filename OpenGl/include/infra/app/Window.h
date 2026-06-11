@@ -24,8 +24,8 @@ namespace Engine::Infra
         void saveWindowState();
         //
 
-        size_t width = 720;
-        size_t height = 480;
+        size_t width = 0;
+        size_t height = 0;
 
         bool isFullscreen{true};
 
@@ -60,6 +60,9 @@ namespace Engine::Infra
         void setWindowed();
 
         void setWindowSize(int w, int h);
+
+        size_t getWidth() { return this->width; };
+        size_t getHeight() { return this->height; };
 
 		void updateViewport() const
 		{

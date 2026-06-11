@@ -50,7 +50,18 @@ Engine::Infra::Window::Window(
 	{
 		throw std::runtime_error("Failed to create GLFW window");
 	}
+
 	glfwMakeContextCurrent(glfwWindow);
+
+	glfwSetFramebufferSizeCallback(glfwWindow, [](GLFWwindow* win, int w, int h) 
+	{
+		glViewport(0, 0, w, h);
+	});
+	
+	int initialWidth, initialHeight;
+	glfwGetFramebufferSize(glfwWindow, &initialWidth, &initialHeight);
+	glViewport(0, 0, initialWidth, initialHeight);
+
 	glewExperimental = GL_TRUE;
 
 	GLenum err = glewInit();
