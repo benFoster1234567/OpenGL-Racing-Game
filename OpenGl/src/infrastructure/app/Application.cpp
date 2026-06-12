@@ -56,9 +56,17 @@ void Engine::Infra::Application::setupDebugCommands()
 			return "window size set to : [ " + std::to_string(w) + ", " + std::to_string(h) + " ]";
 		};
 
+	std::function <std::string(int)> setPolygonMode = [&](int m)
+		{
+			renderer.setPolygonMode(m);
+			std::string mstr = m == LINE ? "line" : "fill";
+			return "Polygon mode set to " + mstr;
+		};
+
 	debugConsoleUi->registerCommand<>("setWindowed", setWindowed);
 	debugConsoleUi->registerCommand<>("setFullscreen", setFullscreen);
 	debugConsoleUi->registerCommand<>("exit", exitFunc);
+	debugConsoleUi->registerCommand<int>("pMode", setPolygonMode);
 }
 
 void Engine::Infra::Application::setupWindowKeyCallback()
@@ -140,7 +148,25 @@ void Engine::Infra::Application::setupInput()
 
 void Engine::Infra::Application::updateRenderQueue()
 {
+	auto eList = engine.pollEntities();
 
+	float currentWidth = static_cast<float>(window->getWidth());
+	float currentHeight = static_cast<float>(window->getHeight());
+
+	if (currentHeight == 0) currentHeight = 1.0f;
+
+	for (const auto & e : eList)
+	{
+		RenderCommand rc
+		{
+			.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
+			.projection = glm::perspective(glm::radians(45.0f), currentHeight / currentHeight, 0.1f, 100.0f),
+			.modelTransform = glm::mat4(1),
+			.shader = e.shader,
+			.mesh = e.mesh
+		};
+		renderer.submit(rc);
+	}
 }
 
 void Engine::Infra::Application::run()

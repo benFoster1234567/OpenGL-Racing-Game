@@ -29,6 +29,7 @@ namespace Engine::Core
 	public:
 		Entity() = default;
 		Entity(int id, MeshData* mesh, MaterialData* material) : id(id), mesh(mesh), material(material) {};
+		Entity(int id, MeshData* mesh, ShaderData* shader) :id(id), mesh(mesh), shader(shader) {};
 		Entity(const Entity& other) = default;
 
 
@@ -38,10 +39,10 @@ namespace Engine::Core
 
 		EntityController* controller = nullptr;
 
-		Transform transform{};
-
+		glm::mat4 transform{1};
+		ShaderData* shader;
 		MeshData* mesh;
-		MaterialData* material;
+		MaterialData* material = nullptr;
 		
 	};
 

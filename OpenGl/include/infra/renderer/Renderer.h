@@ -24,6 +24,11 @@ namespace Engine::Infra
 		Core::MeshData* mesh;
 	};
 
+	enum PolygonMode
+	{
+		FILL, LINE
+	};
+
 	class Renderer
 	{
 	private:
@@ -35,6 +40,8 @@ namespace Engine::Infra
 		void cacheShader(Core::ShaderData* shaderData);
 		void cacheMesh(Core::MeshData* meshData);
 
+		int polygonMode = LINE;
+
 	public:
 		Renderer() = default;
 		~Renderer() = default;
@@ -42,6 +49,8 @@ namespace Engine::Infra
 		void loadMeshes(std::vector<Core::MeshData*>& meshes);
 		void loadShaders(std::vector<Core::ShaderData*>& shaders);
 		void submit(RenderCommand command);
+
+		void setPolygonMode(int m) { polygonMode = m; }
 
 		std::map<Core::ShaderData*, std::unique_ptr<GpuShader>> gpuShaderCache{}; 
 

@@ -50,6 +50,8 @@ void Engine::Infra::Renderer::submit(RenderCommand command)
 void Engine::Infra::Renderer::flush()
 {
 
+	glPolygonMode(GL_FRONT_AND_BACK, polygonMode == LINE? GL_LINE : GL_FILL);
+
 	for (const auto& command : renderQueue)
 	{
 		if (!gpuMeshCache.contains(command.mesh))
@@ -77,4 +79,7 @@ void Engine::Infra::Renderer::flush()
 	}
 
 	renderQueue.clear();
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 }
