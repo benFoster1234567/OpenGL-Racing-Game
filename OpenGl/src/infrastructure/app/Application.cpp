@@ -23,7 +23,7 @@
 
 Engine::Infra::Application::Application()
 {
-	window = std::make_unique<Window>("window", true);
+	window = std::make_unique<Window>("window", false);
 	setupWindowKeyCallback();
 	debugConsoleUi = std::make_unique<DebugConsoleUi>(*window);
 	setupDebugCommands();
