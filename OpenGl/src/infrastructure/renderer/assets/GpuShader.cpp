@@ -7,7 +7,6 @@
 GpuShader::GpuShader(Engine::Core::ShaderData* _data)
 	: data(_data), Id{ 0 }
 {
-
 }
 
 static std::string buildShaderString(int version, const std::string& defineAs, std::string rawShaderBody)
@@ -33,7 +32,7 @@ void GpuShader::compileShaders()
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	
 	std::string vertSrc = buildShaderString(430, "VERTEX_SHADER", data->shaderSrc);
-	std::cout << vertSrc << "\n";
+	//std::cout << vertSrc << "\n";
 	const char* vertSrcStr = vertSrc.c_str();
 	glShaderSource(vertexShader, 1, &vertSrcStr, NULL);
 	glCompileShader(vertexShader);

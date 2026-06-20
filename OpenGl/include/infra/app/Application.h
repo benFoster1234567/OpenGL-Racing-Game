@@ -23,8 +23,7 @@ namespace Engine::Infra
 		Application();
 		~Application() = default;
 		
-		Engine::Core::Engine engine;
-		Core::AssetPipeline assetPipeline;
+		Engine::Core::EngineSystem engine;
 		
 		void setupDebugCommands();
 		void setupWindowKeyCallback();

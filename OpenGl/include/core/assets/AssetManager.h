@@ -21,7 +21,7 @@ namespace Engine::Core
 	using AssetVariant = std::variant<std::monostate, std::unique_ptr<MeshData>, std::unique_ptr<TextureData>, std::unique_ptr<MaterialData>, std::unique_ptr<ShaderData>>;
 
 
-	class AssetManager : public Patterns::Singleton<AssetManager>
+	class AssetManager
 	{
 	private:
 		std::unordered_map<std::string, std::unique_ptr<MeshData>> meshMap{};
@@ -29,17 +29,18 @@ namespace Engine::Core
 		std::unordered_map<std::string, std::unique_ptr<TextureData>> textureMap{};
 		std::unordered_map<std::string, std::unique_ptr<ShaderData>> shaderMap{};
 
+		friend class EngineSystem;
 		friend class AssetPipeline;
-
 	public:
+	
 		AssetManager() = default;
 		~AssetManager();
 
-		// Retrieves a mesh by name. Returns nullopt if the mesh is not found
-		std::optional<MeshData*> getMesh(const std::string& name) const;
-		std::optional<MaterialData*> getMaterial(const std::string& name) const;
-		std::optional<ShaderData*> getShader(const std::string& name) const;
-		std::optional<TextureData*> getTexture(const std::string& name) const;
+		// Retrieves a mesh by name
+		void getMesh(MeshData* meshOut, const std::string& name);
+		void getMaterial(MaterialData* matOut, const std::string& name);
+		void getShader(ShaderData*& shaderOut, const std::string& name);
+		void getTexture(TextureData* texOut, const std::string& name);
 
 		void addAsset(const std::string& name, AssetVariant&& asset)
 		{
@@ -62,7 +63,8 @@ namespace Engine::Core
 
 		}
 		
-
+		void shaderList(std::vector<ShaderData*>& shadersOut);
+		void meshList(std::vector<MeshData*>& meshesOut);
 
 	};
 

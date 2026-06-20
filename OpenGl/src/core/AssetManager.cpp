@@ -4,52 +4,57 @@
 #include "core/assets/ShaderData.h"
 #include <variant>
 
-using namespace Engine::Core;
 
 Engine::Core::AssetManager::~AssetManager() = default;
 
-std::optional<MeshData*>
-AssetManager::getMesh(const std::string& name) const
+void Engine::Core::AssetManager::getMesh(MeshData* meshOut, const std::string& name) 
 {
-	auto it = meshMap.find(name);
-	if (it != meshMap.end())
-	{
-		return std::optional<MeshData*>(it->second.get());
-	}
-	return std::nullopt;
+	if (meshMap.contains(name)) meshOut = meshMap[name].get();
+	else meshOut = nullptr;
 }
 
-std::optional<MaterialData*> 
-AssetManager::getMaterial(const std::string& name) const
+void Engine::Core::AssetManager::getMaterial(MaterialData* matOut, const std::string& name)
 {
-	auto it = materialMap.find(name);
-	if (it != materialMap.end())
-	{
-		return std::optional<MaterialData*>(it->second.get());
-	}
-	return std::nullopt;
+	if (materialMap.contains(name)) matOut = materialMap[name].get();
+	else matOut = nullptr;
 }
 
-std::optional<ShaderData*>
-AssetManager::getShader(const std::string& name) const
+void Engine::Core::AssetManager::getShader(ShaderData*& shaderOut, const std::string& name)
 {
-	auto it = shaderMap.find(name);
-	if (it != shaderMap.end())
+	if (shaderMap.contains(name))
 	{
-		return std::optional<ShaderData*>(it->second.get());
+		std::cout << "Shader " << name << "found!\n";
+		shaderOut = shaderMap[name].get();
 	}
-	return std::nullopt;
+	else 
+	{
+		std::cout << "No shader found when trying to return : " << name << "\n";
+		shaderOut = nullptr;
+	}
 }
 
-std::optional<TextureData*> 
-AssetManager::getTexture(const std::string& name) const
+void Engine::Core::AssetManager::getTexture(TextureData* texOut, const std::string& name)
 {
-	auto it = textureMap.find(name);
-	if (it != textureMap.end())
+	if (textureMap.contains(name)) texOut = textureMap[name].get();
+	else texOut = nullptr;
+}
+
+void Engine::Core::AssetManager::shaderList(std::vector<ShaderData*>& shadersOut)
+{
+	for (const auto& s : shaderMap)
 	{
-		return std::optional<TextureData*>(it->second.get());
+		ShaderData* shader = s.second.get();
+
+		if (shader != NULL)
+		{
+			shadersOut.push_back(shader);
+		}
 	}
-	return std::nullopt;
+}
+
+void Engine::Core::AssetManager::meshList(std::vector<MeshData*>& meshesOut)
+{
+
 }
 
 

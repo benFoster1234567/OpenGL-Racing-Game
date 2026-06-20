@@ -8,28 +8,24 @@
 
 namespace Engine::Core
 {
-	class Engine
+	class EngineSystem
 	{
 	private:
 		EntityManager entityManager{};
-		AssetPipeline assetPipeline{};
-		std::vector<Entity> renderPool{};
 	public:
-		Engine() = default;
-		~Engine() = default;
-
 		AssetManager assetManager{};
-		AssetPipeline& getAssetImporter();
+		EngineSystem() = default;
+		~EngineSystem() = default;
 
+		AssetPipeline assetPipeline{};
 		InputHandler inputHandler{};
-		//called after imports are submitted to asset pipeline, creates asset manager and loads it with imported assets
+
 		void createAssetManager();
-		void entityRenderLogic(Entity entity);
 
-		std::vector<Entity> pollEntities() { return renderPool; }
+		EventDispatcher<std::vector<ShaderData*>> shaderDispatcher{}; //the meshes and shaders get sent to the application layer through here?
+		EventDispatcher<std::vector<MeshData*>> meshDispatcher{}; //
 
-		
-
+		void dispatchAssets();
 
 	};
 }

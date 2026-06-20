@@ -2,20 +2,31 @@
 #include "core/events/EventDispatcher.h"
 #include "core/ecs/Entity.h"
 #include <functional>
+#include"core/assets/AssetManager.h"
 namespace Engine::Core
 {
+	struct EntityCreationCommand
+	{
+		std::string shaderName;
+		std::string meshName;
+	};
+
 	class EntityManager
 	{
 	public:
+		EntityManager() = default;
+		EntityManager(const EntityManager&) = delete;
+		EntityManager(EntityManager&&) = default;
+		EntityManager& operator=(const EntityManager&) = delete;
+		
 		void registerEntity(size_t id, const Entity& entity);
-		void bindRenderSubmitCallback(std::function<void(Entity)> func);
-		EntityId createAndRegisterEntity(MeshData* mesh, MaterialData* material);
-		void addToRenderQueue(EntityId id);
-		void invokeRenderSubmitCallbacks(Entity entity);
-	private:
-		std::unordered_map<EntityId, Entity> entities;
-		std::vector<EntityId> renderQueue;
-		EventDispatcher<Entity> submitToRenderer;
+		
+		EntityId submitEntity(EntityCreationCommand command, AssetManager& am);
 
+	private:
+		std::unordered_map<EntityId, Entity*> entities{};
+		std::vector<std::unique_ptr<Entity>> entityList{};
+		
 	};
+
 }

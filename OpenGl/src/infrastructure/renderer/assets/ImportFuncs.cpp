@@ -78,5 +78,6 @@ Engine::Core::ShaderData Engine::Infra::ImportFuncs::importShaderData(const std:
 	shaderStream << shaderFile.rdbuf();
 	
 	Core::ShaderData sd(name, path, shaderStream.str());
+	//std::cout << "From inside the import func: " << sd.shaderSrc << "\n====================================\n";
 	return sd;
 }

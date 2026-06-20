@@ -15,9 +15,10 @@ void Engine::Infra::Renderer::cacheMesh(Core::MeshData* meshData)
 
 void Engine::Infra::Renderer::cacheShader(Core::ShaderData* shaderData)
 {
-	gpuShaderCache.emplace(shaderData, std::make_unique<GpuShader>(shaderData));
-}
+	auto gpuShader = std::make_unique<GpuShader>(shaderData);
 
+	gpuShaderCache.emplace(shaderData, std::move(gpuShader));
+}
 void Engine::Infra::Renderer::loadMeshes(std::vector<Core::MeshData*>& meshes)
 {
 	for (const auto& mesh : meshes)
@@ -31,6 +32,7 @@ void Engine::Infra::Renderer::loadShaders(std::vector<Core::ShaderData*>& shader
 {
 	for (const auto& shader : shaders)
 	{
+		//std::cout << "shader name: " << shader->name << "\n";
 		cacheShader(shader);
 		gpuShaderCache[shader]->compileShaders();
 	}
@@ -62,7 +64,7 @@ void Engine::Infra::Renderer::flush()
 
 		if (!gpuShaderCache.contains(command.shader))
 		{
-			std::cerr << "no shader exists on the gpu with name: " << command.shader->name << "\Shader needs to be submitted at the start of the program";
+			std::cerr << "no shader exists on the gpu with name: " << command.shader->name << "\nShader needs to be submitted at the start of the program";
 			exit(1);
 		}
 

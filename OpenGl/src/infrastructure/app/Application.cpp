@@ -84,12 +84,12 @@ void Engine::Infra::Application::setupWindowKeyCallback()
 
 void Engine::Infra::Application::setupImportCallbacks()
 {
-	engine.getAssetImporter().registerImportCallback<Core::MeshData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::MeshData>
+	engine.assetPipeline.registerImportCallback<Core::MeshData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::MeshData>
 	{
 		return std::make_unique<Core::MeshData>(Infra::ImportFuncs::importMeshData(path, name));
 	});
 
-	engine.getAssetImporter().registerImportCallback<Core::ShaderData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::ShaderData>
+	engine.assetPipeline.registerImportCallback<Core::ShaderData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::ShaderData>
 	{
 		return std::make_unique<Core::ShaderData>(Infra::ImportFuncs::importShaderData(path, name));
 	});
@@ -97,8 +97,8 @@ void Engine::Infra::Application::setupImportCallbacks()
 
 void Engine::Infra::Application::importAssets()
 {
-	engine.getAssetImporter().submit<Core::MeshData>("assets/meshes/bunny.obj", "bunny");
-	engine.getAssetImporter().submit<Core::ShaderData>("assets/shaders/shader.glsl", "shader");
+	//engine.assetPipeline.submit<Core::MeshData>("assets/meshes/bunny.obj", "bunny");
+	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/shader.glsl", "shader");
 
 	try
 	{
@@ -148,7 +148,7 @@ void Engine::Infra::Application::setupInput()
 
 void Engine::Infra::Application::updateRenderQueue()
 {
-	auto eList = engine.pollEntities();
+	/*auto eList = engine.pollEntities();
 
 	float currentWidth = static_cast<float>(window->getWidth());
 	float currentHeight = static_cast<float>(window->getHeight());
@@ -166,63 +166,132 @@ void Engine::Infra::Application::updateRenderQueue()
 			.mesh = e.mesh
 		};
 		renderer.submit(rc);
+	}*/
+}
+
+
+static std::vector<float> normalsFromVertices(float data[], int size)
+{
+	std::vector<glm::vec3> vertexVectors{};
+	std::vector<glm::vec3> normalVectors{};
+	for (int i{ 0 }; i < size; i += 3)
+	{
+		float x = data[i];
+		float y = data[i+1];
+		float z = data[i+2];
+		vertexVectors.emplace_back(x, y, z);
 	}
+
+	//normals per triangle...
+
+	for (int i{ 0 }; i < vertexVectors.size(); i += 3)
+	{
+		auto p0 = vertexVectors[i];
+		auto p1 = vertexVectors[i + 1];
+		auto p2 = vertexVectors[i + 2];
+	}
+
+
+
+
+}
+
+static Engine::Core::MeshData* sampleCube()
+{
+	float vertices[] = {
+		-0.5f, -0.5f, -0.5f,
+		0.5f, -0.5f, -0.5f,
+		0.5f,  0.5f, -0.5f,  
+		0.5f,  0.5f, -0.5f, 
+		-0.5f,  0.5f, -0.5f, 
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f,  0.5f, 
+		0.5f, -0.5f,  0.5f, 
+		0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f, 
+		-0.5f, -0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f, 
+		-0.5f,  0.5f, -0.5f, 
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f,  0.5f, 
+		-0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f, 
+		0.5f,  0.5f, -0.5f,  
+		0.5f, -0.5f, -0.5f,
+		0.5f, -0.5f, -0.5f,
+		0.5f, -0.5f,  0.5f,  
+		0.5f,  0.5f,  0.5f,
+		-0.5f, -0.5f, -0.5f, 
+		0.5f, -0.5f, -0.5f,  
+		0.5f, -0.5f,  0.5f,
+		0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f,  0.5f, 
+		-0.5f, -0.5f, -0.5f,
+		-0.5f,  0.5f, -0.5f, 
+		0.5f,  0.5f, -0.5f,  
+		0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f, 
+		-0.5f,  0.5f, -0.5f
+	};
+
+	Engine::Core::Attribute a{ .data = std::vector<float>(std::begin(vertices), std::end(vertices)), .size = 3, .index = 0 };
+
+	std::vector<Engine::Core::Attribute> attr{};
+	attr.push_back(a);
+	Engine::Core::MeshData* mesh = new Engine::Core::MeshData(attr);
+
+	return mesh;
+}
+
+static std::vector<Engine::Core::ShaderData*> loadSampleShaders()
+{
+
+	std::string shaderSrcRaw = Engine::Infra::ImportFuncs::importShaderData("assets/shaders/shader.glsl", "shader").shaderSrc;
+
+	Engine::Core::ShaderData* shaderData = new Engine::Core::ShaderData{};
+	shaderData->name = "shader";
+	shaderData->shaderSrc = shaderSrcRaw;
+
+	std::vector<Engine::Core::ShaderData*> shaders{};
+	shaders.push_back(shaderData);
+
+
+	return shaders;
+}
+
+static Engine::Infra::RenderCommand createRcFromEntity(Engine::Core::Entity* e, glm::mat4 viewMat, glm::mat4 projMat)
+{
+	Engine::Infra::RenderCommand rc
+	{
+		.view = viewMat,
+		.projection = projMat,
+		.modelTransform = glm::mat4(1),
+		.shader = e->shader,
+		.mesh = e->mesh
+	};
 }
 
 void Engine::Infra::Application::run()
 {
 	
 	//test renderer with a shader...
+	
+	engine.shaderDispatcher.subscribe([&](std::vector<Engine::Core::ShaderData*> shaderList) 
+		{ 
+			renderer.loadShaders(shaderList); 
+			std::cout << "load shaders invoked!" << "\n";
+		});
+	setupImportCallbacks();
+	importAssets();
 
-	const char* shaderSrcRaw = R"glsl(
-    #ifdef VERTEX_SHADER
-
-    layout (location = 0) in vec3 aPos;
-    uniform mat4 model;
-    uniform mat4 view;
-    uniform mat4 projection;
-    void main() {
-        gl_Position = projection * view * model * vec4(aPos, 1.0);
-    }
-	#endif
-
-	#ifdef FRAGMENT_SHADER
-    
-    out vec4 FragColor;
-    void main() {
-        FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-    }
-
-	#endif
-		
-	)glsl";
-
-	Core::ShaderData* shaderData = new Core::ShaderData{};
-	shaderData->name = "newestShader";
-	shaderData->shaderSrc = shaderSrcRaw;
-
-	std::vector<Core::ShaderData*> shaders{};
-	shaders.push_back(shaderData);
-
-	renderer.loadShaders(shaders);
+	engine.dispatchAssets();// loads shaders and meshes? Might be a bad design choice, since it's kind of hard to read.
 
 	//test renderer with a cube model...
 
-	float vertices[] = {
-		-0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f, -0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f,  0.5f,  0.5f,
-		-0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f,
-		-0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f
-	};
-
-	Core::Attribute a{ .data = std::vector<float>(std::begin(vertices), std::end(vertices)), .size = 3, .index = 0 };
-
-	std::vector<Core::Attribute> attr{};
-	attr.push_back(a);
-
-	Core::MeshData* mesh = new Core::MeshData(attr);
+	auto mesh = sampleCube();
 
 	std::vector<Core::MeshData*> meshes{};
 	meshes.push_back(mesh);
@@ -230,6 +299,10 @@ void Engine::Infra::Application::run()
 	renderer.loadMeshes(meshes);
 
 	//Create a render command...
+
+	Engine::Core::ShaderData* shaderData = nullptr;
+	engine.assetManager.getShader(shaderData, "shader");
+	
 	RenderCommand rc
 	{
 		.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
@@ -239,8 +312,6 @@ void Engine::Infra::Application::run()
 		.mesh = mesh 
 	};
 	
-	
-
 	float lastFrame = 0.0f;
 	float cubeRotation = 0.0f;
 
@@ -282,5 +353,6 @@ void Engine::Infra::Application::run()
 	}
 
 	window->terminateGlfw();
+	delete mesh;
 
 }

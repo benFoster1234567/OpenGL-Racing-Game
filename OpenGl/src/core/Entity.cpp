@@ -5,6 +5,5 @@ Engine::Core::Entity& Engine::Core::Entity::operator=(const Engine::Core::Entity
     controller = other.controller ? other.controller : nullptr;
     transform = other.transform;
     mesh = other.mesh;
-    material = other.material;
     return *this;
 }
