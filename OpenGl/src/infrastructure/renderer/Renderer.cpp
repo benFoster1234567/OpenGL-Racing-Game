@@ -10,7 +10,8 @@
 
 void Engine::Infra::Renderer::cacheMesh(Core::MeshData* meshData)
 {
-	gpuMeshCache.emplace(meshData ,std::make_unique<GpuMesh>(meshData));
+	auto gpuMesh = std::make_unique<GpuMesh>(meshData);
+	gpuMeshCache.emplace(meshData, std::move(gpuMesh));
 }
 
 void Engine::Infra::Renderer::cacheShader(Core::ShaderData* shaderData)
@@ -21,11 +22,14 @@ void Engine::Infra::Renderer::cacheShader(Core::ShaderData* shaderData)
 }
 void Engine::Infra::Renderer::loadMeshes(std::vector<Core::MeshData*>& meshes)
 {
+	int c = 0;
 	for (const auto& mesh : meshes)
 	{
+		c++;
 		cacheMesh(mesh);
 		gpuMeshCache[mesh]->genBuffers();
 	}
+	std::cout << c << " meshes loaded!\n";
 }
 
 void Engine::Infra::Renderer::loadShaders(std::vector<Core::ShaderData*>& shaders)

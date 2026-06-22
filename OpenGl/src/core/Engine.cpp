@@ -26,6 +26,7 @@ void Engine::Core::EngineSystem::dispatchAssets()
 	if (shaderList.empty()) std::cout << "shader list empty!";
 	else shaderDispatcher.invoke(shaderList);
 	std::vector<MeshData*> meshList{};
+	assetManager.meshList(meshList);
 	if (meshList.empty()) std::cout << "mesh list empty!";
 	else meshDispatcher.invoke(meshList);
 

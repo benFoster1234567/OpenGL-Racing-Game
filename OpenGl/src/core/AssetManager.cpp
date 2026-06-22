@@ -7,10 +7,14 @@
 
 Engine::Core::AssetManager::~AssetManager() = default;
 
-void Engine::Core::AssetManager::getMesh(MeshData* meshOut, const std::string& name) 
+void Engine::Core::AssetManager::getMesh(MeshData*& meshOut, const std::string& name) 
 {
 	if (meshMap.contains(name)) meshOut = meshMap[name].get();
-	else meshOut = nullptr;
+	else
+	{
+		std::cout << "Nom mesh found!\n";
+		meshOut = nullptr;
+	}
 }
 
 void Engine::Core::AssetManager::getMaterial(MaterialData* matOut, const std::string& name)
@@ -54,7 +58,10 @@ void Engine::Core::AssetManager::shaderList(std::vector<ShaderData*>& shadersOut
 
 void Engine::Core::AssetManager::meshList(std::vector<MeshData*>& meshesOut)
 {
-
+	for (auto& [key, val] : meshMap)
+	{
+		meshesOut.push_back(val.get());
+	}
 }
 
 

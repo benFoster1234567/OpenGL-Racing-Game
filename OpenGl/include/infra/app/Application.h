@@ -31,7 +31,6 @@ namespace Engine::Infra
 		void importAssets();
 
 		void setupInput();
-		void updateRenderQueue();
 
 		void run();
 	};

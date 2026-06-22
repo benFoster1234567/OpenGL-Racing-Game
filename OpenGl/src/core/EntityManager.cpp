@@ -1,6 +1,7 @@
 #include "core/ecs/EntityManager.h"
 #include <core/engine/Engine.h>
 
+//enter entity into our entitymanager. Ensure entity manager stays in scope so we don't get dangling pointers. (maybe its okay to make copies of entities, but for now we have this...)
 void Engine::Core::EntityManager::registerEntity(size_t id, const Entity& entity)
 {
 	std::unique_ptr<Entity> e = std::make_unique<Entity>(entity);

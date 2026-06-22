@@ -25,6 +25,8 @@ namespace Engine::Core
 		std::string name;
 		
 		std::vector<Attribute> attributes{};
+		void printPoints(); //for debugging purposes...
+
 
 	};
 }

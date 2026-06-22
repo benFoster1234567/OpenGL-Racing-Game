@@ -75,6 +75,9 @@
     <ClCompile Include="src\core\MaterialData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\core\assets\MeshData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\Tester.h">

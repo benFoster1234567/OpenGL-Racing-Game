@@ -21,6 +21,7 @@
 #include <glm/gtc/type_ptr.inl>
 #include <GL/glew.h>
 
+
 Engine::Infra::Application::Application()
 {
 	window = std::make_unique<Window>("window", false);
@@ -30,6 +31,16 @@ Engine::Infra::Application::Application()
 	setupInput();
 }
 
+
+//all asset import calls go here
+void Engine::Infra::Application::importAssets()
+{
+	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/bunny.obj", "bunny");
+	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/shader.glsl", "shader");
+	engine.createAssetManager();
+}
+
+//all debug command lambdas are setup here
 void Engine::Infra::Application::setupDebugCommands()
 {
     std::function <std::string()> exitFunc = [&]()
@@ -69,6 +80,7 @@ void Engine::Infra::Application::setupDebugCommands()
 	debugConsoleUi->registerCommand<int>("pMode", setPolygonMode);
 }
 
+//window key callback is set here
 void Engine::Infra::Application::setupWindowKeyCallback()
 {
 	std::function<void(int, int, int, int)> callback = [&](int _key, int _scancode, int _action, int _mods)
@@ -82,6 +94,7 @@ void Engine::Infra::Application::setupWindowKeyCallback()
 	window->submitKeyCallback(callback);
 }
 
+//import callback lambdas are created here
 void Engine::Infra::Application::setupImportCallbacks()
 {
 	engine.assetPipeline.registerImportCallback<Core::MeshData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::MeshData>
@@ -95,20 +108,7 @@ void Engine::Infra::Application::setupImportCallbacks()
 	});
 }
 
-void Engine::Infra::Application::importAssets()
-{
-	//engine.assetPipeline.submit<Core::MeshData>("assets/meshes/bunny.obj", "bunny");
-	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/shader.glsl", "shader");
 
-	try
-	{
-		engine.createAssetManager();
-	}
-	catch (std::runtime_error& error)
-	{
-		std::cerr << "Caught an error: " << error.what() << std::endl;
-	}
-}
 
 void Engine::Infra::Application::setupInput()
 {
@@ -144,29 +144,6 @@ void Engine::Infra::Application::setupInput()
 
 	engine.inputHandler.subscribeControl(ctrlTrack);
 	engine.inputHandler.subscribeKey(toggleConsole);
-}
-
-void Engine::Infra::Application::updateRenderQueue()
-{
-	/*auto eList = engine.pollEntities();
-
-	float currentWidth = static_cast<float>(window->getWidth());
-	float currentHeight = static_cast<float>(window->getHeight());
-
-	if (currentHeight == 0) currentHeight = 1.0f;
-
-	for (const auto & e : eList)
-	{
-		RenderCommand rc
-		{
-			.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
-			.projection = glm::perspective(glm::radians(45.0f), currentHeight / currentHeight, 0.1f, 100.0f),
-			.modelTransform = glm::mat4(1),
-			.shader = e.shader,
-			.mesh = e.mesh
-		};
-		renderer.submit(rc);
-	}*/
 }
 
 
@@ -258,7 +235,6 @@ static std::vector<Engine::Core::ShaderData*> loadSampleShaders()
 	std::vector<Engine::Core::ShaderData*> shaders{};
 	shaders.push_back(shaderData);
 
-
 	return shaders;
 }
 
@@ -277,39 +253,40 @@ static Engine::Infra::RenderCommand createRcFromEntity(Engine::Core::Entity* e, 
 void Engine::Infra::Application::run()
 {
 	
-	//test renderer with a shader...
-	
 	engine.shaderDispatcher.subscribe([&](std::vector<Engine::Core::ShaderData*> shaderList) 
 		{ 
 			renderer.loadShaders(shaderList); 
 			std::cout << "load shaders invoked!" << "\n";
 		});
+
+	engine.meshDispatcher.subscribe([&](std::vector<Engine::Core::MeshData*> meshList)
+		{
+			renderer.loadMeshes(meshList);
+			std::cout << "load meshes invoked!\n";
+		});
+
 	setupImportCallbacks();
+	
 	importAssets();
 
-	engine.dispatchAssets();// loads shaders and meshes? Might be a bad design choice, since it's kind of hard to read.
+	Engine::Core::MeshData* meshData{};
+	engine.assetManager.getMesh(meshData, "bunny");
 
-	//test renderer with a cube model...
 
-	auto mesh = sampleCube();
 
-	std::vector<Core::MeshData*> meshes{};
-	meshes.push_back(mesh);
-
-	renderer.loadMeshes(meshes);
-
-	//Create a render command...
-
-	Engine::Core::ShaderData* shaderData = nullptr;
+	Engine::Core::ShaderData* shaderData{};
 	engine.assetManager.getShader(shaderData, "shader");
 	
+	engine.dispatchAssets();
+
+
 	RenderCommand rc
 	{
 		.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
 		.projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f),
 		.modelTransform = glm::mat4(1),
 		.shader = shaderData,
-		.mesh = mesh 
+		.mesh = meshData 
 	};
 	
 	float lastFrame = 0.0f;
@@ -353,6 +330,6 @@ void Engine::Infra::Application::run()
 	}
 
 	window->terminateGlfw();
-	delete mesh;
+	//delete mesh;
 
 }
