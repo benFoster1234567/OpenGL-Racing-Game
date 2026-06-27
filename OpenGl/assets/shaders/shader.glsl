@@ -7,16 +7,23 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-void main() {
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+out vec4 posOut; 
+
+void main() 
+{
+    posOut = projection * view * model * vec4(aPos, 1.0);
+    gl_Position = posOut;
 }
+
 #endif
 
 #ifdef FRAGMENT_SHADER
-    
+in vec4 posOut;    
 out vec4 FragColor;
-void main() {
-    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+
+void main() 
+{
+    FragColor = posOut;
 }
 
 #endif

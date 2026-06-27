@@ -38,7 +38,20 @@ namespace Engine::Core
 
 		EntityController* controller = nullptr;
 
-		glm::mat4 transform{1};
+		Transform transform{};
+		glm::mat4 transformMatrix{1};
+		
+		void rotateRadians(float radians, glm::vec3 axis);
+		void rotateDegrees(float degrees, glm::vec3 axis);
+
+		//void moveBy(glm::vec3 units);
+		//void moveTo(glm::vec3 loc);
+
+		glm::mat4 getTransformMatrix() const noexcept
+		{
+			return transform.pos * transform.rot * transform.scale;
+		}
+
 		ShaderData* shader;
 		MeshData* mesh;
 		

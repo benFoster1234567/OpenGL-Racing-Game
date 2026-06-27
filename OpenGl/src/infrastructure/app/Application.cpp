@@ -31,6 +31,41 @@ Engine::Infra::Application::Application()
 	setupInput();
 }
 
+static Engine::Infra::RenderCommand createRcFromEntity(Engine::Core::Entity* e, glm::mat4 viewMat, glm::mat4 projMat)
+{
+	Engine::Infra::RenderCommand rc
+	{
+		.view = viewMat,
+		.projection = projMat,
+		.modelTransform = e->getTransformMatrix(),
+		.shader = e->shader,
+		.mesh = e->mesh
+	};
+	return rc;
+}
+
+void Engine::Infra::Application::submitEngineRenderQueueToRenderer()
+{
+	//using these for now until I get a camera thing going
+
+	float currentWidth = static_cast<float>(window->getWidth());
+	float currentHeight = static_cast<float>(window->getHeight());
+	
+	auto projection = glm::perspective(glm::radians(45.0f), currentWidth / currentHeight, 0.1f, 100.0f);
+	auto view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	if (currentHeight == 0) currentHeight = 1.0f;
+
+
+
+	std::vector<Engine::Core::Entity*> entities{};
+	engine.fillEntityRenderList(entities);
+	if (entities.empty())
+		throw std::runtime_error("entityListBlank!");
+	
+	for (auto& e : entities)
+		renderer.submit(createRcFromEntity(e, view, projection));
+}
 
 //all asset import calls go here
 void Engine::Infra::Application::importAssets()
@@ -108,8 +143,6 @@ void Engine::Infra::Application::setupImportCallbacks()
 	});
 }
 
-
-
 void Engine::Infra::Application::setupInput()
 {
 	auto ctrlTrack = [&](Engine::Core::Control c, Engine::Core::KeyAction a)
@@ -146,110 +179,6 @@ void Engine::Infra::Application::setupInput()
 	engine.inputHandler.subscribeKey(toggleConsole);
 }
 
-
-static std::vector<float> normalsFromVertices(float data[], int size)
-{
-	std::vector<glm::vec3> vertexVectors{};
-	std::vector<glm::vec3> normalVectors{};
-	for (int i{ 0 }; i < size; i += 3)
-	{
-		float x = data[i];
-		float y = data[i+1];
-		float z = data[i+2];
-		vertexVectors.emplace_back(x, y, z);
-	}
-
-	//normals per triangle...
-
-	for (int i{ 0 }; i < vertexVectors.size(); i += 3)
-	{
-		auto p0 = vertexVectors[i];
-		auto p1 = vertexVectors[i + 1];
-		auto p2 = vertexVectors[i + 2];
-	}
-
-
-
-
-}
-
-static Engine::Core::MeshData* sampleCube()
-{
-	float vertices[] = {
-		-0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f,
-		0.5f,  0.5f, -0.5f,  
-		0.5f,  0.5f, -0.5f, 
-		-0.5f,  0.5f, -0.5f, 
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f,  0.5f, 
-		0.5f, -0.5f,  0.5f, 
-		0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f, 
-		-0.5f, -0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f, 
-		-0.5f,  0.5f, -0.5f, 
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f,  0.5f, 
-		-0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f, 
-		0.5f,  0.5f, -0.5f,  
-		0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f,  0.5f,  
-		0.5f,  0.5f,  0.5f,
-		-0.5f, -0.5f, -0.5f, 
-		0.5f, -0.5f, -0.5f,  
-		0.5f, -0.5f,  0.5f,
-		0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f, 
-		-0.5f, -0.5f, -0.5f,
-		-0.5f,  0.5f, -0.5f, 
-		0.5f,  0.5f, -0.5f,  
-		0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f, 
-		-0.5f,  0.5f, -0.5f
-	};
-
-	Engine::Core::Attribute a{ .data = std::vector<float>(std::begin(vertices), std::end(vertices)), .size = 3, .index = 0 };
-
-	std::vector<Engine::Core::Attribute> attr{};
-	attr.push_back(a);
-	Engine::Core::MeshData* mesh = new Engine::Core::MeshData(attr);
-
-	return mesh;
-}
-
-static std::vector<Engine::Core::ShaderData*> loadSampleShaders()
-{
-
-	std::string shaderSrcRaw = Engine::Infra::ImportFuncs::importShaderData("assets/shaders/shader.glsl", "shader").shaderSrc;
-
-	Engine::Core::ShaderData* shaderData = new Engine::Core::ShaderData{};
-	shaderData->name = "shader";
-	shaderData->shaderSrc = shaderSrcRaw;
-
-	std::vector<Engine::Core::ShaderData*> shaders{};
-	shaders.push_back(shaderData);
-
-	return shaders;
-}
-
-static Engine::Infra::RenderCommand createRcFromEntity(Engine::Core::Entity* e, glm::mat4 viewMat, glm::mat4 projMat)
-{
-	Engine::Infra::RenderCommand rc
-	{
-		.view = viewMat,
-		.projection = projMat,
-		.modelTransform = glm::mat4(1),
-		.shader = e->shader,
-		.mesh = e->mesh
-	};
-}
-
 void Engine::Infra::Application::run()
 {
 	
@@ -268,26 +197,9 @@ void Engine::Infra::Application::run()
 	setupImportCallbacks();
 	
 	importAssets();
-
-	Engine::Core::MeshData* meshData{};
-	engine.assetManager.getMesh(meshData, "bunny");
-
-
-
-	Engine::Core::ShaderData* shaderData{};
-	engine.assetManager.getShader(shaderData, "shader");
-	
 	engine.dispatchAssets();
+	engine.createEntities();
 
-
-	RenderCommand rc
-	{
-		.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
-		.projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f),
-		.modelTransform = glm::mat4(1),
-		.shader = shaderData,
-		.mesh = meshData 
-	};
 	
 	float lastFrame = 0.0f;
 	float cubeRotation = 0.0f;
@@ -296,14 +208,6 @@ void Engine::Infra::Application::run()
 	{
 		window->updateViewport();
 
-		float currentWidth = static_cast<float>(window->getWidth());
-		float currentHeight = static_cast<float>(window->getHeight());
-
-		if (currentHeight == 0) currentHeight = 1.0f;
-
-		rc.projection = glm::perspective(glm::radians(45.0f), currentWidth / currentHeight, 0.1f, 100.0f);
-
-
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
@@ -311,18 +215,14 @@ void Engine::Infra::Application::run()
 		float currentFrame = static_cast<float>(glfwGetTime());
 		float deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-		cubeRotation += 50.0f * deltaTime;
 
+		engine.setDeltaTime(deltaTime);
+		engine.updateRenderQueue();
 
-		glm::mat4 model(1.0f);
-		model = glm::rotate(model, glm::radians(cubeRotation), glm::vec3(0.5f, 1.0f, 0.0f));
-		rc.modelTransform = model;
-
-		renderer.submit(rc);
+		submitEngineRenderQueueToRenderer();
 		renderer.flush();
 
 		debugConsoleUi->prepareFrame();
-
 		debugConsoleUi->render();
 
 		window->swapBuffers();

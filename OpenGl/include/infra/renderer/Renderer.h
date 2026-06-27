@@ -24,6 +24,8 @@ namespace Engine::Infra
 		Core::MeshData* mesh;
 	};
 
+
+
 	enum PolygonMode
 	{
 		FILL, LINE
@@ -32,11 +34,11 @@ namespace Engine::Infra
 	class Renderer
 	{
 	private:
+		
 		std::vector<RenderCommand> renderQueue;
 
 		std::map<Core::MeshData*, std::unique_ptr<GpuMesh>> gpuMeshCache{};
 		std::map<Core::TextureData*, std::unique_ptr<GpuTexture>> gpuTextureCache{};
-
 		void cacheShader(Core::ShaderData* shaderData);
 		void cacheMesh(Core::MeshData* meshData);
 

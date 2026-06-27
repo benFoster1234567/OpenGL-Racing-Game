@@ -5,9 +5,15 @@
 #include <variant>
 
 
+
+Engine::Core::AssetManager::AssetManager()
+{
+	meshMap["grid"] = std::make_unique<GridData>();
+}
+
 Engine::Core::AssetManager::~AssetManager() = default;
 
-void Engine::Core::AssetManager::getMesh(MeshData*& meshOut, const std::string& name) 
+void Engine::Core::AssetManager::getMesh(MeshData*& meshOut, const std::string& name)
 {
 	if (meshMap.contains(name)) meshOut = meshMap[name].get();
 	else

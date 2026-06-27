@@ -29,4 +29,36 @@ namespace Engine::Core
 
 
 	};
+
+	class GridData : public MeshData
+	{
+	public:
+		GridData()
+		{
+			std::vector<float> vertices;
+			int slices = 20;
+			float spacing = 1.0f;
+			float size = (slices * spacing) / 2.0f;
+
+			for (int i = 0; i <= slices; ++i) {
+				float pos = -size + (i * spacing);
+
+				vertices.push_back(pos);   vertices.push_back(0.0f); vertices.push_back(-size);
+				vertices.push_back(pos);   vertices.push_back(0.0f); vertices.push_back(size);
+
+				vertices.push_back(-size); vertices.push_back(0.0f); vertices.push_back(pos);
+				vertices.push_back(size);  vertices.push_back(0.0f); vertices.push_back(pos);
+			}
+
+			Attribute verts{};
+			verts.data = vertices;
+			
+			verts.index = 0;
+			verts.size = 3;
+
+			attributes.push_back(verts);
+		}
+
+
+	};
 }

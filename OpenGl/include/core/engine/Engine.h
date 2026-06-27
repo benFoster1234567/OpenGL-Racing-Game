@@ -12,6 +12,9 @@ namespace Engine::Core
 	{
 	private:
 		EntityManager entityManager{};
+		std::vector<EntityId> renderQueue{};
+		float deltaTime{1};
+
 	public:
 		AssetManager assetManager{};
 		EngineSystem() = default;
@@ -19,11 +22,18 @@ namespace Engine::Core
 
 		AssetPipeline assetPipeline{};
 		InputHandler inputHandler{};
+		
+		void setDeltaTime(float t)  { deltaTime = t; }
 
 		void createAssetManager();
 
-		EventDispatcher<std::vector<ShaderData*>> shaderDispatcher{}; //the meshes and shaders get sent to the application layer through here?
-		EventDispatcher<std::vector<MeshData*>> meshDispatcher{}; //
+		void fillEntityRenderList(std::vector<Entity*>& entityListOut);
+
+		void updateRenderQueue();
+		void createEntities();
+
+		EventDispatcher<std::vector<ShaderData*>> shaderDispatcher{};
+		EventDispatcher<std::vector<MeshData*>> meshDispatcher{};
 
 		void dispatchAssets();
 

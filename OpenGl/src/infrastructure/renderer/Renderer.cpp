@@ -14,6 +14,7 @@ void Engine::Infra::Renderer::cacheMesh(Core::MeshData* meshData)
 	gpuMeshCache.emplace(meshData, std::move(gpuMesh));
 }
 
+
 void Engine::Infra::Renderer::cacheShader(Core::ShaderData* shaderData)
 {
 	auto gpuShader = std::make_unique<GpuShader>(shaderData);
@@ -29,6 +30,7 @@ void Engine::Infra::Renderer::loadMeshes(std::vector<Core::MeshData*>& meshes)
 		cacheMesh(mesh);
 		gpuMeshCache[mesh]->genBuffers();
 	}
+
 	std::cout << c << " meshes loaded!\n";
 }
 
@@ -55,7 +57,8 @@ void Engine::Infra::Renderer::submit(RenderCommand command)
 
 void Engine::Infra::Renderer::flush()
 {
-
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT_AND_BACK, polygonMode == LINE? GL_LINE : GL_FILL);
 
 	for (const auto& command : renderQueue)

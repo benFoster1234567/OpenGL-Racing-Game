@@ -29,7 +29,7 @@ namespace Engine::Infra
 		void setupWindowKeyCallback();
 		void setupImportCallbacks();
 		void importAssets();
-
+		void submitEngineRenderQueueToRenderer();
 		void setupInput();
 
 		void run();

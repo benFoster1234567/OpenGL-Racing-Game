@@ -33,7 +33,7 @@ namespace Engine::Core
 		friend class AssetPipeline;
 	public:
 	
-		AssetManager() = default;
+		AssetManager();
 		~AssetManager();
 
 		// Retrieves a mesh by name

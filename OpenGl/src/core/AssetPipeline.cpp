@@ -12,6 +12,7 @@ void Engine::Core::AssetPipeline::processCommand(ImportCommand cmd, AssetManager
 
 void Engine::Core::AssetPipeline::refreshAssetManager(AssetManager& am)
 {
+
 	while (!queue.empty())
 	{
 		Engine::Core::ImportCommand icmd = queue.top();

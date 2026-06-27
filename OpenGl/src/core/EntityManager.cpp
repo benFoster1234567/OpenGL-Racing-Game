@@ -36,3 +36,24 @@ Engine::Core::EntityId Engine::Core::EntityManager::submitEntity(EntityCreationC
 
 	return id;
 }
+
+void Engine::Core::EntityManager::setEntityTransform(EntityId id, glm::mat4 translation, glm::mat4 rotation, glm::mat4 scale)
+{
+	if (!entities.contains(id)) return;
+
+	Entity* e = entities[id];
+	e->transform.pos = translation;
+	e->transform.rot = rotation;
+	e->transform.scale = scale;
+
+	e->transformMatrix = translation * rotation * scale;
+
+}
+
+//TODO: get rid of this...
+void Engine::Core::EntityManager::setEntityTransform(EntityId id, glm::mat4 newTransform)
+{
+	if (!entities.contains(id)) return;
+	entities[id]->transformMatrix = newTransform;
+
+}
