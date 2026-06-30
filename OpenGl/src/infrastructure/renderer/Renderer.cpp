@@ -27,6 +27,8 @@ void Engine::Infra::Renderer::loadMeshes(std::vector<Core::MeshData*>& meshes)
 	for (const auto& mesh : meshes)
 	{
 		c++;
+		mesh->recomputeNormals();
+
 		cacheMesh(mesh);
 		gpuMeshCache[mesh]->genBuffers();
 	}

@@ -27,7 +27,7 @@ namespace Engine::Core
 		std::vector<Attribute> attributes{};
 		void printPoints(); //for debugging purposes...
 
-
+		void recomputeNormals(int vertexIndex = 0, int normalsIndex = 1);
 	};
 
 	class GridData : public MeshData
@@ -36,6 +36,9 @@ namespace Engine::Core
 		GridData()
 		{
 			std::vector<float> vertices;
+			std::vector<float> norms;
+			Attribute verts{};
+			Attribute normals{};
 			int slices = 20;
 			float spacing = 1.0f;
 			float size = (slices * spacing) / 2.0f;
@@ -48,13 +51,23 @@ namespace Engine::Core
 
 				vertices.push_back(-size); vertices.push_back(0.0f); vertices.push_back(pos);
 				vertices.push_back(size);  vertices.push_back(0.0f); vertices.push_back(pos);
+
+				for (int i{}; i < 4; i++)
+				{
+					norms.push_back(0);
+					norms.push_back(1);
+					norms.push_back(0);
+				}
 			}
 
-			Attribute verts{};
 			verts.data = vertices;
 			
 			verts.index = 0;
 			verts.size = 3;
+
+			normals.data = norms;
+			normals.size = 3;
+			normals.index = 1;
 
 			attributes.push_back(verts);
 		}
