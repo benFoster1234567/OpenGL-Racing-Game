@@ -55,6 +55,4 @@ void Engine::Core::MeshData::recomputeNormals(int vertexIndex, int normalsIndex)
 
 	attributes[normalsIndex].data = norms;
 
-
-
 }

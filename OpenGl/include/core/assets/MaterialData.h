@@ -27,8 +27,6 @@ namespace Engine::Core
 
 
 		ShaderData* shader{ nullptr };
-		TextureData* diffuse{ nullptr };
-		TextureData* normal{ nullptr };
 		MaterialInfo materialSettings{};
 
 	private:

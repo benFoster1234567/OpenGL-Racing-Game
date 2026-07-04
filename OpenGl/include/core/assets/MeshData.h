@@ -15,6 +15,12 @@ namespace Engine::Core
 		unsigned int index;
 	};
 
+	enum class MeshType
+	{
+		Wireframe, 
+		Fill
+	};
+
 	class MeshData
 	{
 	private:
@@ -23,7 +29,7 @@ namespace Engine::Core
 		MeshData(std::vector<Attribute> as) : attributes(std::move(as)) {}
 		~MeshData() = default;
 		std::string name;
-		
+		MeshType meshType{ MeshType::Fill };
 		std::vector<Attribute> attributes{};
 		void printPoints(); //for debugging purposes...
 
@@ -35,6 +41,7 @@ namespace Engine::Core
 	public:
 		GridData()
 		{
+			meshType = MeshType::Wireframe;
 			std::vector<float> vertices;
 			std::vector<float> norms;
 			Attribute verts{};

@@ -1,6 +1,5 @@
 #pragma once
 #include <GL/glew.h>
-#include "core/ecs/Entity.h"
 #include "infra/renderer/assets/GPUMesh.h"
 #include "infra/renderer/assets/GPUTexture.h"
 #include "infra/renderer/assets/GpuShader.h"

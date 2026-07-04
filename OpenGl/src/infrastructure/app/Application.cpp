@@ -15,12 +15,14 @@
 #include <stdexcept>
 #include <core/assets/ShaderData.h>
 #include <GLFW/glfw3.h>
-//#include <glm/ext/matrix_transform.inl>
-#include <glm/ext/matrix_clip_space.inl>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/matrix_clip_space.hpp>  // <-- CORRECT: Use .hpp instead
 #include <glm/ext/matrix_float4x4.hpp>
-#include <glm/gtc/type_ptr.inl>
+
+#include <glm/gtc/type_ptr.hpp>
 #include <GL/glew.h>
 
+#include <bit>
 
 Engine::Infra::Application::Application()
 {
@@ -31,40 +33,19 @@ Engine::Infra::Application::Application()
 	setupInput();
 }
 
-static Engine::Infra::RenderCommand createRcFromEntity(Engine::Core::Entity* e, glm::mat4 viewMat, glm::mat4 projMat)
-{
-	Engine::Infra::RenderCommand rc
-	{
-		.view = viewMat,
-		.projection = projMat,
-		.modelTransform = e->getTransformMatrix(),
-		.shader = e->shader,
-		.mesh = e->mesh
-	};
-	return rc;
-}
+
 
 void Engine::Infra::Application::submitEngineRenderQueueToRenderer()
 {
-	//using these for now until I get a camera thing going
+	std::vector<Core::EntityRenderCommand> renderCmds{};
+	engine.fillEntityRenderList(renderCmds);
 
-	float currentWidth = static_cast<float>(window->getWidth());
-	float currentHeight = static_cast<float>(window->getHeight());
-	
-	auto projection = glm::perspective(glm::radians(45.0f), currentWidth / currentHeight, 0.1f, 100.0f);
-	auto view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	for (auto& cmd : renderCmds)
+	{
+		Engine::Infra::RenderCommand entityCmd = std::bit_cast<Engine::Infra::RenderCommand>(cmd);
+		renderer.submit(entityCmd);
+	}
 
-	if (currentHeight == 0) currentHeight = 1.0f;
-
-
-
-	std::vector<Engine::Core::Entity*> entities{};
-	engine.fillEntityRenderList(entities);
-	if (entities.empty())
-		throw std::runtime_error("entityListBlank!");
-	
-	for (auto& e : entities)
-		renderer.submit(createRcFromEntity(e, view, projection));
 }
 
 //all asset import calls go here
@@ -198,8 +179,14 @@ void Engine::Infra::Application::run()
 	
 	importAssets();
 	engine.dispatchAssets();
-	engine.createEntities();
 
+	float currentWidth = static_cast<float>(window->getWidth());
+	float currentHeight = static_cast<float>(window->getHeight());
+
+	auto projection = glm::perspective(glm::radians(45.0f), currentWidth / currentHeight, 0.1f, 100.0f);
+	auto view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	engine.setupEcs(view, projection);
 	
 	float lastFrame = 0.0f;
 	float cubeRotation = 0.0f;
@@ -210,14 +197,18 @@ void Engine::Infra::Application::run()
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
 
 		float currentFrame = static_cast<float>(glfwGetTime());
 		float deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+		
+		float currentWidth = static_cast<float>(window->getWidth());
+		float currentHeight = static_cast<float>(window->getHeight());
 
-		engine.setDeltaTime(deltaTime);
-		engine.updateRenderQueue();
+		engine.updateDeltaTime(deltaTime);
+		engine.updateAspect(currentWidth/currentHeight);
+		engine.updateSystems();
+		engine.updateComponents();
 
 		submitEngineRenderQueueToRenderer();
 		renderer.flush();

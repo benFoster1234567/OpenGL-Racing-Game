@@ -27,9 +27,6 @@
     <ClCompile Include="tests\RunTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\Entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\infrastructure\renderer\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -60,9 +57,6 @@
     <ClCompile Include="src\infrastructure\renderer\assets\GPUMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\EntityManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\core\Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -78,18 +72,15 @@
     <ClCompile Include="include\core\assets\MeshData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\core\ECS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\Tester.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\core\assets\AssetManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\core\ecs\EntityController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\core\ecs\Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\core\events\EventDispatcher.h">
@@ -146,16 +137,13 @@
     <ClInclude Include="include\infra\engine\ImportFuncs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\ecs\EntityManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\infra\engine\CameraInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\infra\engine\DebugConsoleUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\ecs\Component.h">
+    <ClInclude Include="include\core\ecs\ECS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,6 +1,5 @@
 #include "infra/renderer/Renderer.h"
 #include <memory>
-#include <core/ecs/Entity.h>
 #include <infra/renderer/assets/GPUMesh.h>
 #include <infra/renderer/assets/GPUTexture.h>
 #include <GL/glew.h>
@@ -14,13 +13,13 @@ void Engine::Infra::Renderer::cacheMesh(Core::MeshData* meshData)
 	gpuMeshCache.emplace(meshData, std::move(gpuMesh));
 }
 
-
 void Engine::Infra::Renderer::cacheShader(Core::ShaderData* shaderData)
 {
 	auto gpuShader = std::make_unique<GpuShader>(shaderData);
 
 	gpuShaderCache.emplace(shaderData, std::move(gpuShader));
 }
+
 void Engine::Infra::Renderer::loadMeshes(std::vector<Core::MeshData*>& meshes)
 {
 	int c = 0;

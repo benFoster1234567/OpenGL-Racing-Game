@@ -32,9 +32,9 @@ void Engine::Infra::GpuMesh::genBuffers()
 
 void Engine::Infra::GpuMesh::draw() const
 {
-
+	auto renderAs = meshData->meshType == Engine::Core::MeshType::Fill ? GL_TRIANGLES : GL_LINES;
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+	glDrawArrays(renderAs, 0, vertexCount);
 	glBindVertexArray(0);
 
 }

@@ -1,4 +1,5 @@
 #include "core/engine/Engine.h"
+#include <glm/ext/quaternion_trigonometric.hpp>
 
 
 void Engine::Core::EngineSystem::createAssetManager()
@@ -19,49 +20,73 @@ void Engine::Core::EngineSystem::createAssetManager()
 	}
 }
 
-void Engine::Core::EngineSystem::fillEntityRenderList(std::vector<Entity*>& entityListOut)
+void Engine::Core::EngineSystem::fillEntityRenderList(std::vector<EntityRenderCommand>& entityListOut)
 {
-	if (entityListOut.size() > 0)
-		entityListOut.clear();
+	ECS::Entity player = gameObjects.player;
+	ECS::Entity camera = gameObjects.camera;
 
-	if (renderQueue.empty())
-		return;
+	ECS::CameraComponent& cameraComp = ecsManager.components.getComponent<ECS::CameraComponent>(camera);
+	ECS::TransformComponent& playerTransform = ecsManager.components.getComponent<ECS::TransformComponent>(player);
+	ECS::MeshComponent& playerMesh = ecsManager.components.getComponent<ECS::MeshComponent>(player);
+	ECS::ShaderComponent& playerShader = ecsManager.components.getComponent<ECS::ShaderComponent>(player);
 
-	for (EntityId id : renderQueue)
+	entityListOut.emplace_back(EntityRenderCommand{
+		.view = cameraComp.view,
+		.projection = cameraComp.projection,
+		.modelTransform = playerTransform.getTransformMatrix(),
+		.shader = playerShader.shaderData,
+		.mesh = playerMesh.meshData,
+	});
+
+}
+
+//this is where we program our game ->
+void Engine::Core::EngineSystem::setupEcs(glm::mat4 view, glm::mat4 projection)
+{
+	MeshData* meshData = nullptr;
+	ShaderData* shaderData = nullptr;
+	gameObjects.player = ecsManager.createEntity();
+	gameObjects.camera = ecsManager.createEntity();
+	
+	ECS::CameraComponent cameraComp{};
+	cameraComp.view = view;
+	cameraComp.projection = projection;
+
+	assetManager.getMesh(meshData, "bunny");
+	ECS::MeshComponent meshComp{meshData};
+
+	assetManager.getShader(shaderData, "shader");
+	ECS::ShaderComponent shaderComp{ shaderData };
+
+	ecsManager.addComponent(gameObjects.camera, cameraComp);
+	ecsManager.addComponent(gameObjects.player, meshComp);
+	ecsManager.addComponent(gameObjects.player, shaderComp);
+	ecsManager.addComponent(gameObjects.player, ECS::TransformComponent{});
+
+	auto rotateQuad = [&](float degrees, glm::vec3 axis) -> glm::quat
 	{
-		Entity* e = nullptr;
-		entityManager.getEntity(id, e);
-		if (e != nullptr)
-			entityListOut.push_back(e);
-	}
+		float radians = glm::radians(degrees);
+		glm::quat q = glm::angleAxis(radians, glm::normalize(axis));
+		return q;
+	};
+
+	ecsManager.addSystem(gameObjects.player, [&](ECS::Entity entity, ECS::ComponentRegistry& components)
+		{
+			auto deltaTime = gameObjects.deltaTime;
+			auto& transform = components.getComponent<ECS::TransformComponent>(entity);
+			transform.rotation *= rotateQuad(deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
+		});
+
+	ecsManager.addSystem(gameObjects.camera, [&](ECS::Entity entity, ECS::ComponentRegistry& components)
+		{
+			auto& cameraInfo = components.getComponent<ECS::CameraComponent>(entity);
+			cameraInfo.projection = glm::perspective(glm::radians(45.0f), gameObjects.aspect, 0.1f, 100.0f);
+		});
 }
 
-void Engine::Core::EngineSystem::updateRenderQueue()
+void Engine::Core::EngineSystem::updateComponents()
 {
-	
-		Entity* e{ nullptr };
-		entityManager.getEntity(0, e);
-		if (e != nullptr)
-			e->rotateDegrees(15.0f * deltaTime, glm::vec3(0.5f, 1.0f, 0.0f));
-
-
-}
-
-void Engine::Core::EngineSystem::createEntities()
-{
-	auto entity = entityManager.submitEntity({ .shaderName = "shader", .meshName = "bunny" }, assetManager);
-	auto grid = entityManager.submitEntity({ .shaderName = "shader", .meshName = "grid" }, assetManager);
-	
-	Entity* g = nullptr;
-
-	entityManager.getEntity(1, g);
-
-	g->transform.pos = glm::translate(glm::mat4(1), glm::vec3(0, -0.5f, 0));
-
-	renderQueue.push_back(grid);
-	renderQueue.push_back(entity);
-
-
+	ecsManager.updateSystems();
 }
 
 void Engine::Core::EngineSystem::dispatchAssets()

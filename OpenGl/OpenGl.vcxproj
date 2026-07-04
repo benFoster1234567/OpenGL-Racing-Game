@@ -129,10 +129,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="include\core\assets\MeshData.cpp" />
+    <ClCompile Include="src\core\ECS.cpp" />
     <ClCompile Include="src\core\MaterialData.cpp" />
     <ClCompile Include="src\core\ShaderData.cpp" />
     <ClCompile Include="src\core\Engine.cpp" />
-    <ClCompile Include="src\core\EntityManager.cpp" />
     <ClCompile Include="src\infrastructure\app\Application.cpp" />
     <ClCompile Include="src\infrastructure\engine\DebugConsoleUI.cpp" />
     <ClCompile Include="src\infrastructure\renderer\assets\GPUMesh.cpp" />
@@ -140,7 +140,6 @@
     <ClCompile Include="src\infrastructure\app\GlfwKeyHandler.cpp" />
     <ClCompile Include="src\core\AssetPipeline.cpp" />
     <ClCompile Include="src\core\AssetManager.cpp" />
-    <ClCompile Include="src\core\Entity.cpp" />
     <ClCompile Include="src\infrastructure\renderer\assets\GPUTexture.cpp" />
     <ClCompile Include="src\core\InputHandler.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -154,12 +153,9 @@
     <ClInclude Include="include\core\assets\AssetPipeline.h" />
     <ClInclude Include="include\core\assets\AssetManager.h" />
     <ClInclude Include="include\core\assets\ShaderData.h" />
-    <ClInclude Include="include\core\ecs\Component.h" />
-    <ClInclude Include="include\core\ecs\Entity.h" />
-    <ClInclude Include="include\core\ecs\EntityManager.h" />
+    <ClInclude Include="include\core\ecs\ECS.h" />
     <ClInclude Include="include\core\engine\Engine.h" />
     <ClInclude Include="include\core\events\EventDispatcher.h" />
-    <ClInclude Include="include\core\ecs\EntityController.h" />
     <ClInclude Include="include\infra\app\Application.h" />
     <ClInclude Include="include\infra\engine\CameraInfo.h" />
     <ClInclude Include="include\infra\engine\DebugConsoleUI.h" />
