@@ -14,6 +14,7 @@
 
 #include "core/assets/MeshData.h"
 #include "core/assets/ShaderData.h"
+#include "core/assets/MaterialData.h"
 #include <typeindex>
 #include <bitset>
 #include <glm/gtc/quaternion.hpp>
@@ -80,6 +81,17 @@ namespace Engine::Core::ECS
 		~ShaderComponent() = default;
 
 		Engine::Core::ShaderData* shaderData{ nullptr };
+	};
+
+	struct MaterialComponent : public IComponent
+	{
+		MaterialComponent() = default;
+		MaterialComponent(ShaderData* _shader, MaterialData* _material) : shader{ _shader }, material{ _material } {}
+
+		~MaterialComponent() = default;
+
+		ShaderData* shader{nullptr};
+		MaterialData* material{nullptr};
 	};
 
 	class IComponentArray

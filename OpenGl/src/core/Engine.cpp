@@ -2,6 +2,22 @@
 #include <glm/ext/quaternion_trigonometric.hpp>
 
 
+Engine::Core::EntityRenderCommand Engine::Core::EngineSystem::createRenderCommand(ECS::Entity entity, ECS::Entity camera)
+{
+	ECS::CameraComponent& cameraComp = ecsManager.components.getComponent<ECS::CameraComponent>(camera);
+	ECS::TransformComponent& transform = ecsManager.components.getComponent<ECS::TransformComponent>(entity);
+	ECS::MeshComponent& mesh = ecsManager.components.getComponent<ECS::MeshComponent>(entity);
+	ECS::ShaderComponent& shader = ecsManager.components.getComponent<ECS::ShaderComponent>(entity);
+
+	return EntityRenderCommand{
+		.view = cameraComp.view,
+		.projection = cameraComp.projection,
+		.modelTransform = transform.getTransformMatrix(),
+		.shader = shader.shaderData,
+		.mesh = mesh.meshData,
+	};
+}
+
 void Engine::Core::EngineSystem::createAssetManager()
 {
 	int initialShaders = assetManager.shaderMap.size();
@@ -20,34 +36,29 @@ void Engine::Core::EngineSystem::createAssetManager()
 	}
 }
 
+
+
 void Engine::Core::EngineSystem::fillEntityRenderList(std::vector<EntityRenderCommand>& entityListOut)
 {
 	ECS::Entity player = gameObjects.player;
 	ECS::Entity camera = gameObjects.camera;
+	ECS::Entity grid = gameObjects.grid;
 
-	ECS::CameraComponent& cameraComp = ecsManager.components.getComponent<ECS::CameraComponent>(camera);
-	ECS::TransformComponent& playerTransform = ecsManager.components.getComponent<ECS::TransformComponent>(player);
-	ECS::MeshComponent& playerMesh = ecsManager.components.getComponent<ECS::MeshComponent>(player);
-	ECS::ShaderComponent& playerShader = ecsManager.components.getComponent<ECS::ShaderComponent>(player);
-
-	entityListOut.emplace_back(EntityRenderCommand{
-		.view = cameraComp.view,
-		.projection = cameraComp.projection,
-		.modelTransform = playerTransform.getTransformMatrix(),
-		.shader = playerShader.shaderData,
-		.mesh = playerMesh.meshData,
-	});
-
+	entityListOut.emplace_back(createRenderCommand(player, camera));
+	entityListOut.emplace_back(createRenderCommand(grid, camera));
 }
 
-//this is where we program our game ->
+//this is where we program our game - use system functions
 void Engine::Core::EngineSystem::setupEcs(glm::mat4 view, glm::mat4 projection)
 {
 	MeshData* meshData = nullptr;
+	MeshData* gridData = nullptr;
+
 	ShaderData* shaderData = nullptr;
 	gameObjects.player = ecsManager.createEntity();
 	gameObjects.camera = ecsManager.createEntity();
-	
+	gameObjects.grid = ecsManager.createEntity();
+
 	ECS::CameraComponent cameraComp{};
 	cameraComp.view = view;
 	cameraComp.projection = projection;
@@ -58,10 +69,19 @@ void Engine::Core::EngineSystem::setupEcs(glm::mat4 view, glm::mat4 projection)
 	assetManager.getShader(shaderData, "shader");
 	ECS::ShaderComponent shaderComp{ shaderData };
 
+	assetManager.getMesh(gridData, "grid");
+	ECS::MeshComponent gridComp{ gridData };
+	
+	ECS::TransformComponent transform{};
+	transform.position.y = -1.0f;
+
 	ecsManager.addComponent(gameObjects.camera, cameraComp);
 	ecsManager.addComponent(gameObjects.player, meshComp);
 	ecsManager.addComponent(gameObjects.player, shaderComp);
 	ecsManager.addComponent(gameObjects.player, ECS::TransformComponent{});
+	ecsManager.addComponent(gameObjects.grid, transform);
+	ecsManager.addComponent(gameObjects.grid, gridComp);
+	ecsManager.addComponent(gameObjects.grid, shaderComp);
 
 	auto rotateQuad = [&](float degrees, glm::vec3 axis) -> glm::quat
 	{

@@ -25,8 +25,6 @@ namespace Engine::Core
 
 		std::string getName() const { return name; }
 
-
-		ShaderData* shader{ nullptr };
 		MaterialInfo materialSettings{};
 
 	private:

@@ -40,7 +40,7 @@ namespace Engine::Core
 
 		float deltaTime{1};
 
-
+		EntityRenderCommand createRenderCommand(ECS::Entity entity, ECS::Entity camera);
 		GameObjects gameObjects{};
 
 	public:
@@ -54,6 +54,7 @@ namespace Engine::Core
 		
 		void updateDeltaTime(float t)  { gameObjects.deltaTime = t; }
 		void updateAspect(float a) { gameObjects.aspect = a; }
+
 
 		void createAssetManager();
 
