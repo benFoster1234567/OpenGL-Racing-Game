@@ -106,27 +106,21 @@ void Engine::Core::EngineSystem::setupEcs(glm::mat4 view, glm::mat4 projection)
 			transform.rotation *= rotateQuad(deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
 		});
 
-
 	ecsManager.addSystem(gameObjects.camera, [&](ECS::Entity entity, ECS::ComponentRegistry& components)
 		{
 			auto& cameraInfo = components.getComponent<ECS::CameraComponent>(entity);
 			cameraInfo.projection = glm::perspective(glm::radians(45.0f), gameObjects.aspect, 0.1f, 100.0f);
-		});
-	ecsManager.addSystem(gameObjects.player, [&](ECS::Entity entity, ECS::ComponentRegistry& components)
-		{
-			if (inputHandler.keyPressed(int(KeyCode::A)))
+
+			if (inputHandler.keyHeld(int(KeyCode::A)))
 			{
-				std::cout << "A pressed\n";
+				cameraInfo.rotate(-30.0f* gameObjects.deltaTime, { 0,1,0 });
 			}
-			else if (inputHandler.keyHeld(int(KeyCode::A)))
+			else if (inputHandler.keyHeld(int(KeyCode::D)))
 			{
-				std::cout << "A held\n";
-			}
-			else if (inputHandler.keyReleased(int(KeyCode::A)))
-			{
-				std::cout << "A released\n";
+				cameraInfo.rotate(30.0f * gameObjects.deltaTime, { 0,1,0 });
 			}
 		});
+
 }
 
 void Engine::Core::EngineSystem::dispatchAssets()

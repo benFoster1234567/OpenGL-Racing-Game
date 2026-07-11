@@ -48,3 +48,8 @@ void Engine::Core::ECS::EntityComponentSystemManager::updateSystems()
 Engine::Core::ECS::IComponent::~IComponent() = default;
 
 Engine::Core::ECS::IComponentArray::~IComponentArray() = default;
+
+void Engine::Core::ECS::CameraComponent::rotate(float degrees, glm::vec3 axis)
+{
+	view = glm::rotate(view, glm::radians(degrees), axis);
+}

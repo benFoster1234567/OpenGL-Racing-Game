@@ -99,23 +99,25 @@ void Engine::Infra::Application::setupDebugCommands()
 //window key callback is set here
 void Engine::Infra::Application::setupWindowKeyCallback()
 {
-	auto toggleConsole = [&](Engine::Core::KeyCode k, Engine::Core::KeyAction a)
-		{
-			if (k == Engine::Core::KeyCode::BackTick && a == Engine::Core::KeyAction::Down)
-			{
-				debugConsoleUi->toggleVisibility();
-				std::cout << "Console Visibility: " << debugConsoleUi->isVisible << "\n";
-			}
-		};
+	//auto toggleConsole = [&](Engine::Core::KeyCode k, Engine::Core::KeyAction a)
+	//	{
+
+	//	};
 
 	std::function<void(int, int, int, int)> callback = [&](int _key, int _scancode, int _action, int _mods)
 		{
 			if (debugConsoleUi->isKeyboardCaptured()) return;
 			Engine::Core::KeyAction ka = keyHandler.getAction(_action);
 			Engine::Core::KeyCode k = keyHandler.getInput(_key);
-			toggleConsole(k, ka);
+			//toggleConsole(k, ka);
 			
-			if (_action == GLFW_PRESS)
+			if (k == Engine::Core::KeyCode::BackTick && ka == Engine::Core::KeyAction::Down)
+			{
+				debugConsoleUi->toggleVisibility();
+				std::cout << "Console Visibility: " << debugConsoleUi->isVisible << "\n";
+			}
+
+			else if (_action == GLFW_PRESS)
 			{
 				engine.inputHandler.setKey(k, true);
 			}
@@ -180,7 +182,7 @@ void Engine::Infra::Application::run()
 	while (!window->shouldClose())
 	{
 		window->pollEvents();
-	//std::cout << "frame\n";
+
 		window->updateViewport();
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -197,7 +199,6 @@ void Engine::Infra::Application::run()
 		engine.updateAspect(currentWidth/currentHeight);
 		engine.updateSystems();
 		engine.updateInputState();
-		//engine.inputHandler.printDebugInfo();
 
 		submitEngineRenderQueueToRenderer();
 		renderer.flush();
