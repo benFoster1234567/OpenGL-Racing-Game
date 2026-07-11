@@ -41,4 +41,11 @@ namespace Engine::Core
 		ALT = 1 << 1,
 		CTRL = 1 << 2,
 	};
+
+	enum class KeyAction
+	{
+		Down,
+		Up,
+		Held
+	};
 }

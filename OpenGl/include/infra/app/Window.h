@@ -5,6 +5,7 @@
 #include <functional>
 #include <string>
 #include <GL/gl.h>
+#include <bitset>
 
 namespace Engine::Infra
 {
@@ -13,6 +14,7 @@ namespace Engine::Infra
     class alignas(16) Window
     {
     private:
+
 
         // for fullscreen
         struct 
@@ -46,6 +48,9 @@ namespace Engine::Infra
 
         void pollEvents() const { glfwPollEvents(); }
 
+        std::bitset<512> pollEventsGetKeys();
+
+
         static void glfwKeyCallback(GLFWwindow* _glfwWindow, int _key, int _scancode, int _action, int _mods) 
         {
             Window* window = static_cast<Window*>(glfwGetWindowUserPointer(_glfwWindow));
@@ -73,6 +78,7 @@ namespace Engine::Infra
 		void swapBuffers() const { glfwSwapBuffers(glfwWindow); }
         bool shouldClose() const { return closeApplication || glfwWindowShouldClose(glfwWindow); }
         void onKey(int key, int scancode, int action, int mods);
+
         void destroyWindow() 
         { 
             if (glfwWindow) {
@@ -81,6 +87,7 @@ namespace Engine::Infra
             }
             glfwTerminate();
         }
+
 		void terminateGlfw()
 		{
 			glfwTerminate();

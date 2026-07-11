@@ -11,6 +11,7 @@ namespace Engine::Core
 	constexpr int MAX_ENTITIES{ 100 };
 
 
+
 	struct EntityRenderCommand
 	{
 		glm::mat4 view;
@@ -23,9 +24,6 @@ namespace Engine::Core
 	struct GameObjects
 	{
 
-		//std::array<ECS::Entity, MAX_ENTITIES> actors{};
-		//std::array<ECS::Entity, MAX_ENTITIES> objects{};
-		//std::array<ECS::Entity, MAX_ENTITIES> cameras{};
 		ECS::Entity player{};
 		ECS::Entity camera{};
 		ECS::Entity grid{};
@@ -37,7 +35,7 @@ namespace Engine::Core
 	class EngineSystem
 	{
 	private:
-
+		
 		float deltaTime{1};
 
 		EntityRenderCommand createRenderCommand(ECS::Entity entity, ECS::Entity camera);
@@ -46,14 +44,23 @@ namespace Engine::Core
 	public:
 		ECS::EntityComponentSystemManager ecsManager{};
 		AssetManager assetManager{};
+		InputHandler inputHandler{};
 		EngineSystem() = default;
+
 		~EngineSystem() = default;
 
+		//InputState inputState;
+
 		AssetPipeline assetPipeline{};
-		InputHandler inputHandler{};
 		
 		void updateDeltaTime(float t)  { gameObjects.deltaTime = t; }
 		void updateAspect(float a) { gameObjects.aspect = a; }
+
+		//call whenever a key is pressed
+		void onKey(KeyCode k, bool pressed);
+		
+		//after everything is set for the frame, call this?
+		void updateInputState();
 
 
 		void createAssetManager();
@@ -66,7 +73,6 @@ namespace Engine::Core
 		EventDispatcher<std::vector<ShaderData*>> shaderDispatcher{};
 		EventDispatcher<std::vector<MeshData*>> meshDispatcher{};
 
-		void updateComponents();
 		void updateSystems() { ecsManager.updateSystems(); }
 
 		void dispatchAssets();

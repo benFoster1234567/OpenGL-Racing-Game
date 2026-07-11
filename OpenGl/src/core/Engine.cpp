@@ -18,6 +18,17 @@ Engine::Core::EntityRenderCommand Engine::Core::EngineSystem::createRenderComman
 	};
 }
 
+void Engine::Core::EngineSystem::onKey(KeyCode k, bool pressed)
+{
+	inputHandler.setKey(k, pressed);
+}
+
+void Engine::Core::EngineSystem::updateInputState()
+{
+	//std::cout << "updating input state\n";
+	inputHandler.updateKeyboard();
+}
+
 void Engine::Core::EngineSystem::createAssetManager()
 {
 	int initialShaders = assetManager.shaderMap.size();
@@ -35,8 +46,6 @@ void Engine::Core::EngineSystem::createAssetManager()
 		throw std::runtime_error("Nothing was imported during asset refresh!");
 	}
 }
-
-
 
 void Engine::Core::EngineSystem::fillEntityRenderList(std::vector<EntityRenderCommand>& entityListOut)
 {
@@ -64,14 +73,14 @@ void Engine::Core::EngineSystem::setupEcs(glm::mat4 view, glm::mat4 projection)
 	cameraComp.projection = projection;
 
 	assetManager.getMesh(meshData, "bunny");
-	ECS::MeshComponent meshComp{meshData};
+	ECS::MeshComponent meshComp{ meshData };
 
 	assetManager.getShader(shaderData, "shader");
 	ECS::ShaderComponent shaderComp{ shaderData };
 
 	assetManager.getMesh(gridData, "grid");
 	ECS::MeshComponent gridComp{ gridData };
-	
+
 	ECS::TransformComponent transform{};
 	transform.position.y = -1.0f;
 
@@ -84,11 +93,11 @@ void Engine::Core::EngineSystem::setupEcs(glm::mat4 view, glm::mat4 projection)
 	ecsManager.addComponent(gameObjects.grid, shaderComp);
 
 	auto rotateQuad = [&](float degrees, glm::vec3 axis) -> glm::quat
-	{
-		float radians = glm::radians(degrees);
-		glm::quat q = glm::angleAxis(radians, glm::normalize(axis));
-		return q;
-	};
+		{
+			float radians = glm::radians(degrees);
+			glm::quat q = glm::angleAxis(radians, glm::normalize(axis));
+			return q;
+		};
 
 	ecsManager.addSystem(gameObjects.player, [&](ECS::Entity entity, ECS::ComponentRegistry& components)
 		{
@@ -97,16 +106,27 @@ void Engine::Core::EngineSystem::setupEcs(glm::mat4 view, glm::mat4 projection)
 			transform.rotation *= rotateQuad(deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
 		});
 
+
 	ecsManager.addSystem(gameObjects.camera, [&](ECS::Entity entity, ECS::ComponentRegistry& components)
 		{
 			auto& cameraInfo = components.getComponent<ECS::CameraComponent>(entity);
 			cameraInfo.projection = glm::perspective(glm::radians(45.0f), gameObjects.aspect, 0.1f, 100.0f);
 		});
-}
-
-void Engine::Core::EngineSystem::updateComponents()
-{
-	ecsManager.updateSystems();
+	ecsManager.addSystem(gameObjects.player, [&](ECS::Entity entity, ECS::ComponentRegistry& components)
+		{
+			if (inputHandler.keyPressed(int(KeyCode::A)))
+			{
+				std::cout << "A pressed\n";
+			}
+			else if (inputHandler.keyHeld(int(KeyCode::A)))
+			{
+				std::cout << "A held\n";
+			}
+			else if (inputHandler.keyReleased(int(KeyCode::A)))
+			{
+				std::cout << "A released\n";
+			}
+		});
 }
 
 void Engine::Core::EngineSystem::dispatchAssets()
@@ -121,5 +141,20 @@ void Engine::Core::EngineSystem::dispatchAssets()
 	assetManager.meshList(meshList);
 	if (meshList.empty()) std::cout << "mesh list empty!";
 	else meshDispatcher.invoke(meshList);
+
+}
+
+void Engine::Core::InputState::updateKeyState(std::bitset<512> inputData)
+{
+	previousFrameInputData = currentFrameInputData;
+	currentFrameInputData = inputData;
+}
+
+void Engine::Core::InputState::updateMouseState(glm::vec2 currentMouse)
+{
+	glm::vec2 lastMouse = mousePos;
+	mousePos = currentMouse;
+
+	mouseDelta = currentMouse - lastMouse;
 
 }

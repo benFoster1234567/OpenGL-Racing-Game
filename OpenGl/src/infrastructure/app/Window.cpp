@@ -72,8 +72,6 @@ Engine::Infra::Window::Window(
 
 }
 
-
-
 void Engine::Infra::Window::saveWindowState(int x, int y, int w, int h)
 {
 	savedWindowState.x = x;

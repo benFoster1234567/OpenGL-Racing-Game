@@ -8,6 +8,7 @@
 
 #include "Keys.h"
 #include "core/events/EventDispatcher.h"
+#include <bitset>
 
 
 namespace Engine::Core
@@ -29,12 +30,7 @@ namespace Engine::Core
 		Console
 	};
 
-	enum class KeyAction
-	{
-		Down,
-		Up,
-		Held
-	};
+
 
 	struct KeyboardMappings
 	{
@@ -51,43 +47,53 @@ namespace Engine::Core
 		KeyCode Console = KeyCode::BackTick;
 	};
 
+
+
+	struct InputState
+	{
+		std::bitset<512> currentFrameInputData{};
+		std::bitset<512> previousFrameInputData{};
+
+		glm::vec2 mousePos{0,0};
+		glm::vec2 lastMousePos{0,0};
+		glm::vec2 mouseDelta{0,0};
+
+		//add mouseButtons
+
+		void updateKeyState(std::bitset<512> inputData);
+		void updateMouseState(glm::vec2 currentMouse/* , currentMouseButtons */);
+
+	};
+
 	class InputHandler
 	{
-	public:
-		InputHandler() { mapKeys({}); }
-		InputHandler(KeyboardMappings keymaps);
-		InputHandler(const InputHandler&) = default;
-		InputHandler(InputHandler&&) = default;
-		~InputHandler() = default;
-
-		void invokeKeyAndControl(KeyCode k, KeyAction a);
-
-		void invokeControl(Control c, KeyAction a);
-		void invokeKey(KeyCode k, KeyAction a);
-		
-		size_t subscribeKey(std::function<void(KeyCode, KeyAction)> func);
-		size_t subscribeControl(std::function<void(Control, KeyAction)> func);
-
-
 	private:
-		bool mapKeys(KeyboardMappings _km);//helper for constructor
-		KeyboardMappings km{};
+		InputState inputState{};
 
-		std::map<KeyCode, Control> keyboardMap{};
-		std::set<KeyCode> heldKeys{};
-		std::set<Control> heldControlKey{};
+	public:
 
-		EventDispatcher<KeyCode, KeyAction> keyBus{};
-		EventDispatcher<Control, KeyAction> controlBus{};
+		void setKey(KeyCode k, bool pressed);
 
-		bool checkHeld(KeyCode k) const
+		void updateKeyboard();
+
+		void printDebugInfo();
+
+		bool keyPressed(int key) const
 		{
-			return heldKeys.contains(k);
+			//if (key >= 512) throw std::runtime_error("invalid key!");
+			return inputState.currentFrameInputData.test(key) && !inputState.previousFrameInputData.test(key);
 		}
 
-		bool checkHeld(Control c) const
+		bool keyReleased(int key) const
 		{
-			return heldControlKey.contains(c);
+			//if (key >= 512) throw std::runtime_error("invalid key!");
+			return inputState.currentFrameInputData.test(key) == false && inputState.previousFrameInputData.test(key) == true;
+		}
+
+		bool keyHeld(int key) const
+		{
+			//if (key >= 512) throw std::runtime_error("invalid key!");
+			return inputState.currentFrameInputData.test(key) && inputState.previousFrameInputData.test(key);
 		}
 
 	};

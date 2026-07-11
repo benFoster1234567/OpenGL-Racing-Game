@@ -185,13 +185,10 @@ namespace Engine::Core::ECS
 
 	public:
 		using SystemFunction = std::function<void(Entity, ComponentRegistry&)>;
-		
-		
 		void update(Entity entity, ComponentRegistry& compreg);
 		void registerSystem(Entity entity, SystemFunction systemFunc); //later we can add in a signature that keeps track of which components are required for the system to run. For now, we will just assume that the system can run on any entity.
 	
 	private:
-
 		std::unordered_map<Entity, std::vector<SystemFunction>> systemMap{};
 	};
 

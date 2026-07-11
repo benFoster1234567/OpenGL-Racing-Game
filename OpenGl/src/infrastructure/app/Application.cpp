@@ -16,7 +16,7 @@
 #include <core/assets/ShaderData.h>
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_transform.hpp>
-#include <glm/ext/matrix_clip_space.hpp>  // <-- CORRECT: Use .hpp instead
+#include <glm/ext/matrix_clip_space.hpp> 
 #include <glm/ext/matrix_float4x4.hpp>
 
 #include <glm/gtc/type_ptr.hpp>
@@ -99,12 +99,30 @@ void Engine::Infra::Application::setupDebugCommands()
 //window key callback is set here
 void Engine::Infra::Application::setupWindowKeyCallback()
 {
+	auto toggleConsole = [&](Engine::Core::KeyCode k, Engine::Core::KeyAction a)
+		{
+			if (k == Engine::Core::KeyCode::BackTick && a == Engine::Core::KeyAction::Down)
+			{
+				debugConsoleUi->toggleVisibility();
+				std::cout << "Console Visibility: " << debugConsoleUi->isVisible << "\n";
+			}
+		};
+
 	std::function<void(int, int, int, int)> callback = [&](int _key, int _scancode, int _action, int _mods)
 		{
 			if (debugConsoleUi->isKeyboardCaptured()) return;
 			Engine::Core::KeyAction ka = keyHandler.getAction(_action);
 			Engine::Core::KeyCode k = keyHandler.getInput(_key);
-			engine.inputHandler.invokeKeyAndControl(k, ka);
+			toggleConsole(k, ka);
+			
+			if (_action == GLFW_PRESS)
+			{
+				engine.inputHandler.setKey(k, true);
+			}
+			else if (_action == GLFW_RELEASE)
+			{
+				engine.inputHandler.setKey(k, false);
+			}
 
 		};
 	window->submitKeyCallback(callback);
@@ -126,38 +144,7 @@ void Engine::Infra::Application::setupImportCallbacks()
 
 void Engine::Infra::Application::setupInput()
 {
-	auto ctrlTrack = [&](Engine::Core::Control c, Engine::Core::KeyAction a)
-		{
-			switch (c)
-			{
-			case Engine::Core::Control::TurnLeft:
-				std::cout << "Turn Left"; break;
-			case Engine::Core::Control::TurnRight:
-				std::cout << "Turn Right"; break;
-			default:
-				std::cout << "Control Active"; break;
-			}
 
-			switch (a)
-			{
-			case Engine::Core::KeyAction::Down: std::cout << " Down"; break;
-			case Engine::Core::KeyAction::Up: std::cout << " Up"; break;
-			case Engine::Core::KeyAction::Held: std::cout << " Held"; break;
-			}
-			std::cout << "\n";
-		};
-
-	auto toggleConsole = [&](Engine::Core::KeyCode k, Engine::Core::KeyAction a)
-		{
-			if (k == Engine::Core::KeyCode::BackTick && a == Engine::Core::KeyAction::Down)
-			{
-				debugConsoleUi->toggleVisibility();
-				std::cout << "Console Visibility: " << debugConsoleUi->isVisible << "\n";
-			}
-		};
-
-	engine.inputHandler.subscribeControl(ctrlTrack);
-	engine.inputHandler.subscribeKey(toggleConsole);
 }
 
 void Engine::Infra::Application::run()
@@ -176,7 +163,6 @@ void Engine::Infra::Application::run()
 		});
 
 	setupImportCallbacks();
-	
 	importAssets();
 	engine.dispatchAssets();
 
@@ -193,6 +179,8 @@ void Engine::Infra::Application::run()
 
 	while (!window->shouldClose())
 	{
+		window->pollEvents();
+	//std::cout << "frame\n";
 		window->updateViewport();
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -208,7 +196,8 @@ void Engine::Infra::Application::run()
 		engine.updateDeltaTime(deltaTime);
 		engine.updateAspect(currentWidth/currentHeight);
 		engine.updateSystems();
-		engine.updateComponents();
+		engine.updateInputState();
+		//engine.inputHandler.printDebugInfo();
 
 		submitEngineRenderQueueToRenderer();
 		renderer.flush();
@@ -217,7 +206,6 @@ void Engine::Infra::Application::run()
 		debugConsoleUi->render();
 
 		window->swapBuffers();
-		window->pollEvents();
 	}
 
 	window->terminateGlfw();
