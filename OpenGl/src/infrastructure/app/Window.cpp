@@ -58,6 +58,8 @@ Engine::Infra::Window::Window(
 		glViewport(0, 0, w, h);
 	});
 	
+
+
 	int initialWidth, initialHeight;
 	glfwGetFramebufferSize(glfwWindow, &initialWidth, &initialHeight);
 	glViewport(0, 0, initialWidth, initialHeight);
@@ -69,6 +71,18 @@ Engine::Infra::Window::Window(
 		std::cerr << "GLEW Initialization Failed: " << glewGetErrorString(err) << "\n";
 		return;
 	}
+	glfwSetWindowUserPointer(glfwWindow, this);
+	auto mouseCallback = [](GLFWwindow* window, double xpos, double ypos)
+		{
+			auto* app = static_cast<Window*>(glfwGetWindowUserPointer(window));
+			if (app) 
+			{
+				app->cursorState = { xpos, ypos };
+			}
+		};
+
+	glfwSetCursorPosCallback(glfwWindow, mouseCallback);
+
 
 }
 
@@ -101,6 +115,23 @@ void Window::submitKeyCallback(std::function<void(int, int, int, int)> callback)
 	keyPressedDispatcher.subscribe(callback);
 	glfwSetKeyCallback(glfwWindow, glfwKeyCallback);
 	glfwSetWindowUserPointer(glfwWindow, this);
+}
+
+void Engine::Infra::Window::enableCursor()
+{
+	glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+}
+
+void Engine::Infra::Window::disableCursor()
+{
+	glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+std::tuple<float, float> Engine::Infra::Window::getCurrentCursor()
+{
+
+	return cursorState;
 }
 
 void Engine::Infra::Window::setFullscreen()

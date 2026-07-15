@@ -29,6 +29,8 @@ namespace Engine::Infra
         int width = 0;
         int height = 0;
 
+        std::tuple<float, float> cursorState{};
+
         bool isFullscreen{true};
 
         const char* windowTitle;
@@ -45,11 +47,10 @@ namespace Engine::Infra
         bool closeApplication{ false };
 
         void submitKeyCallback(std::function<void(int, int, int, int)> callback);
-
         void pollEvents() const { glfwPollEvents(); }
-
-        std::bitset<512> pollEventsGetKeys();
-
+        
+        void enableCursor();
+        void disableCursor();
 
         static void glfwKeyCallback(GLFWwindow* _glfwWindow, int _key, int _scancode, int _action, int _mods) 
         {
@@ -59,6 +60,8 @@ namespace Engine::Infra
                 window->onKey(_key, _scancode, _action, _mods);
             }
         }
+
+        std::tuple<float, float> getCurrentCursor();
 
         void setFullscreen();
 

@@ -30,19 +30,22 @@ namespace Engine::Core::ECS
 	using ComponentType = std::uint8_t;
 	const ComponentType MAX_COMPONENTS = 32;
 
-	struct IComponent
+	using System = size_t;
+
+
+	struct ComponentBase
 	{
-		virtual ~IComponent();
+		virtual ~ComponentBase();
 	};
 
-	struct CameraComponent : public IComponent
+	struct CameraComponent : public ComponentBase
 	{
 		glm::mat4 projection{};
 		glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		void rotate(float degrees, glm::vec3 axis);
 	};
 
-	struct TransformComponent : public IComponent
+	struct TransformComponent : public ComponentBase
 	{
 		glm::vec3 position{ 0.0f, 0.0f, 0.0f };
 		glm::quat rotation{ 1.0f, 0.0f, 0.0f, 0.0f }; // Quaternion representation
@@ -58,7 +61,7 @@ namespace Engine::Core::ECS
 
 	};
 
-	struct MeshComponent : public IComponent
+	struct MeshComponent : public ComponentBase
 	{
 		MeshComponent() = default;
 		MeshComponent(Engine::Core::MeshData* mesh) : meshData(mesh) {}
@@ -71,7 +74,7 @@ namespace Engine::Core::ECS
 		Engine::Core::MeshData* meshData{ nullptr };
 	};
 
-	struct ShaderComponent : public IComponent
+	struct ShaderComponent : public ComponentBase
 	{
 		ShaderComponent() = default;
 		ShaderComponent(Engine::Core::ShaderData* shader) : shaderData(shader) {}
@@ -84,7 +87,7 @@ namespace Engine::Core::ECS
 		Engine::Core::ShaderData* shaderData{ nullptr };
 	};
 
-	struct MaterialComponent : public IComponent
+	struct MaterialComponent : public ComponentBase
 	{
 		MaterialComponent() = default;
 		MaterialComponent(ShaderData* _shader, MaterialData* _material) : shader{ _shader }, material{ _material } {}
@@ -101,7 +104,7 @@ namespace Engine::Core::ECS
 		virtual ~IComponentArray();
 	};
 
-	template <std::derived_from<IComponent> T>
+	template <std::derived_from<ComponentBase> T>
 	class ComponentArray : public IComponentArray
 	{
 	private:
@@ -149,7 +152,7 @@ namespace Engine::Core::ECS
 
 	public:
 
-		template <std::derived_from<IComponent> T>
+		template <std::derived_from<ComponentBase> T>
 		void registerComponent(Entity entity, T component)
 		{
 			//check to see if this works with an object that contains a pointer to a mesh or shader. 
@@ -167,7 +170,7 @@ namespace Engine::Core::ECS
 			componentArray->addData(entity, component);
 		}
 
-		template <std::derived_from<IComponent> T>
+		template <std::derived_from<ComponentBase> T>
 		T& getComponent(Entity entity)
 		{
 			if (!componentArrays.contains(std::type_index(typeid(T))))
@@ -180,23 +183,25 @@ namespace Engine::Core::ECS
 
 	};
 
-
 	class SystemRegistry
 	{
 
 	public:
 		using SystemFunction = std::function<void(Entity, ComponentRegistry&)>;
-		void update(Entity entity, ComponentRegistry& compreg);
-		void registerSystem(Entity entity, SystemFunction systemFunc); //later we can add in a signature that keeps track of which components are required for the system to run. For now, we will just assume that the system can run on any entity.
+		System registerSystem(SystemFunction systemFunc); //later we can add in a signature that keeps track of which components are required for the system to run. For now, we will just assume that the system can run on any entity.
 	
 	private:
-		std::unordered_map<Entity, std::vector<SystemFunction>> systemMap{};
+		System nextSystem{ 0 };
+		std::unordered_map<System, SystemFunction> systemMap{};
+		friend class EntityComponentSystemManager;
 	};
 
 	class EntityComponentSystemManager
 	{
 	private:
+		//using SystemTag = std::bitset<512>;
 		Entity nextEntityId{ 0 };
+		std::unordered_map<Entity, std::vector<System>> entitySystemMap{};
 		std::vector<Entity> entities{};
 	public:
 		
@@ -207,12 +212,14 @@ namespace Engine::Core::ECS
 
 		std::vector<Entity> getEntities() const { return entities; }
 
-		void addComponent(Entity entity, std::derived_from<IComponent> auto component)
+		void addComponent(Entity entity, std::derived_from<ComponentBase> auto component)
 		{
 			components.registerComponent(entity, component);
 		}
 
-		void addSystem(Entity entity, SystemRegistry::SystemFunction systemFunc);
+
+
+		void attachSystem(Entity entity, System system);
 
 		void updateSystems();
 	};

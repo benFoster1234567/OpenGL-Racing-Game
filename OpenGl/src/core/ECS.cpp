@@ -1,27 +1,13 @@
 #include "core/ecs/ECS.h"
 
-void Engine::Core::ECS::SystemRegistry::update(Entity entity, ComponentRegistry& compreg)
+
+
+Engine::Core::ECS::System Engine::Core::ECS::SystemRegistry::registerSystem(SystemFunction systemFunc)
 {
-	if (!systemMap.contains(entity))
-	{
-		return;
-	}
-
-	for (const auto& s : systemMap[entity])
-	{
-		s(entity, compreg);
-	}
-
-}
-
-void Engine::Core::ECS::SystemRegistry::registerSystem(Entity entity, SystemFunction systemFunc)
-{
-	if (!systemMap.contains(entity))
-	{
-		systemMap[entity] = std::vector<SystemFunction>{};
-	}
-
-	systemMap[entity].push_back(systemFunc);
+	auto currentSystem = nextSystem;
+	systemMap[currentSystem] = systemFunc;
+	nextSystem++;
+	return currentSystem;
 }
 
 Engine::Core::ECS::Entity Engine::Core::ECS::EntityComponentSystemManager::createEntity()
@@ -31,21 +17,23 @@ Engine::Core::ECS::Entity Engine::Core::ECS::EntityComponentSystemManager::creat
 	return e;
 }
 
-void Engine::Core::ECS::EntityComponentSystemManager::addSystem(Entity entity, SystemRegistry::SystemFunction systemFunc)
+void Engine::Core::ECS::EntityComponentSystemManager::attachSystem(Entity entity, System system)
 {
-	systems.registerSystem(entity, systemFunc);
+	entitySystemMap[entity].push_back(int(system));
 }
 
 void Engine::Core::ECS::EntityComponentSystemManager::updateSystems()
 {
-	for (const auto& entity : entities)
+	for (auto& [entity, systemList] : entitySystemMap)
 	{
-		systems.update(entity, components);
+		for (auto s : systemList)
+		{
+			systems.systemMap[s](entity, components);
+		}
 	}
-
 }
 
-Engine::Core::ECS::IComponent::~IComponent() = default;
+Engine::Core::ECS::ComponentBase::~ComponentBase() = default;
 
 Engine::Core::ECS::IComponentArray::~IComponentArray() = default;
 

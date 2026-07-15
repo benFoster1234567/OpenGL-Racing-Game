@@ -99,14 +99,14 @@ void Engine::Core::EngineSystem::setupEcs(glm::mat4 view, glm::mat4 projection)
 			return q;
 		};
 
-	ecsManager.addSystem(gameObjects.player, [&](ECS::Entity entity, ECS::ComponentRegistry& components)
+	auto rotateObject = ecsManager.systems.registerSystem([&](ECS::Entity entity, ECS::ComponentRegistry& components)
 		{
 			auto deltaTime = gameObjects.deltaTime;
 			auto& transform = components.getComponent<ECS::TransformComponent>(entity);
 			transform.rotation *= rotateQuad(deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
 		});
 
-	ecsManager.addSystem(gameObjects.camera, [&](ECS::Entity entity, ECS::ComponentRegistry& components)
+	auto rotateCameraByKeys = ecsManager.systems.registerSystem([&](ECS::Entity entity, ECS::ComponentRegistry& components)
 		{
 			auto& cameraInfo = components.getComponent<ECS::CameraComponent>(entity);
 			cameraInfo.projection = glm::perspective(glm::radians(45.0f), gameObjects.aspect, 0.1f, 100.0f);
@@ -120,6 +120,8 @@ void Engine::Core::EngineSystem::setupEcs(glm::mat4 view, glm::mat4 projection)
 				cameraInfo.rotate(30.0f * gameObjects.deltaTime, { 0,1,0 });
 			}
 		});
+
+	ecsManager.attachSystem(gameObjects.camera, rotateCameraByKeys);
 
 }
 
