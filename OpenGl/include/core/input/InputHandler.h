@@ -75,6 +75,7 @@ namespace Engine::Core
 		void setKey(KeyCode k, bool pressed);
 
 		void updateKeyboard();
+		void updateMousePosition(glm::vec2 pos) { inputState.updateMouseState(pos); }
 
 		void printDebugInfo();
 

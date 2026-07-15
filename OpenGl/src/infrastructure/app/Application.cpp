@@ -27,7 +27,7 @@
 Engine::Infra::Application::Application()
 {
 	window = std::make_unique<Window>("window", false);
-	setupWindowKeyCallback();
+	setupWindowCallbacks();
 	debugConsoleUi = std::make_unique<DebugConsoleUi>(*window);
 	setupDebugCommands();
 	setupInput();
@@ -97,12 +97,8 @@ void Engine::Infra::Application::setupDebugCommands()
 }
 
 //window key callback is set here
-void Engine::Infra::Application::setupWindowKeyCallback()
+void Engine::Infra::Application::setupWindowCallbacks()
 {
-	//auto toggleConsole = [&](Engine::Core::KeyCode k, Engine::Core::KeyAction a)
-	//	{
-
-	//	};
 
 	std::function<void(int, int, int, int)> callback = [&](int _key, int _scancode, int _action, int _mods)
 		{
@@ -127,7 +123,14 @@ void Engine::Infra::Application::setupWindowKeyCallback()
 			}
 
 		};
+
+	auto mouseMotionCallback = [&](double x, double y)
+		{
+			engine.inputHandler.updateMousePosition({ x,y });
+		};
+
 	window->submitKeyCallback(callback);
+
 }
 
 //import callback lambdas are created here

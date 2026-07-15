@@ -26,7 +26,7 @@ namespace Engine::Infra
 		Engine::Core::EngineSystem engine;
 		
 		void setupDebugCommands();
-		void setupWindowKeyCallback();
+		void setupWindowCallbacks();
 		void setupImportCallbacks();
 		void importAssets();
 		void submitEngineRenderQueueToRenderer();

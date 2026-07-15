@@ -34,7 +34,9 @@ namespace Engine::Infra
         bool isFullscreen{true};
 
         const char* windowTitle;
-        Engine::Core::EventDispatcher<int, int, int, int> keyPressedDispatcher;
+        Engine::Core::EventDispatcher<int, int, int, int> keyPressedDispatcher{};
+        Engine::Core::EventDispatcher<double, double> mouseMotionDispatcher{};
+
 		friend class DebugConsoleUi;
     public:
 
@@ -46,11 +48,14 @@ namespace Engine::Infra
         GLFWwindow* glfwWindow;
         bool closeApplication{ false };
 
-        void submitKeyCallback(std::function<void(int, int, int, int)> callback);
-        void pollEvents() const { glfwPollEvents(); }
-        
-        void enableCursor();
-        void disableCursor();
+        static void glfwMouseMotionCallback(GLFWwindow* _glfwWindow, double _xpos, double _ypos)
+        {
+            Window* window = static_cast<Window*>(glfwGetWindowUserPointer(_glfwWindow));
+            if (window)
+            {
+                window->onMouseMotion(_xpos, _ypos);
+            }
+        }
 
         static void glfwKeyCallback(GLFWwindow* _glfwWindow, int _key, int _scancode, int _action, int _mods) 
         {
@@ -64,9 +69,7 @@ namespace Engine::Infra
         std::tuple<float, float> getCurrentCursor();
 
         void setFullscreen();
-
         void setWindowed();
-
         void setWindowSize(int w, int h);
 
         int getWidth() { return this->width; };
@@ -81,6 +84,14 @@ namespace Engine::Infra
 		void swapBuffers() const { glfwSwapBuffers(glfwWindow); }
         bool shouldClose() const { return closeApplication || glfwWindowShouldClose(glfwWindow); }
         void onKey(int key, int scancode, int action, int mods);
+        void onMouseMotion(double xpos, double ypos);
+
+        void enableCursor();
+        void disableCursor();
+
+        void submitMouseMotionCallback(std::function<void(double, double)> func); //should be able to connect to the input handler
+        void submitKeyCallback(std::function<void(int, int, int, int)> callback);
+        void pollEvents() const { glfwPollEvents(); }
 
         void destroyWindow() 
         { 

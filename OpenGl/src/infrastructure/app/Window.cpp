@@ -81,7 +81,7 @@ Engine::Infra::Window::Window(
 			}
 		};
 
-	glfwSetCursorPosCallback(glfwWindow, mouseCallback);
+	glfwSetCursorPosCallback(glfwWindow, glfwMouseMotionCallback);
 
 
 }
@@ -169,5 +169,15 @@ void Engine::Infra::Window::setWindowSize(int w, int h)
 void Window::onKey(int key, int scancode, int action, int mods)
 {
 	keyPressedDispatcher.invoke(key, scancode, action, mods);
+}
+
+void Engine::Infra::Window::onMouseMotion(double xpos, double ypos)
+{
+	mouseMotionDispatcher.invoke(xpos, ypos);
+}
+
+void Engine::Infra::Window::submitMouseMotionCallback(std::function<void(double, double)> func)
+{
+	mouseMotionDispatcher.subscribe(func);
 }
 
