@@ -99,7 +99,7 @@ void Engine::Infra::Application::setupDebugCommands()
 //window key callback is set here
 void Engine::Infra::Application::setupWindowCallbacks()
 {
-
+	
 	std::function<void(int, int, int, int)> callback = [&](int _key, int _scancode, int _action, int _mods)
 		{
 			if (debugConsoleUi->isKeyboardCaptured()) return;
@@ -110,6 +110,14 @@ void Engine::Infra::Application::setupWindowCallbacks()
 			if (k == Engine::Core::KeyCode::BackTick && ka == Engine::Core::KeyAction::Down)
 			{
 				debugConsoleUi->toggleVisibility();
+				if (debugConsoleUi->isVisible)
+				{
+					window->enableCursor();
+				}
+				else
+				{
+					window->disableCursor();
+				}
 				std::cout << "Console Visibility: " << debugConsoleUi->isVisible << "\n";
 			}
 
@@ -117,6 +125,7 @@ void Engine::Infra::Application::setupWindowCallbacks()
 			{
 				engine.inputHandler.setKey(k, true);
 			}
+
 			else if (_action == GLFW_RELEASE)
 			{
 				engine.inputHandler.setKey(k, false);
@@ -128,7 +137,7 @@ void Engine::Infra::Application::setupWindowCallbacks()
 		{
 			engine.inputHandler.updateMousePosition({ x,y });
 		};
-
+	window->submitMouseMotionCallback(mouseMotionCallback);
 	window->submitKeyCallback(callback);
 
 }
@@ -188,20 +197,18 @@ void Engine::Infra::Application::run()
 
 		window->updateViewport();
 
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		renderer.clear();
 
-		float currentFrame = static_cast<float>(glfwGetTime());
-		float deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
+		window->updateDeltaTime();
 		
 		float currentWidth = static_cast<float>(window->getWidth());
 		float currentHeight = static_cast<float>(window->getHeight());
 
-		engine.updateDeltaTime(deltaTime);
+		engine.updateDeltaTime(window->deltaTime());
 		engine.updateAspect(currentWidth/currentHeight);
 		engine.updateSystems();
 		engine.updateInputState();
+		engine.inputHandler.inputState.updateMouseState();
 
 		submitEngineRenderQueueToRenderer();
 		renderer.flush();

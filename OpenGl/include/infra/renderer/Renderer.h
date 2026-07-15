@@ -53,6 +53,12 @@ namespace Engine::Infra
 
 		void setPolygonMode(int m) { polygonMode = m; }
 
+		void clear() const
+		{
+			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		}
+
 		std::map<Core::ShaderData*, std::unique_ptr<GpuShader>> gpuShaderCache{}; 
 
 		void flush();

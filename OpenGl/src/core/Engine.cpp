@@ -121,7 +121,39 @@ void Engine::Core::EngineSystem::setupEcs(glm::mat4 view, glm::mat4 projection)
 			}
 		});
 
-	ecsManager.attachSystem(gameObjects.camera, rotateCameraByKeys);
+auto rotateCameraByMouse = ecsManager.systems.registerSystem([&](ECS::Entity entity, ECS::ComponentRegistry& components)   
+	{    
+		std::cout << "moving mouse!" << inputHandler.inputState.mousePos.x << ", " << inputHandler.inputState.mousePos.y << "\n";
+
+		auto mouseDelta = inputHandler.inputState.mouseDelta;
+		if (mouseDelta.x == 0.0f && mouseDelta.y == 0.0f) return;
+
+		auto& camera = components.getComponent<ECS::CameraComponent>(entity);
+    
+		// 1. Extract the current Right and Up vectors directly from the View matrix columns/rows
+		// For a standard row-major or column-major view matrix, these are the camera-space axes in world coordinates.
+		glm::vec3 cameraRight = glm::vec3(camera.view[0][0], camera.view[1][0], camera.view[2][0]); 
+		glm::vec3 worldUp     = glm::vec3(0.0f, 1.0f, 0.0f); // Keep a fixed world up to prevent roll
+
+		// 2. Calculate the incremental rotation quaternions based on mouse movement
+		float sensitivity = 0.001f; // Adjust this value to fit your engine's scaling
+		glm::quat yawRotation   = glm::angleAxis(-mouseDelta.x * sensitivity, worldUp);
+		glm::quat pitchRotation = glm::angleAxis(-mouseDelta.y * sensitivity, cameraRight);
+		glm::quat combinedRotation = yawRotation * pitchRotation;
+
+		// 3. Extract the current camera position from the inverse view matrix
+		glm::mat4 invView = glm::inverse(camera.view);
+		glm::vec3 position = glm::vec3(invView[3]);
+
+		// 4. Extract and rotate the current target orientation forward vector
+		glm::vec3 forward = -glm::vec3(camera.view[0][2], camera.view[1][2], camera.view[2][2]);
+		forward = combinedRotation * forward;
+
+		// 5. Rebuild the LookAt View matrix with the new forward direction
+		camera.view = glm::lookAt(position, position + forward, worldUp);
+	});
+
+	ecsManager.attachSystem(gameObjects.camera, rotateCameraByMouse);
 	ecsManager.attachSystem(gameObjects.player, rotateObject);
 }
 

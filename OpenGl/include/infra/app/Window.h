@@ -22,6 +22,11 @@ namespace Engine::Infra
             int x, y, w, h;
         } savedWindowState{ 0,0,0,0 };
 
+        struct
+        {
+            float lastTime, deltaTime;
+        } times{ 0.0f, 0.0f };
+
         void saveWindowState(int x, int y, int w, int h);
         void saveWindowState();
         //
@@ -74,6 +79,9 @@ namespace Engine::Infra
 
         int getWidth() { return this->width; };
         int getHeight() { return this->height; };
+
+        void updateDeltaTime();
+        float deltaTime() const { return times.deltaTime; }
 
 		void updateViewport()
 		{

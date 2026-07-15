@@ -45,23 +45,15 @@ namespace Engine::Core
 		ECS::EntityComponentSystemManager ecsManager{};
 		AssetManager assetManager{};
 		InputHandler inputHandler{};
-		EngineSystem() = default;
-
-		~EngineSystem() = default;
-
-		//InputState inputState;
 
 		AssetPipeline assetPipeline{};
 		
 		void updateDeltaTime(float t)  { gameObjects.deltaTime = t; }
 		void updateAspect(float a) { gameObjects.aspect = a; }
 
-		//call whenever a key is pressed
 		void onKey(KeyCode k, bool pressed);
 		
-		//after everything is set for the frame, call this?
 		void updateInputState();
-
 
 		void createAssetManager();
 

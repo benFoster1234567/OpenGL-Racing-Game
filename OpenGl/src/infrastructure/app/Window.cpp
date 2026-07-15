@@ -120,7 +120,6 @@ void Window::submitKeyCallback(std::function<void(int, int, int, int)> callback)
 void Engine::Infra::Window::enableCursor()
 {
 	glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
 }
 
 void Engine::Infra::Window::disableCursor()
@@ -166,6 +165,13 @@ void Engine::Infra::Window::setWindowSize(int w, int h)
 
 }
 
+void Engine::Infra::Window::updateDeltaTime()
+{
+	float currentFrame = static_cast<float>(glfwGetTime());
+	times.deltaTime = currentFrame - times.lastTime;
+	times.lastTime = currentFrame;
+}
+
 void Window::onKey(int key, int scancode, int action, int mods)
 {
 	keyPressedDispatcher.invoke(key, scancode, action, mods);
@@ -173,6 +179,7 @@ void Window::onKey(int key, int scancode, int action, int mods)
 
 void Engine::Infra::Window::onMouseMotion(double xpos, double ypos)
 {
+	std::cout << "mouse motion detected\n";
 	mouseMotionDispatcher.invoke(xpos, ypos);
 }
 

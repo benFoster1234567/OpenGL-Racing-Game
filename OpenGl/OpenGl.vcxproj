@@ -158,6 +158,7 @@
     <ClInclude Include="include\core\engine\Engine.h" />
     <ClInclude Include="include\core\events\EventDispatcher.h" />
     <ClInclude Include="include\core\Game.h" />
+    <ClInclude Include="include\core\Game\player.h" />
     <ClInclude Include="include\infra\app\Application.h" />
     <ClInclude Include="include\infra\engine\CameraInfo.h" />
     <ClInclude Include="include\infra\engine\DebugConsoleUI.h" />

@@ -14,7 +14,6 @@
 namespace Engine::Core
 {
 
-
 	enum class Control
 	{
 		None,
@@ -29,8 +28,6 @@ namespace Engine::Core
 		EBrake,
 		Console
 	};
-
-
 
 	struct KeyboardMappings
 	{
@@ -47,8 +44,6 @@ namespace Engine::Core
 		KeyCode Console = KeyCode::BackTick;
 	};
 
-
-
 	struct InputState
 	{
 		std::bitset<512> currentFrameInputData{};
@@ -61,6 +56,12 @@ namespace Engine::Core
 		//add mouseButtons
 
 		void updateKeyState(std::bitset<512> inputData);
+		void updateMouseState()
+		{
+			lastMousePos = mousePos;
+			mouseDelta = { 0.0,0.0 };
+		}
+
 		void updateMouseState(glm::vec2 currentMouse/* , currentMouseButtons */);
 
 	};
@@ -68,10 +69,10 @@ namespace Engine::Core
 	class InputHandler
 	{
 	private:
-		InputState inputState{};
 
 	public:
-
+		
+		InputState inputState{};
 		void setKey(KeyCode k, bool pressed);
 
 		void updateKeyboard();
