@@ -122,7 +122,7 @@ void Engine::Core::EngineSystem::setupEcs(glm::mat4 view, glm::mat4 projection)
 		});
 
 	ecsManager.attachSystem(gameObjects.camera, rotateCameraByKeys);
-
+	ecsManager.attachSystem(gameObjects.player, rotateObject);
 }
 
 void Engine::Core::EngineSystem::dispatchAssets()
