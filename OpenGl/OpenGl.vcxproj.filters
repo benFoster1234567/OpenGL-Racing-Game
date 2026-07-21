@@ -18,7 +18,7 @@
     <ClCompile Include="tests\Tester.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\InputHandler.cpp">
+    <ClCompile Include="src\core\KeyboardInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Main.cpp">
@@ -69,10 +69,34 @@
     <ClCompile Include="src\core\MaterialData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\core\assets\MeshData.cpp">
+    <ClCompile Include="src\core\ecs\ECS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\ECS.cpp">
+    <ClCompile Include="src\core\ecs\EntityRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\MeshData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\ecs\ComponentRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\ecs\SystemRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\ecs\Component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\ecs\ComponentArray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\ecs\ComponentReegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\ecs\System.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\core\ecs\Systems.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,7 +110,7 @@
     <ClInclude Include="include\core\events\EventDispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\input\InputHandler.h">
+    <ClInclude Include="include\core\input\KeyboardInput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\core\input\Keys.h">
@@ -146,13 +170,37 @@
     <ClInclude Include="include\core\ecs\ECS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\core\ecs\Component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\ecs\ComponentArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\ecs\ComponentRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\ecs\Coordinator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\ecs\EntityRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\ecs\System.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\ecs\SystemRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\Game\Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\Physics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\input\MouseInputResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\core\ecs\Systems.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\core\Game.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\core\Game\player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

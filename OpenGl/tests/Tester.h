@@ -1,6 +1,6 @@
 #pragma once
 #include "core/events/EventDispatcher.h"
-#include "core/input/InputHandler.h"
+#include "core/input/KeyboardInput.h"
 #include "infra/engine/DebugConsoleUI.h"
 
 

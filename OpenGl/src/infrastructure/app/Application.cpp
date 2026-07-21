@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 #include <core/assets/MeshData.h>
-#include <core/input/InputHandler.h>
+#include <core/input/KeyboardInput.h>
 #include <core/input/Keys.h>
 #include <infra/app/Window.h>
 #include <infra/engine/DebugConsoleUI.h>
@@ -37,14 +37,6 @@ Engine::Infra::Application::Application()
 
 void Engine::Infra::Application::submitEngineRenderQueueToRenderer()
 {
-	std::vector<Core::EntityRenderCommand> renderCmds{};
-	engine.fillEntityRenderList(renderCmds);
-
-	for (auto& cmd : renderCmds)
-	{
-		Engine::Infra::RenderCommand entityCmd = std::bit_cast<Engine::Infra::RenderCommand>(cmd);
-		renderer.submit(entityCmd);
-	}
 
 }
 
@@ -137,7 +129,7 @@ void Engine::Infra::Application::setupWindowCallbacks()
 		{
 			engine.inputHandler.updateMousePosition({ x,y });
 		};
-	window->submitMouseMotionCallback(mouseMotionCallback);
+	//window->submitMouseMotionCallback(mouseMotionCallback);
 	window->submitKeyCallback(callback);
 
 }
@@ -178,23 +170,16 @@ void Engine::Infra::Application::run()
 
 	setupImportCallbacks();
 	importAssets();
-	engine.dispatchAssets();
 
 	float currentWidth = static_cast<float>(window->getWidth());
 	float currentHeight = static_cast<float>(window->getHeight());
 
-	auto projection = glm::perspective(glm::radians(45.0f), currentWidth / currentHeight, 0.1f, 100.0f);
-	auto view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-	engine.setupEcs(view, projection);
-	
 	float lastFrame = 0.0f;
 	float cubeRotation = 0.0f;
 
 	while (!window->shouldClose())
 	{
 		window->pollEvents();
-
 		window->updateViewport();
 
 		renderer.clear();
@@ -203,14 +188,13 @@ void Engine::Infra::Application::run()
 		
 		float currentWidth = static_cast<float>(window->getWidth());
 		float currentHeight = static_cast<float>(window->getHeight());
+		
+		double x{}, y{};
 
-		engine.updateDeltaTime(window->deltaTime());
-		engine.updateAspect(currentWidth/currentHeight);
-		engine.updateSystems();
-		engine.updateInputState();
-		engine.inputHandler.inputState.updateMouseState();
+		window->getMousePosition(x, y);
 
-		submitEngineRenderQueueToRenderer();
+		std::cout << "x: " << x << ", " << y << "\n";
+
 		renderer.flush();
 
 		debugConsoleUi->prepareFrame();

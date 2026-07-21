@@ -94,6 +94,8 @@ namespace Engine::Infra
         void onKey(int key, int scancode, int action, int mods);
         void onMouseMotion(double xpos, double ypos);
 
+        void getMousePosition(double& xpos, double& ypos);
+
         void enableCursor();
         void disableCursor();
 

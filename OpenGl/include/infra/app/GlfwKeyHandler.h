@@ -1,6 +1,6 @@
 #pragma once
 #include "core/input/Keys.h"
-#include "core/input/InputHandler.h"
+#include "core/input/KeyboardInput.h"
 #include <GLFW/glfw3.h>
 #include <unordered_map>
 

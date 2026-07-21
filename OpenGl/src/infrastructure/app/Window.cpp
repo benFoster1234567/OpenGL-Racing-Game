@@ -72,14 +72,6 @@ Engine::Infra::Window::Window(
 		return;
 	}
 	glfwSetWindowUserPointer(glfwWindow, this);
-	auto mouseCallback = [](GLFWwindow* window, double xpos, double ypos)
-		{
-			auto* app = static_cast<Window*>(glfwGetWindowUserPointer(window));
-			if (app) 
-			{
-				app->cursorState = { xpos, ypos };
-			}
-		};
 
 	glfwSetCursorPosCallback(glfwWindow, glfwMouseMotionCallback);
 
@@ -100,12 +92,8 @@ void Engine::Infra::Window::saveWindowState()
 	glfwGetWindowSize(glfwWindow, &savedWindowState.w, &savedWindowState.h);
 }
 
-
-
-
 Window::~Window()
 {
-
 	destroyWindow();
 }
 
@@ -181,6 +169,11 @@ void Engine::Infra::Window::onMouseMotion(double xpos, double ypos)
 {
 	std::cout << "mouse motion detected\n";
 	mouseMotionDispatcher.invoke(xpos, ypos);
+}
+
+void Engine::Infra::Window::getMousePosition(double& xpos, double& ypos)
+{
+	glfwGetCursorPos(glfwWindow, &xpos, &ypos);
 }
 
 void Engine::Infra::Window::submitMouseMotionCallback(std::function<void(double, double)> func)

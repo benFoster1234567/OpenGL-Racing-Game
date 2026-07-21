@@ -1,4 +1,4 @@
-#include "MeshData.h"
+#include "core/assets/MeshData.h"
 
 
 void Engine::Core::MeshData::printPoints()

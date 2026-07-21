@@ -1,16 +1,19 @@
+//required steps:
+/*
+* 
+*/
+
 #pragma once
 
 #include "core/assets/AssetPipeline.h"
 #include "core/assets/AssetManager.h"
-#include "core/input/InputHandler.h"
+#include "core/input/KeyboardInput.h"
 #include "core/input/Keys.h"
 #include "core/ecs/ECS.h"
-
+#include "core/Game/Game.h"
 namespace Engine::Core
 {
 	constexpr int MAX_ENTITIES{ 100 };
-
-
 
 	struct EntityRenderCommand
 	{
@@ -35,39 +38,40 @@ namespace Engine::Core
 	class EngineSystem
 	{
 	private:
-		
-		float deltaTime{1};
 
-		EntityRenderCommand createRenderCommand(ECS::Entity entity, ECS::Entity camera);
-		GameObjects gameObjects{};
-
+		float deltaTime{};
+		float aspect{};
+		std::unique_ptr<Game::MainGame> game{};
 	public:
-		ECS::EntityComponentSystemManager ecsManager{};
+
 		AssetManager assetManager{};
-		InputHandler inputHandler{};
-
 		AssetPipeline assetPipeline{};
+		KeyboardBridge inputHandler{};
 		
-		void updateDeltaTime(float t)  { gameObjects.deltaTime = t; }
-		void updateAspect(float a) { gameObjects.aspect = a; }
-
-		void onKey(KeyCode k, bool pressed);
+		EngineSystem() {
+			game = std::make_unique<Game::MainGame>(Game::MainGame(assetManager, inputHandler));
+		}
 		
-		void updateInputState();
-
-		void createAssetManager();
-
-		void fillEntityRenderList(std::vector<EntityRenderCommand>& entityListOut);
-
-
-		void setupEcs(glm::mat4 view, glm::mat4 projection);
-
+		//TODO: make a template func for callbacks for different asset types...
+		//I think this would make this code less confusing
 		EventDispatcher<std::vector<ShaderData*>> shaderDispatcher{};
 		EventDispatcher<std::vector<MeshData*>> meshDispatcher{};
 
-		void updateSystems() { ecsManager.updateSystems(); }
-
 		void dispatchAssets();
 
+		void updateDeltaTime(float dt)
+		{
+			deltaTime = dt;
+		}
+		void updateAspect(float a) 
+		{ 
+			aspect = a;
+		}
+
+
+		void setMouse( double xpos, double ypos);
+		void updateInputState();
+		void createAssetManager();
+		
 	};
 }

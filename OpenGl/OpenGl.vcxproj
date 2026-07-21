@@ -128,8 +128,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\core\assets\MeshData.cpp" />
-    <ClCompile Include="src\core\ECS.cpp" />
+    <ClCompile Include="include\core\ecs\Systems.cpp" />
+    <ClCompile Include="src\core\ecs\System.cpp" />
+    <ClCompile Include="src\core\ecs\EntityRegistry.cpp" />
+    <ClCompile Include="src\core\MeshData.cpp" />
+    <ClCompile Include="src\core\ecs\ComponentRegistry.cpp" />
+    <ClCompile Include="src\core\ecs\SystemRegistry.cpp" />
+    <ClCompile Include="src\core\ecs\Component.cpp" />
+    <ClCompile Include="src\core\ecs\ComponentArray.cpp" />
+    <ClCompile Include="src\core\ecs\ComponentReegistry.cpp" />
+    <ClCompile Include="src\core\ecs\ECS.cpp" />
     <ClCompile Include="src\core\MaterialData.cpp" />
     <ClCompile Include="src\core\ShaderData.cpp" />
     <ClCompile Include="src\core\Engine.cpp" />
@@ -141,7 +149,7 @@
     <ClCompile Include="src\core\AssetPipeline.cpp" />
     <ClCompile Include="src\core\AssetManager.cpp" />
     <ClCompile Include="src\infrastructure\renderer\assets\GPUTexture.cpp" />
-    <ClCompile Include="src\core\InputHandler.cpp" />
+    <ClCompile Include="src\core\KeyboardInput.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\infrastructure\app\Window.cpp" />
     <ClCompile Include="src\infrastructure\renderer\Renderer.cpp" />
@@ -153,12 +161,20 @@
     <ClInclude Include="include\core\assets\AssetPipeline.h" />
     <ClInclude Include="include\core\assets\AssetManager.h" />
     <ClInclude Include="include\core\assets\ShaderData.h" />
+    <ClInclude Include="include\core\ecs\Component.h" />
+    <ClInclude Include="include\core\ecs\ComponentArray.h" />
+    <ClInclude Include="include\core\ecs\ComponentRegistry.h" />
+    <ClInclude Include="include\core\ecs\Coordinator.h" />
     <ClInclude Include="include\core\ecs\ECS.h" />
+    <ClInclude Include="include\core\ecs\EntityRegistry.h" />
+    <ClInclude Include="include\core\ecs\System.h" />
+    <ClInclude Include="include\core\ecs\SystemRegistry.h" />
     <ClInclude Include="include\core\ecs\Systems.h" />
     <ClInclude Include="include\core\engine\Engine.h" />
     <ClInclude Include="include\core\events\EventDispatcher.h" />
-    <ClInclude Include="include\core\Game.h" />
-    <ClInclude Include="include\core\Game\player.h" />
+    <ClInclude Include="include\core\Game\Game.h" />
+    <ClInclude Include="include\core\input\MouseInputResource.h" />
+    <ClInclude Include="include\core\Physics.h" />
     <ClInclude Include="include\infra\app\Application.h" />
     <ClInclude Include="include\infra\engine\CameraInfo.h" />
     <ClInclude Include="include\infra\engine\DebugConsoleUI.h" />
@@ -166,7 +182,7 @@
     <ClInclude Include="include\infra\app\GlfwKeyHandler.h" />
     <ClInclude Include="include\infra\renderer\assets\GPUMesh.h" />
     <ClInclude Include="include\infra\renderer\assets\GPUTexture.h" />
-    <ClInclude Include="include\core\input\InputHandler.h" />
+    <ClInclude Include="include\core\input\KeyboardInput.h" />
     <ClInclude Include="include\core\input\Keys.h" />
     <ClInclude Include="include\core\assets\MaterialData.h" />
     <ClInclude Include="include\core\assets\MeshData.h" />

@@ -44,7 +44,7 @@ namespace Engine::Core
 		KeyCode Console = KeyCode::BackTick;
 	};
 
-	struct InputState
+	struct KeyboardInputResource
 	{
 		std::bitset<512> currentFrameInputData{};
 		std::bitset<512> previousFrameInputData{};
@@ -52,10 +52,8 @@ namespace Engine::Core
 		glm::vec2 mousePos{0,0};
 		glm::vec2 lastMousePos{0,0};
 		glm::vec2 mouseDelta{0,0};
-
+		
 		//add mouseButtons
-
-		void updateKeyState(std::bitset<512> inputData);
 		void updateMouseState()
 		{
 			lastMousePos = mousePos;
@@ -63,16 +61,15 @@ namespace Engine::Core
 		}
 
 		void updateMouseState(glm::vec2 currentMouse/* , currentMouseButtons */);
-
 	};
 
-	class InputHandler
+	class KeyboardBridge
 	{
 	private:
 
 	public:
 		
-		InputState inputState{};
+		KeyboardInputResource inputState{};
 		void setKey(KeyCode k, bool pressed);
 
 		void updateKeyboard();

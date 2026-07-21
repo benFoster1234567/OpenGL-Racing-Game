@@ -36,6 +36,8 @@ namespace Engine::Core {
 		template<typename T>
 		void submit(const std::string& path, const std::string& assetName)
 		{
+			std::type_index ti = typeid(T);
+			assert(import.contains(ti) && "no import func found for type");
 			queue.push({ .path = path, .assetName = assetName, .typeId = typeid(T) });
 		}
 		
