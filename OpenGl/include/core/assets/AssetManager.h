@@ -42,27 +42,7 @@ namespace Engine::Core
 		void getShader(ShaderData*& shaderOut, const std::string& name);
 		void getTexture(TextureData* texOut, const std::string& name);
 
-		void addAsset(const std::string& name, AssetVariant&& asset)
-		{
-			std::visit([this, &name](auto&& arg)
-			{
-				using T = std::decay_t <decltype(arg)>; //find asset type
-
-				if constexpr(std::is_same_v < T, std::unique_ptr<MeshData>>)
-				{
-					meshMap[name] = std::move(arg);
-				}
-
-				if constexpr (std::is_same_v<T, std::unique_ptr<ShaderData>>)
-				{
-					shaderMap[name] = std::move(arg);
-				}
-
-
-			}, std::move(asset));
-
-
-		}
+		void addAsset(const std::string& name, AssetVariant&& asset);
 		
 		void shaderList(std::vector<ShaderData*>& shadersOut);
 		void meshList(std::vector<MeshData*>& meshesOut);

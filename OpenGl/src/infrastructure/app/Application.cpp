@@ -33,8 +33,6 @@ Engine::Infra::Application::Application()
 	setupInput();
 }
 
-
-
 void Engine::Infra::Application::submitEngineRenderQueueToRenderer()
 {
 
@@ -92,7 +90,6 @@ void Engine::Infra::Application::setupDebugCommands()
 //window key callback is set here
 void Engine::Infra::Application::setupWindowCallbacks()
 {
-	
 	std::function<void(int, int, int, int)> callback = [&](int _key, int _scancode, int _action, int _mods)
 		{
 			if (debugConsoleUi->isKeyboardCaptured()) return;

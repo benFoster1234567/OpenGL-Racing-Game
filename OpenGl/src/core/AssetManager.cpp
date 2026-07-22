@@ -49,6 +49,25 @@ void Engine::Core::AssetManager::getTexture(TextureData* texOut, const std::stri
 	else texOut = nullptr;
 }
 
+void Engine::Core::AssetManager::addAsset(const std::string& name, AssetVariant&& asset)
+{
+	std::visit([this, &name](auto&& arg)
+		{
+			using T = std::decay_t <decltype(arg)>; //find asset type
+
+			if constexpr (std::is_same_v < T, std::unique_ptr<MeshData>>)
+			{
+				meshMap[name] = std::move(arg);
+			}
+
+			if constexpr (std::is_same_v<T, std::unique_ptr<ShaderData>>)
+			{
+				shaderMap[name] = std::move(arg);
+			}
+
+		}, std::move(asset));
+}
+
 void Engine::Core::AssetManager::shaderList(std::vector<ShaderData*>& shadersOut)
 {
 	for (const auto& s : shaderMap)

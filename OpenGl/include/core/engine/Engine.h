@@ -61,7 +61,7 @@ namespace Engine::Core
 		EngineSystem() : assetManager{}, assetPipeline{}, inputHandler{}, game(assetManager, inputHandler)
 		{
 		}
-		
+
 		void setUpGame()
 		{
 			game.setup();

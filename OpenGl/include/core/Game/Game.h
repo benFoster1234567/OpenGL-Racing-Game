@@ -77,7 +77,6 @@ namespace Engine::Core::Game
 
 			ECS::MeshComponent mesh{};
 			assetManager.getMesh(mesh.meshData, "bunny");
-
 			ECS::ShaderComponent shader{};
 			assetManager.getShader(shader.shaderData, "shader");
 
@@ -85,7 +84,6 @@ namespace Engine::Core::Game
 			coordinator.addComponent(entity, ECS::TransformComponent{});
 			coordinator.addComponent(entity, ECS::CameraComponent{});
 			coordinator.addComponent(entity, shader);
-
 		}
 
 		void shutdown() override
