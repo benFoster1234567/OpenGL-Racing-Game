@@ -171,7 +171,7 @@ void Engine::Infra::Application::run()
 
 	Engine::Core::ECS::RenderDispatcher::sendRenderInfo.subscribe([&](Engine::Core::ECS::RenderOutput output)
 		{
-			RenderCommand rc = std::bit_cast<RenderCommand>(output);
+			RenderCommand rc = { .view = output.view, .projection = output.projection, .modelTransform = output.modelTransform, .shader = output.shader, .mesh = output.mesh };
 			renderer.submit(rc);
 		});
 
@@ -196,7 +196,7 @@ void Engine::Infra::Application::run()
 		float currentHeight = static_cast<float>(window->getHeight());
 		
 		double x{}, y{};
-
+		window->updateDeltaTime();
 		window->getMousePosition(x, y);
 		engine.updateAspect(currentWidth / currentHeight);
 		engine.updateMouse(x, y);
