@@ -10,7 +10,7 @@ void Engine::Core::AssetPipeline::processCommand(ImportCommand cmd, AssetManager
 	}
 }
 
-void Engine::Core::AssetPipeline::refreshAssetManager(AssetManager& am)
+void Engine::Core::AssetPipeline::populateAssetManager(AssetManager& am)
 {
 
 	while (!queue.empty())

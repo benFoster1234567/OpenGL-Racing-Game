@@ -19,6 +19,12 @@ namespace Engine::Core::ECS
 		{
 		}
 
+		Coordinator(const Coordinator&) = delete;
+		Coordinator& operator=(const Coordinator&) = delete;
+
+		Coordinator(Coordinator&&) noexcept = default;
+		Coordinator& operator=(Coordinator&&) noexcept = default;
+
 		Entity createEntity()
 		{
 			return entityRegistry->createEntity();

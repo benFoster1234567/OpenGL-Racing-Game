@@ -41,6 +41,12 @@ namespace Engine::Core {
 			std::erase_if(callbacks, [id](const Listener& l) { return l.id == id; });
 		}
 
+		void clear()
+		{
+			callbacks.clear();
+			curid = 0;
+		}
+
 		void invoke(Args... args)
 		{
 			for (const auto& l : callbacks)

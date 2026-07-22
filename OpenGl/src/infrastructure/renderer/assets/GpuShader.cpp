@@ -24,10 +24,8 @@ void GpuShader::compileShaders()
 		exit(1);
 	}
 
-
 	GLint success;
 	char infoLog[512];
-
 
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	

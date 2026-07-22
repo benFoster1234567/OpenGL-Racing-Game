@@ -78,12 +78,17 @@ void Engine::Infra::Renderer::flush()
 
 		GpuMesh* mesh = gpuMeshCache[command.mesh].get();
 		GpuShader* shader = gpuShaderCache[command.shader].get();
-
 		glUseProgram(shader->getId());
 
-		glUniformMatrix4fv(glGetUniformLocation(shader->getId(), "projection"), 1, GL_FALSE, glm::value_ptr(command.projection));
-		glUniformMatrix4fv(glGetUniformLocation(shader->getId(), "view"), 1, GL_FALSE, glm::value_ptr(command.view));
-		glUniformMatrix4fv(glGetUniformLocation(shader->getId(), "model"), 1, GL_FALSE, glm::value_ptr(command.modelTransform));
+		auto p = glGetUniformLocation(shader->getId(), "projection");
+		auto v = glGetUniformLocation(shader->getId(), "view");
+		auto m = glGetUniformLocation(shader->getId(), "model");
+
+		assert(!(p == -1 || v == -1 || m == -1) && "error sending mvp to shader");
+
+		glUniformMatrix4fv(p, 1, GL_FALSE, glm::value_ptr(command.projection));
+		glUniformMatrix4fv(v, 1, GL_FALSE, glm::value_ptr(command.view));
+		glUniformMatrix4fv(m, 1, GL_FALSE, glm::value_ptr(command.modelTransform));
 
 		mesh->draw();
 	}

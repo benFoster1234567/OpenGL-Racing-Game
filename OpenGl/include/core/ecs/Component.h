@@ -20,11 +20,11 @@ namespace Engine::Core::ECS
 
 	struct CameraComponent : public ComponentBase
 	{
-		float fieldOfView{60.0f};
+		float fieldOfView{glm::radians(60.0f)};
 		float nearClipPlane{0.01f};
 		float farClipPlane{ 10.0f };
 		bool isOrtho{false};
-		glm::vec3 position{0.0f,0.0f,0.0f};
+		glm::vec3 position{0.0f,0.0f,5.0f};
 	};
 
 	struct TransformComponent : public ComponentBase

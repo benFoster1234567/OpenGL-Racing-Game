@@ -19,11 +19,11 @@ namespace Engine::Core::Game
 	protected:
 		ECS::Coordinator coordinator{};
 		AssetManager& assetManager;
-		KeyboardBridge& inputHandler;
+		InputBridge& inputHandler;
 
 	public:
 
-		Game(AssetManager& _assetManager, KeyboardBridge& _inputHandler) : 
+		Game(AssetManager& _assetManager, InputBridge& _inputHandler) : 
 			assetManager(_assetManager), 
 			inputHandler(_inputHandler)
 		{ 
@@ -43,7 +43,7 @@ namespace Engine::Core::Game
 		virtual void shutdown() = 0;
 
 		//called in main loop - updates systems, etc.
-		virtual void update(float aspect, glm::vec2 mouse) = 0;
+		virtual void update(float aspect, MouseInputResource mouseState) = 0;
 
 	};
 
@@ -51,13 +51,13 @@ namespace Engine::Core::Game
 	class MainGame : public Game
 	{
 	private:
-		ECS::RenderDispatcher* renderDispatcher{};
+		ECS::RenderDispatcherOrbitalCamera* renderDispatcher{};
 	public:
 		using Game::Game;
 
 		void setup() override
 		{
-			renderDispatcher = coordinator.registerSystem<ECS::RenderDispatcher>();
+			renderDispatcher = coordinator.registerSystem<ECS::RenderDispatcherOrbitalCamera>();
 			
 			ECS::Entity entity = coordinator.createEntity();
 
@@ -73,7 +73,7 @@ namespace Engine::Core::Game
 			signature.set(coordinator.getComponentType<ECS::ShaderComponent>());
 			signature.set(coordinator.getComponentType<ECS::MeshComponent>());
 
-			coordinator.setSystemSignature<ECS::RenderDispatcher>(signature);
+			coordinator.setSystemSignature<ECS::RenderDispatcherOrbitalCamera>(signature);
 
 			ECS::MeshComponent mesh{};
 			assetManager.getMesh(mesh.meshData, "bunny");
@@ -94,7 +94,7 @@ namespace Engine::Core::Game
 		}
 
 		//update systems here
-		void update(float aspect, glm::vec2 mouse) override
+		void update(float aspect, MouseInputResource mouseState) override
 		{
 			renderDispatcher->update(coordinator, aspect);
 		}

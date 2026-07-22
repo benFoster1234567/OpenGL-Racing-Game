@@ -1,5 +1,14 @@
 //required steps:
 /*
+* bind import callbacks
+* import assets/create assetManager
+* setup ecs systems
+* subscribe to RenderDispatcher system so that the render commands are created after every iteration
+* in the loop:
+* call update aspect
+* call update mouse
+* call updateSystems - this will update the components and send the render data to the renderer for each entity bound.
+* 
 * 
 */
 
@@ -14,6 +23,7 @@
 namespace Engine::Core
 {
 	constexpr int MAX_ENTITIES{ 100 };
+
 
 	struct EntityRenderCommand
 	{
@@ -41,37 +51,47 @@ namespace Engine::Core
 
 		float deltaTime{};
 		float aspect{};
-		std::unique_ptr<Game::MainGame> game{};
+		Game::MainGame game;
 	public:
 
-		AssetManager assetManager{};
-		AssetPipeline assetPipeline{};
-		KeyboardBridge inputHandler{};
-		
-		EngineSystem() {
-			game = std::make_unique<Game::MainGame>(Game::MainGame(assetManager, inputHandler));
+		AssetManager assetManager;
+		AssetPipeline assetPipeline;
+		InputBridge inputHandler;
+	
+		EngineSystem() : assetManager{}, assetPipeline{}, inputHandler{}, game(assetManager, inputHandler)
+		{
 		}
 		
-		//TODO: make a template func for callbacks for different asset types...
-		//I think this would make this code less confusing
+		void setUpGame()
+		{
+			game.setup();
+		}
+		
 		EventDispatcher<std::vector<ShaderData*>> shaderDispatcher{};
 		EventDispatcher<std::vector<MeshData*>> meshDispatcher{};
 
-		void dispatchAssets();
+		void createAssetManager();
+		void publishAssets();
 
 		void updateDeltaTime(float dt)
 		{
 			deltaTime = dt;
 		}
+
 		void updateAspect(float a) 
 		{ 
 			aspect = a;
 		}
 
 
-		void setMouse( double xpos, double ypos);
+		void updateMouse( double xpos, double ypos);
+
+		void updateGame()
+		{
+			game.update(aspect, inputHandler.mouseState);
+		}
+
 		void updateInputState();
-		void createAssetManager();
 		
 	};
 }

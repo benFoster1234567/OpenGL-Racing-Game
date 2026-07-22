@@ -51,6 +51,7 @@ void Engine::Infra::Application::importAssets()
 //all debug command lambdas are setup here
 void Engine::Infra::Application::setupDebugCommands()
 {
+	//TODO: check for memory leaks with these lambda captures. Ensure they are not called after the window is destroyed.
     std::function <std::string()> exitFunc = [&]()
     {
         window->closeApplication = true;
@@ -155,7 +156,7 @@ void Engine::Infra::Application::setupInput()
 
 void Engine::Infra::Application::run()
 {
-	
+	//TODO: ensure that all of the dispatchers are reset when this is destroyed.
 	engine.shaderDispatcher.subscribe([&](std::vector<Engine::Core::ShaderData*> shaderList) 
 		{ 
 			renderer.loadShaders(shaderList); 
@@ -168,14 +169,19 @@ void Engine::Infra::Application::run()
 			std::cout << "load meshes invoked!\n";
 		});
 
+	Engine::Core::ECS::RenderDispatcher::sendRenderInfo.subscribe([&](Engine::Core::ECS::RenderOutput output)
+		{
+			RenderCommand rc = std::bit_cast<RenderCommand>(output);
+			renderer.submit(rc);
+		});
+
 	setupImportCallbacks();
 	importAssets();
-
+	engine.publishAssets();
 	float currentWidth = static_cast<float>(window->getWidth());
 	float currentHeight = static_cast<float>(window->getHeight());
 
-	float lastFrame = 0.0f;
-	float cubeRotation = 0.0f;
+	engine.setUpGame();
 
 	while (!window->shouldClose())
 	{
@@ -192,16 +198,17 @@ void Engine::Infra::Application::run()
 		double x{}, y{};
 
 		window->getMousePosition(x, y);
-
-		std::cout << "x: " << x << ", " << y << "\n";
+		engine.updateAspect(currentWidth / currentHeight);
+		engine.updateMouse(x, y);
+		engine.updateGame();
 
 		renderer.flush();
-
 		debugConsoleUi->prepareFrame();
 		debugConsoleUi->render();
-
 		window->swapBuffers();
 	}
+
+	Engine::Core::ECS::RenderDispatcher::sendRenderInfo.clear();
 
 	window->terminateGlfw();
 	//delete mesh;

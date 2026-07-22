@@ -167,7 +167,7 @@ void Window::onKey(int key, int scancode, int action, int mods)
 
 void Engine::Infra::Window::onMouseMotion(double xpos, double ypos)
 {
-	std::cout << "mouse motion detected\n";
+	//std::cout << "mouse motion detected\n";
 	mouseMotionDispatcher.invoke(xpos, ypos);
 }
 

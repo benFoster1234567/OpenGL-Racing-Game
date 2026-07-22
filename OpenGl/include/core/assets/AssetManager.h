@@ -58,6 +58,7 @@ namespace Engine::Core
 					shaderMap[name] = std::move(arg);
 				}
 
+
 			}, std::move(asset));
 
 

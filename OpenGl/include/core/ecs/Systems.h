@@ -24,29 +24,18 @@ namespace Engine::Core::ECS
 	class RenderDispatcher : public System
 	{
 	public:
-		static EventDispatcher<RenderOutput> sendRenderInfo; // connect renderer to this //
-		virtual void update(Coordinator& coordinator, float aspect)
-		{
-
-			for (auto entity : entities)
-			{
-				glm::mat4 transformMat{};
-				glm::mat4 cameraMat{};
-				const auto& cameraComp = coordinator.getComponent<CameraComponent>(entity);
-				const auto& transform = coordinator.getComponent<TransformComponent>(entity);
-				const auto& meshData = coordinator.getComponent<MeshComponent>(entity);
-				const auto& shaderData = coordinator.getComponent<ShaderComponent>(entity);
-				//sendRenderInfo.invoke({ .mesh = meshData.meshData, .shader = shaderData.shaderData });
-			}
-		}
+		inline static EventDispatcher<RenderOutput> sendRenderInfo; // connect renderer to this //
+		virtual void update(Coordinator& coordinator, float aspect) = 0;
 	};
 
 	//this makes the camera follow the entity transform position.
 	//requires camera, transform, mesh and shader components
 	class RenderDispatcherOrbitalCamera : public RenderDispatcher
 	{
+	public:
 		void update(Coordinator& coordinator, float aspect) override
 		{
+
 			for (auto entity : entities)
 			{
 				const auto& cameraComp = coordinator.getComponent<CameraComponent>(entity);
@@ -54,14 +43,16 @@ namespace Engine::Core::ECS
 				const auto& meshData = coordinator.getComponent<MeshComponent>(entity);
 				const auto& shaderData = coordinator.getComponent<ShaderComponent>(entity);
 
-				glm::mat4 projectionMat = glm::perspective(cameraComp.fieldOfView,
-					aspect, cameraComp.nearClipPlane, cameraComp.farClipPlane);
+				glm::mat4 projectionMat = glm::perspective(glm::radians(70.0f), aspect, 0.1f, 1000.0f);
+
+				//glm::mat4 projectionMat = glm::perspective(cameraComp.fieldOfView,
+				//	aspect, cameraComp.nearClipPlane, cameraComp.farClipPlane);
 
 				glm::mat4 viewMat = glm::lookAt(transform.position + cameraComp.position, transform.position, { 0,1,0 });
 				
 				glm::mat4 transformMat = glm::translate(glm::mat4{}, transform.position)
 					* glm::mat4_cast(transform.rotation)
-					* glm::scale(glm::mat4{}, transform.scale);
+					* glm::scale(glm::mat4{1.0f}, transform.scale);
 
 				//invokes and sends to renderer
 				sendRenderInfo.invoke({.view = viewMat
@@ -76,7 +67,7 @@ namespace Engine::Core::ECS
 	class KeyControlSystem : public System
 	{
 	public:
-		void update(Coordinator& coordinator, const KeyboardBridge& inputHandler)
+		void update(Coordinator& coordinator, const InputBridge& inputHandler)
 		{
 		}
 	};

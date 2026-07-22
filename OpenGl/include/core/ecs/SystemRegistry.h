@@ -12,23 +12,23 @@ namespace Engine::Core::ECS
 	private:
 		std::unordered_map<std::type_index, Signature> signatures{};
 		std::unordered_map<std::type_index, std::unique_ptr<System>> systems{};
-	
+
 	public:
-		template<class T>
+		template<std::derived_from<System> T>
 		T* registerSystem()
 		{
-			auto typeId = std::type_index(typeid(T));
+			std::type_index typeId = typeid(T);
 			assert(!systems.contains(typeId) && "System already registered.");
 			auto system = std::make_unique<T>();
 			systems[typeId] = std::move(system);
-			return systems[typeId].get();
+			return static_cast<T*>(systems[typeId].get());
 		}
 
 		template<class T>
 		void setSignature(Signature signature)
 		{
-			auto typeId = std::type_index(typeid(T));
-			assert(systems.contains(typeId) && "System sig already set.");
+			std::type_index typeId = typeid(T);
+			assert(systems.contains(typeId) && "System used before registered.");
 			signatures.insert({ typeId, signature });
 		}
 

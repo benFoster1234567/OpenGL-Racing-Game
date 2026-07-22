@@ -16,8 +16,6 @@ namespace Engine::Core {
 
 	class AssetManager;
 	
-
-
 	struct ImportCommand
 	{
 		std::string path{};
@@ -51,7 +49,7 @@ namespace Engine::Core {
 		}
 
 		void processCommand(ImportCommand cmd, AssetManager& am);
-		void refreshAssetManager(AssetManager& am);
+		void populateAssetManager(AssetManager& am);
 
 	};
 

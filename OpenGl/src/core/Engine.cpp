@@ -3,16 +3,17 @@
 #include <glm/ext/quaternion_float.hpp>
 
 
-void Engine::Core::EngineSystem::dispatchAssets()
+void Engine::Core::EngineSystem::publishAssets()
 {
 	std::vector<ShaderData*> shaderList{};
 	assetManager.shaderList(shaderList);
 	std::vector<MeshData*> meshList{};
+	assetManager.meshList(meshList);
 	shaderDispatcher.invoke(shaderList);
 	meshDispatcher.invoke(meshList);
 }
 
-void Engine::Core::EngineSystem::setMouse(double xpos, double ypos)
+void Engine::Core::EngineSystem::updateMouse(double xpos, double ypos)
 {
 	inputHandler.updateMousePosition({ xpos,ypos });
 }
@@ -30,7 +31,7 @@ void Engine::Core::EngineSystem::createAssetManager()
 	int initialMeshes = assetManager.meshMap.size();
 	int initialTextures = assetManager.textureMap.size();
 
-	assetPipeline.refreshAssetManager(assetManager);
+	assetPipeline.populateAssetManager(assetManager);
 
 	int addedShaders = assetManager.shaderMap.size() - initialShaders;
 	int addedMeshes = assetManager.meshMap.size() - initialMeshes;
