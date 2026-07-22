@@ -33,9 +33,12 @@ void Engine::Core::ECS::MouseControlSystem::update(Coordinator& coordinator, Mou
 	{
 		auto& cameraComp = coordinator.getComponent<CameraComponent>(entity);
 		auto& orbitalCam = coordinator.getComponent<OrbitalCameraComponent>(entity);
+		const auto& mouseSettings = coordinator.getComponent<MouseInputSettings>(entity);
 
-		orbitalCam.pitch += mouse.mouseDelta.y;
-		orbitalCam.yaw += mouse.mouseDelta.x;
+		//std::cout << "mouse delta: " << mouse.mouseDelta.x << ", " << mouse.mouseDelta.y << "\n";
+
+		orbitalCam.pitch += mouse.mouseDelta.y * mouseSettings.sensitivity.y;
+		orbitalCam.yaw += mouse.mouseDelta.x * mouseSettings.sensitivity.x;
 
 		//glm::mat4 projectionMat = glm::perspective(cameraComp.fieldOfView,
 		//	aspect, cameraComp.nearClipPlane, cameraComp.farClipPlane);

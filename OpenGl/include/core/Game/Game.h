@@ -68,6 +68,7 @@ namespace Engine::Core::Game
 			coordinator.registerComponent<ECS::ShaderComponent>();
 			coordinator.registerComponent<ECS::TransformComponent>();
 			coordinator.registerComponent<ECS::OrbitalCameraComponent>();
+			coordinator.registerComponent<ECS::MouseInputSettings>();
 
 			ECS::Signature signature{};
 
@@ -76,6 +77,7 @@ namespace Engine::Core::Game
 			signature.set(coordinator.getComponentType<ECS::ShaderComponent>());
 			signature.set(coordinator.getComponentType<ECS::MeshComponent>());
 			signature.set(coordinator.getComponentType<ECS::OrbitalCameraComponent>());
+			signature.set(coordinator.getComponentType<ECS::MouseInputSettings>());
 
 			coordinator.setSystemSignature<ECS::RenderDispatcherOrbitalCamera>(signature);
 			coordinator.setSystemSignature<ECS::MouseControlSystem>(signature);
@@ -88,6 +90,8 @@ namespace Engine::Core::Game
 			coordinator.addComponent(entity, ECS::TransformComponent{});
 			coordinator.addComponent(entity, ECS::CameraComponent{});
 			coordinator.addComponent(entity, shader);
+			coordinator.addComponent(entity, ECS::OrbitalCameraComponent{});
+			coordinator.addComponent(entity, ECS::MouseInputSettings{});
 		}
 
 		void shutdown() override
@@ -98,9 +102,8 @@ namespace Engine::Core::Game
 		//update systems here
 		void update(float aspect, MouseInputResource mouseState) override
 		{
-			//mouseControl->update(coordinator, mouseState);
+			mouseControl->update(coordinator, mouseState);
 			renderDispatcher->update(coordinator, aspect);
-
 		}
 	};
 

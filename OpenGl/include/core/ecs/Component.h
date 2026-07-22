@@ -70,9 +70,9 @@ namespace Engine::Core::ECS
 		KeyCode backward{};
 	};
 
-	struct MouseInput
+	struct MouseInputSettings : ComponentBase
 	{
-		glm::vec2 mousePos{};
+		glm::vec2 sensitivity{ 0.07f,0.05f };
 	};
 
 	struct OrbitalCameraComponent : public ComponentBase
