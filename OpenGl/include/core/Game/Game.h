@@ -52,19 +52,22 @@ namespace Engine::Core::Game
 	{
 	private:
 		ECS::RenderDispatcherOrbitalCamera* renderDispatcher{};
+		ECS::MouseControlSystem* mouseControl{};
 	public:
 		using Game::Game;
 
 		void setup() override
 		{
 			renderDispatcher = coordinator.registerSystem<ECS::RenderDispatcherOrbitalCamera>();
-			
+			mouseControl = coordinator.registerSystem<ECS::MouseControlSystem>();
+
 			ECS::Entity entity = coordinator.createEntity();
 
 			coordinator.registerComponent<ECS::CameraComponent>();
 			coordinator.registerComponent<ECS::MeshComponent>();
 			coordinator.registerComponent<ECS::ShaderComponent>();
 			coordinator.registerComponent<ECS::TransformComponent>();
+			coordinator.registerComponent<ECS::OrbitalCameraComponent>();
 
 			ECS::Signature signature{};
 
@@ -72,9 +75,10 @@ namespace Engine::Core::Game
 			signature.set(coordinator.getComponentType<ECS::TransformComponent>());
 			signature.set(coordinator.getComponentType<ECS::ShaderComponent>());
 			signature.set(coordinator.getComponentType<ECS::MeshComponent>());
+			signature.set(coordinator.getComponentType<ECS::OrbitalCameraComponent>());
 
 			coordinator.setSystemSignature<ECS::RenderDispatcherOrbitalCamera>(signature);
-
+			coordinator.setSystemSignature<ECS::MouseControlSystem>(signature);
 			ECS::MeshComponent mesh{};
 			assetManager.getMesh(mesh.meshData, "bunny");
 			ECS::ShaderComponent shader{};
@@ -94,7 +98,9 @@ namespace Engine::Core::Game
 		//update systems here
 		void update(float aspect, MouseInputResource mouseState) override
 		{
+			//mouseControl->update(coordinator, mouseState);
 			renderDispatcher->update(coordinator, aspect);
+
 		}
 	};
 

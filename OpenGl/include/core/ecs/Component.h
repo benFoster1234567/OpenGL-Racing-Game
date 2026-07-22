@@ -75,7 +75,7 @@ namespace Engine::Core::ECS
 		glm::vec2 mousePos{};
 	};
 
-	struct OrbitalCameraComponent
+	struct OrbitalCameraComponent : public ComponentBase
 	{
 		float yaw{};
 		float pitch{};

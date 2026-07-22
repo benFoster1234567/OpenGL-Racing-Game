@@ -20,7 +20,6 @@ namespace Engine::Core
 {
 	using AssetVariant = std::variant<std::monostate, std::unique_ptr<MeshData>, std::unique_ptr<TextureData>, std::unique_ptr<MaterialData>, std::unique_ptr<ShaderData>>;
 
-
 	class AssetManager
 	{
 	private:

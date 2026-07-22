@@ -4,7 +4,6 @@
 #include "core/events/EventDispatcher.h"
 #include "core/ECS/Coordinator.h"
 #include <core/input/KeyboardInput.h>
-#include <core/input/MouseInputResource.h>
 #include "core/ecs/System.h"
 
 
@@ -13,7 +12,6 @@ namespace Engine::Core::ECS
 
 	struct RenderOutput
 	{
-
 		glm::mat4 view{1.0f};
 		glm::mat4 projection{1.0f};
 		glm::mat4 modelTransform{1.0f};
@@ -46,8 +44,7 @@ namespace Engine::Core::ECS
 
 	class MouseControlSystem : public System
 	{
-		void update(Coordinator& coordinator, Input::MouseInputResource& mouse)
-		{
-		}
+	public:
+		void update(Coordinator& coordinator, MouseInputResource& mouse);
 	};
 }

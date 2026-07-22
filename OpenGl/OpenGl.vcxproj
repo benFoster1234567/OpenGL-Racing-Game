@@ -129,15 +129,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="include\core\ecs\Systems.cpp" />
-    <ClCompile Include="src\core\ecs\System.cpp" />
     <ClCompile Include="src\core\ecs\EntityRegistry.cpp" />
     <ClCompile Include="src\core\MeshData.cpp" />
     <ClCompile Include="src\core\ecs\ComponentRegistry.cpp" />
     <ClCompile Include="src\core\ecs\SystemRegistry.cpp" />
-    <ClCompile Include="src\core\ecs\Component.cpp" />
     <ClCompile Include="src\core\ecs\ComponentArray.cpp" />
-    <ClCompile Include="src\core\ecs\ComponentReegistry.cpp" />
-    <ClCompile Include="src\core\ecs\ECS.cpp" />
     <ClCompile Include="src\core\MaterialData.cpp" />
     <ClCompile Include="src\core\ShaderData.cpp" />
     <ClCompile Include="src\core\Engine.cpp" />
@@ -173,7 +169,6 @@
     <ClInclude Include="include\core\engine\Engine.h" />
     <ClInclude Include="include\core\events\EventDispatcher.h" />
     <ClInclude Include="include\core\Game\Game.h" />
-    <ClInclude Include="include\core\input\MouseInputResource.h" />
     <ClInclude Include="include\core\Physics.h" />
     <ClInclude Include="include\infra\app\Application.h" />
     <ClInclude Include="include\infra\engine\CameraInfo.h" />
