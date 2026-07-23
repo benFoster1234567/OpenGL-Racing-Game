@@ -21,7 +21,7 @@ void Engine::Core::InputBridge::printDebugInfo()
 
 void Engine::Core::MouseInputResource::zeroMouseDelta()
 {
-	lastMousePos = mousePos;
+	lastMousePos = { 0.0,0.0 };
 	mouseDelta = { 0.0,0.0 };
 }
 
@@ -29,5 +29,5 @@ void Engine::Core::MouseInputResource::updateMouseState(glm::vec2 currentMouse)
 {
 	mouseDelta = currentMouse - mousePos;
 	lastMousePos = mousePos;
-	mousePos = currentMouse;
+	mousePos   = currentMouse;
 }

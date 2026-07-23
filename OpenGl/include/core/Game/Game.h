@@ -53,6 +53,9 @@ namespace Engine::Core::Game
 	private:
 		ECS::RenderDispatcherOrbitalCamera* renderDispatcher{};
 		ECS::MouseControlSystem* mouseControl{};
+		ECS::Entity playerEntity{};
+		ECS::Entity gridEntity{};
+
 	public:
 		using Game::Game;
 
@@ -62,6 +65,9 @@ namespace Engine::Core::Game
 			mouseControl = coordinator.registerSystem<ECS::MouseControlSystem>();
 
 			ECS::Entity entity = coordinator.createEntity();
+			playerEntity = entity;
+
+			gridEntity = coordinator.createEntity();
 
 			coordinator.registerComponent<ECS::CameraComponent>();
 			coordinator.registerComponent<ECS::MeshComponent>();

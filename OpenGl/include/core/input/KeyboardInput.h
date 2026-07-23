@@ -64,10 +64,7 @@ namespace Engine::Core
 
 	class InputBridge
 	{
-	private:
-
-	public:
-		
+	public:	
 		KeyboardInputResource inputState{};
 		MouseInputResource mouseState{};
 		void setKey(KeyCode k, bool pressed);

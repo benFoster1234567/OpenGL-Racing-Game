@@ -86,6 +86,8 @@ namespace Engine::Core
 
 		void updateMouse( double xpos, double ypos);
 
+		void zeroMouse();
+
 		void updateGame()
 		{
 			game.update(aspect, inputHandler.mouseState);

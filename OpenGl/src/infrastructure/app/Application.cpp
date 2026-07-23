@@ -152,6 +152,8 @@ void Engine::Infra::Application::setupInput()
 
 }
 
+
+
 void Engine::Infra::Application::run()
 {
 	//TODO: ensure that all of the dispatchers are reset when this is destroyed.
@@ -199,6 +201,7 @@ void Engine::Infra::Application::run()
 		engine.updateAspect(currentWidth / currentHeight);
 		engine.updateMouse(x, y);
 		engine.updateGame();
+		engine.zeroMouse();
 
 		renderer.flush();
 		debugConsoleUi->prepareFrame();

@@ -32,6 +32,7 @@ namespace Engine::Infra
 		void submitEngineRenderQueueToRenderer();
 		void setupInput();
 
+
 		void run();
 	};
 

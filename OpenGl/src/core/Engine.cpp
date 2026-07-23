@@ -17,6 +17,10 @@ void Engine::Core::EngineSystem::updateMouse(double xpos, double ypos)
 {
 	inputHandler.updateMousePosition({ xpos,ypos });
 }
+void Engine::Core::EngineSystem::zeroMouse()
+{
+	inputHandler.mouseState.zeroMouseDelta();
+}
 
 void Engine::Core::EngineSystem::updateInputState()
 {

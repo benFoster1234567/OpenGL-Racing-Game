@@ -23,7 +23,6 @@ namespace Engine::Core::ECS
 	{
 	public:
 		inline static EventDispatcher<RenderOutput> sendRenderInfo; // connect renderer to this //
-		virtual void update(Coordinator& coordinator, float aspect) = 0;
 	};
 
 	//this makes the camera follow the entity transform position.
@@ -31,7 +30,12 @@ namespace Engine::Core::ECS
 	class RenderDispatcherOrbitalCamera : public RenderDispatcher
 	{
 	public:
-		void update(Coordinator& coordinator, float aspect) override;
+		void update(Coordinator& coordinator, float aspect);
+	};
+
+	class RenderDispatcherExternalCamera : public RenderDispatcher
+	{
+		void update(Coordinator& coordinator, float aspect, Entity cameraEntity);
 	};
 
 	class KeyControlSystem : public System

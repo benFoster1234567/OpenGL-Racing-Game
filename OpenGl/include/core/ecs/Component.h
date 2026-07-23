@@ -25,6 +25,10 @@ namespace Engine::Core::ECS
 		float farClipPlane{ 10.0f };
 		bool isOrtho{false};
 		glm::vec3 position{0.0f,0.0f,5.0f};
+
+		glm::mat4 projectionMat{1.0f};
+		glm::mat4 viewMat{1.0f};
+
 	};
 
 	struct TransformComponent : public ComponentBase
@@ -80,7 +84,6 @@ namespace Engine::Core::ECS
 		float yaw{};
 		float pitch{};
 		float roll{};
-
 	};
 
 }
