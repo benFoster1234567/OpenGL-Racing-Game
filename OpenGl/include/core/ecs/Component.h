@@ -24,6 +24,8 @@ namespace Engine::Core::ECS
 		float nearClipPlane{0.01f};
 		float farClipPlane{ 10.0f };
 		bool isOrtho{false};
+		float distance{ 5.0f };
+
 		glm::vec3 position{0.0f,0.0f,5.0f};
 
 		glm::mat4 projectionMat{1.0f};
@@ -31,10 +33,29 @@ namespace Engine::Core::ECS
 
 	};
 
+	struct OrbitalCameraComponent : public ComponentBase
+	{
+		float yaw{};
+		float pitch{};
+		float roll{};
+	};
+
+	//change this to add more keybindings
+	struct PlayerController : ComponentBase
+	{
+		KeyCode strafeLeft{ KeyCode::A };
+		KeyCode strafeRight{ KeyCode::D };
+		KeyCode forward{ KeyCode::W };
+		KeyCode backward{ KeyCode::S };
+
+		float speed{ 5.0f };
+		glm::vec3 baseForward{ 0.0f,0.0f,-1.0f };
+	};
+
 	struct TransformComponent : public ComponentBase
 	{
 		glm::vec3 position{ 0.0f, 0.0f, 0.0f };
-		glm::quat rotation{ 1.0f, 0.0f, 0.0f, 0.0f }; // Quaternion representation
+		glm::quat rotation{ 1.0f, 0.0f, 0.0f, 0.0f };
 		glm::vec3 scale{ 1.0f, 1.0f, 1.0f };
 	};
 
@@ -65,25 +86,10 @@ namespace Engine::Core::ECS
 		MaterialData* material{ nullptr };
 	};
 
-	//change this to add more keybindings
-	struct KeyInput
-	{
-		KeyCode strafeLeft{};
-		KeyCode strafeRight{};
-		KeyCode forward{};
-		KeyCode backward{};
-	};
-
 	struct MouseInputSettings : ComponentBase
 	{
 		glm::vec2 sensitivity{ 0.07f,0.05f };
 	};
 
-	struct OrbitalCameraComponent : public ComponentBase
-	{
-		float yaw{};
-		float pitch{};
-		float roll{};
-	};
 
 }

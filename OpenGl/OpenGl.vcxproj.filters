@@ -69,9 +69,6 @@
     <ClCompile Include="src\core\MaterialData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\ecs\ECS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\core\ecs\EntityRegistry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -84,16 +81,7 @@
     <ClCompile Include="src\core\ecs\SystemRegistry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\ecs\Component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\core\ecs\ComponentArray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\ecs\ComponentReegistry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\ecs\System.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="include\core\ecs\Systems.cpp">
@@ -195,9 +183,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\core\Physics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\core\input\MouseInputResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\core\ecs\Systems.h">

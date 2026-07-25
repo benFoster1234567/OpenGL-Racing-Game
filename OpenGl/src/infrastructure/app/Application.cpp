@@ -24,6 +24,7 @@
 
 #include <bit>
 
+
 Engine::Infra::Application::Application()
 {
 	window = std::make_unique<Window>("window", false);
@@ -182,6 +183,7 @@ void Engine::Infra::Application::run()
 	float currentHeight = static_cast<float>(window->getHeight());
 
 	engine.setUpGame();
+	window->disableCursor();
 
 	while (!window->shouldClose())
 	{

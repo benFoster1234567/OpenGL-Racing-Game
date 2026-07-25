@@ -53,6 +53,7 @@ namespace Engine::Core::Game
 	private:
 		ECS::RenderDispatcherOrbitalCamera* renderDispatcher{};
 		ECS::MouseControlSystem* mouseControl{};
+		ECS::RenderDispatcherExternalCamera* externalCameraSystem{};
 		ECS::Entity playerEntity{};
 		ECS::Entity gridEntity{};
 
@@ -63,11 +64,13 @@ namespace Engine::Core::Game
 		{
 			renderDispatcher = coordinator.registerSystem<ECS::RenderDispatcherOrbitalCamera>();
 			mouseControl = coordinator.registerSystem<ECS::MouseControlSystem>();
+			externalCameraSystem = coordinator.registerSystem<ECS::RenderDispatcherExternalCamera>();
 
-			ECS::Entity entity = coordinator.createEntity();
-			playerEntity = entity;
-
+			playerEntity = coordinator.createEntity();
 			gridEntity = coordinator.createEntity();
+			
+			ECS::Signature playerSignature{};
+			ECS::Signature gridSignature{};
 
 			coordinator.registerComponent<ECS::CameraComponent>();
 			coordinator.registerComponent<ECS::MeshComponent>();
@@ -76,28 +79,43 @@ namespace Engine::Core::Game
 			coordinator.registerComponent<ECS::OrbitalCameraComponent>();
 			coordinator.registerComponent<ECS::MouseInputSettings>();
 
-			ECS::Signature signature{};
 
-			signature.set(coordinator.getComponentType<ECS::CameraComponent>());
-			signature.set(coordinator.getComponentType<ECS::TransformComponent>());
-			signature.set(coordinator.getComponentType<ECS::ShaderComponent>());
-			signature.set(coordinator.getComponentType<ECS::MeshComponent>());
-			signature.set(coordinator.getComponentType<ECS::OrbitalCameraComponent>());
-			signature.set(coordinator.getComponentType<ECS::MouseInputSettings>());
+			playerSignature.set(coordinator.getComponentType<ECS::CameraComponent>());
+			playerSignature.set(coordinator.getComponentType<ECS::TransformComponent>());
+			playerSignature.set(coordinator.getComponentType<ECS::ShaderComponent>());
+			playerSignature.set(coordinator.getComponentType<ECS::MeshComponent>());
+			playerSignature.set(coordinator.getComponentType<ECS::OrbitalCameraComponent>());
+			playerSignature.set(coordinator.getComponentType<ECS::MouseInputSettings>());
 
-			coordinator.setSystemSignature<ECS::RenderDispatcherOrbitalCamera>(signature);
-			coordinator.setSystemSignature<ECS::MouseControlSystem>(signature);
+			coordinator.setSystemSignature<ECS::RenderDispatcherOrbitalCamera>(playerSignature);
+			coordinator.setSystemSignature<ECS::MouseControlSystem>(playerSignature);
 			ECS::MeshComponent mesh{};
 			assetManager.getMesh(mesh.meshData, "bunny");
 			ECS::ShaderComponent shader{};
 			assetManager.getShader(shader.shaderData, "shader");
 
-			coordinator.addComponent(entity, mesh);
-			coordinator.addComponent(entity, ECS::TransformComponent{});
-			coordinator.addComponent(entity, ECS::CameraComponent{});
-			coordinator.addComponent(entity, shader);
-			coordinator.addComponent(entity, ECS::OrbitalCameraComponent{});
-			coordinator.addComponent(entity, ECS::MouseInputSettings{});
+			coordinator.addComponent(playerEntity, mesh);
+			coordinator.addComponent(playerEntity, ECS::TransformComponent{});
+			coordinator.addComponent(playerEntity, ECS::CameraComponent{});
+			coordinator.addComponent(playerEntity, shader);
+			coordinator.addComponent(playerEntity, ECS::OrbitalCameraComponent{});
+			coordinator.addComponent(playerEntity, ECS::MouseInputSettings{});
+
+			gridSignature.set(coordinator.getComponentType<ECS::TransformComponent>());
+			gridSignature.set(coordinator.getComponentType<ECS::MeshComponent>());
+			gridSignature.set(coordinator.getComponentType<ECS::ShaderComponent>());
+
+			coordinator.setSystemSignature<ECS::RenderDispatcherExternalCamera>(gridSignature);
+
+			ECS::MeshComponent gridMesh{};
+			assetManager.getMesh(gridMesh.meshData, "grid");
+
+			ECS::TransformComponent gridTransform{};
+			gridTransform.position = { 0.0f,-1.0f,0.0f };
+
+			coordinator.addComponent(gridEntity, gridMesh);
+			coordinator.addComponent(gridEntity, shader);
+			coordinator.addComponent(gridEntity, gridTransform);
 		}
 
 		void shutdown() override
@@ -109,6 +127,7 @@ namespace Engine::Core::Game
 		void update(float aspect, MouseInputResource mouseState) override
 		{
 			mouseControl->update(coordinator, mouseState);
+			externalCameraSystem->update(coordinator, aspect, playerEntity);
 			renderDispatcher->update(coordinator, aspect);
 		}
 	};
