@@ -187,7 +187,6 @@ void Engine::Infra::Application::run()
 		pointLights.push_back(splr);
 	}
 
-
 	renderer.loadLights(pointLights);
 
 	window->disableCursor();

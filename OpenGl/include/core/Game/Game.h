@@ -106,7 +106,6 @@ namespace Engine::Core::Game
 			externalCamSig.set(coordinator.getComponentType<ECS::ExternalCameraComponent>());
 			coordinator.setSystemSignature<ECS::RenderDispatcherExternalCamera>(externalCamSig);
 
-
 			ECS::Signature lightSignature{};
 			lightSignature.set(coordinator.getComponentType<ECS::TransformComponent>());
 			lightSignature.set(coordinator.getComponentType<ECS::StaticPointLightComponent>());
@@ -185,6 +184,7 @@ namespace Engine::Core::Game
 			registerSystems();
 			registerComponents();
 			defineSystemSignatures();
+
 			playerEntity = setupPlayerEntity();
 			gridEntity = setupGridEntity(playerEntity);
 			lightEntity = setupLightEntity();
