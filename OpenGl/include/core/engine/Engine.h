@@ -23,8 +23,6 @@
 namespace Engine::Core
 {
 	constexpr int MAX_ENTITIES{ 100 };
-
-
 	struct EntityRenderCommand
 	{
 		glm::mat4 view;
@@ -48,10 +46,10 @@ namespace Engine::Core
 	class EngineSystem
 	{
 	private:
-
 		float deltaTime{};
 		float aspect{};
 		Game::MainGame game;
+	
 	public:
 
 		AssetManager assetManager;
@@ -66,7 +64,7 @@ namespace Engine::Core
 		{
 			game.setup();
 		}
-		
+		void fillStaticLightVector(std::vector<ECS::StaticPointLightRendererData>& lights);
 		EventDispatcher<std::vector<ShaderData*>> shaderDispatcher{};
 		EventDispatcher<std::vector<MeshData*>> meshDispatcher{};
 
@@ -83,14 +81,13 @@ namespace Engine::Core
 			aspect = a;
 		}
 
-
 		void updateMouse( double xpos, double ypos);
 
 		void zeroMouse();
 
 		void updateGame()
 		{
-			game.update(aspect, inputHandler.mouseState);
+			game.update(aspect, inputHandler.mouseState, deltaTime);
 		}
 
 		void updateInputState();

@@ -10,8 +10,6 @@ void Engine::Core::ECS::RenderDispatcherOrbitalCamera::update(Coordinator& coord
 		const auto& shaderData = coordinator.getComponent<ShaderComponent>(entity);
 		const auto& orbitalCam = coordinator.getComponent<OrbitalCameraComponent>(entity);
 
-
-
 		glm::mat4 projectionMat = glm::perspective(glm::radians(70.0f), aspect, 0.1f, 1000.0f);
 		cameraComp.projectionMat = projectionMat;
 		glm::mat4 viewMat = glm::lookAt(transform.position + cameraComp.position, transform.position, { 0.0f,1.0f,0.0f });
@@ -54,11 +52,12 @@ void Engine::Core::ECS::MouseControlSystem::update(Coordinator& coordinator, Mou
 	}
 }
 
-void Engine::Core::ECS::RenderDispatcherExternalCamera::update(Coordinator& coordinator, float aspect, Entity cameraEntity)
+void Engine::Core::ECS::RenderDispatcherExternalCamera::update(Coordinator& coordinator, float aspect)
 {
 	for (auto entity : entities)
 	{
-		const auto& cameraComp = coordinator.getComponent<CameraComponent>(cameraEntity);
+		const auto& extCameraComp = coordinator.getComponent<ExternalCameraComponent>(entity);
+		const auto& cameraComp = coordinator.getComponent<CameraComponent>(extCameraComp.entityWithCamera);
 		const auto& transform = coordinator.getComponent<TransformComponent>(entity);
 		const auto& meshData = coordinator.getComponent<MeshComponent>(entity);
 		const auto& shaderData = coordinator.getComponent<ShaderComponent>(entity);
@@ -76,5 +75,61 @@ void Engine::Core::ECS::RenderDispatcherExternalCamera::update(Coordinator& coor
 			, .modelTransform = transformMat
 			, .shader = shaderData.shaderData
 			, .mesh = meshData.meshData });
+	}
+}
+
+void Engine::Core::ECS::KeyControlSystem::update(Coordinator& coordinator, const InputBridge& inputHandler, float deltaTime)
+{
+	//TODO: fix broken keyHeld method
+	for (auto entity : entities)
+	{
+		const auto& inputKeys = coordinator.getComponent<PlayerController>(entity);
+		auto& transform = coordinator.getComponent<TransformComponent>(entity);
+		glm::vec3 rotAxis{ 0.0f,1.0f,0.0f };
+		glm::vec3 forwards{ 0,0,0 };
+		float rotAngle = 0.0f;
+		glm::quat rotQuat;
+
+		if (inputHandler.keyPressed(int(inputKeys.strafeLeft)))
+		{
+			rotAngle -= inputKeys.turnSensitivity;
+		}
+
+		if (inputHandler.keyPressed(int(inputKeys.strafeRight)))
+		{
+			rotAngle += inputKeys.turnSensitivity;
+		}
+
+		if (inputHandler.keyPressed(int(inputKeys.forward)))
+		{
+			forwards.z = +0.01f;
+		}
+
+		if (inputHandler.keyPressed(int(inputKeys.backward)))
+		{
+			forwards.z = -0.01f;
+		}
+
+		rotQuat = glm::angleAxis(glm::radians(rotAngle), rotAxis);
+		rotQuat *= transform.rotation;
+		forwards = rotQuat * forwards;
+		transform.position += forwards;
+		transform.rotation = rotQuat;
+	}
+}
+
+void Engine::Core::ECS::StaticLightRenderSetupSystem::fill(Coordinator& coordinator, std::vector<StaticPointLightRendererData>& queue)
+{
+	for (auto entity : entities)
+	{
+		const auto& light = coordinator.getComponent<StaticPointLightComponent>(entity);
+		const auto& transform = coordinator.getComponent<TransformComponent>(entity);
+
+		StaticPointLightRendererData rd{};
+		rd.color = light.color;
+		rd.position = transform.position;
+		rd.radius = light.radius;
+
+		queue.push_back(rd);
 	}
 }

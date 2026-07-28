@@ -31,7 +31,6 @@ Engine::Infra::Application::Application()
 	setupWindowCallbacks();
 	debugConsoleUi = std::make_unique<DebugConsoleUi>(*window);
 	setupDebugCommands();
-	setupInput();
 }
 
 void Engine::Infra::Application::submitEngineRenderQueueToRenderer()
@@ -147,14 +146,6 @@ void Engine::Infra::Application::setupImportCallbacks()
 	});
 }
 
-//TODO: delete this
-void Engine::Infra::Application::setupInput()
-{
-
-}
-
-
-
 void Engine::Infra::Application::run()
 {
 	//TODO: ensure that all of the dispatchers are reset when this is destroyed.
@@ -178,11 +169,27 @@ void Engine::Infra::Application::run()
 
 	setupImportCallbacks();
 	importAssets();
-	engine.publishAssets();
-	float currentWidth = static_cast<float>(window->getWidth());
-	float currentHeight = static_cast<float>(window->getHeight());
+	engine.publishAssets(); //sends to gpu
+	std::vector<Engine::Core::ECS::StaticPointLightRendererData> lightData{};
+
+
 
 	engine.setUpGame();
+	engine.fillStaticLightVector(lightData);
+	std::vector<StaticPointLightResource> pointLights{};
+	for (const auto& light : lightData)
+	{
+		StaticPointLightResource splr{};
+		splr.position = light.position;
+		splr.color = light.color;
+		splr.radius = light.radius;
+
+		pointLights.push_back(splr);
+	}
+
+
+	renderer.loadLights(pointLights);
+
 	window->disableCursor();
 
 	while (!window->shouldClose())

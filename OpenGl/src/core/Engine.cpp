@@ -28,18 +28,23 @@ void Engine::Core::EngineSystem::updateInputState()
 	inputHandler.updateKeyboard();
 }
 
+void Engine::Core::EngineSystem::fillStaticLightVector(std::vector<ECS::StaticPointLightRendererData>& lights)
+{
+	game.setupLights(lights);
+}
+
 //loads assets from files
 void Engine::Core::EngineSystem::createAssetManager()
 {
-	int initialShaders = assetManager.shaderMap.size();
-	int initialMeshes = assetManager.meshMap.size();
-	int initialTextures = assetManager.textureMap.size();
+	size_t initialShaders = assetManager.shaderMap.size();
+	size_t initialMeshes = assetManager.meshMap.size();
+	size_t initialTextures = assetManager.textureMap.size();
 
 	assetPipeline.populateAssetManager(assetManager);
 
-	int addedShaders = assetManager.shaderMap.size() - initialShaders;
-	int addedMeshes = assetManager.meshMap.size() - initialMeshes;
-	int addedTextures = assetManager.textureMap.size() - initialTextures;
+	size_t addedShaders = assetManager.shaderMap.size() - initialShaders;
+	size_t addedMeshes = assetManager.meshMap.size() - initialMeshes;
+	size_t addedTextures = assetManager.textureMap.size() - initialTextures;
 
 	if (addedShaders == 0 && addedMeshes == 0 && addedTextures == 0)
 	{

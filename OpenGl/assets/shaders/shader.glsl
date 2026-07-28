@@ -20,10 +20,22 @@ void main()
 #endif
 
 #ifdef FRAGMENT_SHADER
+
+#define MAX_LIGHTS 100
+struct StaticPointLight {
+    vec4 posRad; 
+    vec4 color;  
+};
+
+layout (std140) uniform LightBlock {
+    StaticPointLight lights[MAX_LIGHTS];
+    int activeLightCount;
+};
+
 in vec4 normOut;    
 out vec4 FragColor;
 
-void main() 
+void main()
 {
     FragColor = normOut;
 }

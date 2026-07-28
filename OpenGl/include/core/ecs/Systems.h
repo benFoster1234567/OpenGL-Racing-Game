@@ -36,38 +36,14 @@ namespace Engine::Core::ECS
 	class RenderDispatcherExternalCamera : public RenderDispatcher
 	{
 	public:
-		void update(Coordinator& coordinator, float aspect, Entity cameraEntity);
+		//void update(Coordinator& coordinator, float aspect, Entity cameraEntity);
+		void update(Coordinator& coordinator, float aspect);
 	};
 
 	class KeyControlSystem : public System
 	{
 	public:
-		void update(Coordinator& coordinator, const InputBridge& inputHandler)
-		{
-			for (auto entity : entities)
-			{
-				const auto& inputKeys = coordinator.getComponent<PlayerController>(entity);
-				auto& transform = coordinator.getComponent<TransformComponent>(entity);
-				glm::vec3 rotAxis{ 0.0f,1.0f,0.0f };
-
-				if (inputHandler.keyHeld(int(inputKeys.strafeLeft)))
-				{
-
-				}
-				if (inputHandler.keyHeld(int(inputKeys.strafeRight)))
-				{
-
-				}
-				if (inputHandler.keyHeld(int(inputKeys.forward)))
-				{
-
-				}
-				if (inputHandler.keyHeld(int(inputKeys.backward)))
-				{
-
-				}
-			}
-		}
+		void update(Coordinator& coordinator, const InputBridge& inputHandler, float deltaTime);
 	};
 
 	class MouseControlSystem : public System
@@ -75,4 +51,18 @@ namespace Engine::Core::ECS
 	public:
 		void update(Coordinator& coordinator, MouseInputResource& mouse);
 	};
+
+	struct StaticPointLightRendererData
+	{
+		glm::vec3 position{ 0.0f };
+		glm::vec3 color{ 0.0f };
+		float radius{ 0.0f };
+	};
+
+	class StaticLightRenderSetupSystem : public System
+	{
+	public:
+		void fill(Coordinator& coordinator, std::vector<StaticPointLightRendererData>& queue);
+	};
+
 }

@@ -159,6 +159,7 @@
   <ItemGroup>
     <ClInclude Include="include\core\assets\AssetPipeline.h" />
     <ClInclude Include="include\core\assets\AssetManager.h" />
+    <ClInclude Include="include\core\assets\MeshFactory.h" />
     <ClInclude Include="include\core\assets\ShaderData.h" />
     <ClInclude Include="include\core\ecs\Component.h" />
     <ClInclude Include="include\core\ecs\ComponentArray.h" />
@@ -166,6 +167,7 @@
     <ClInclude Include="include\core\ecs\Coordinator.h" />
     <ClInclude Include="include\core\ecs\ECS.h" />
     <ClInclude Include="include\core\ecs\EntityRegistry.h" />
+    <ClInclude Include="include\core\ecs\StaticPointLight.h" />
     <ClInclude Include="include\core\ecs\System.h" />
     <ClInclude Include="include\core\ecs\SystemRegistry.h" />
     <ClInclude Include="include\core\ecs\Systems.h" />

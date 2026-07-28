@@ -12,7 +12,6 @@
 #include "core/input/Keys.h"
 namespace Engine::Core::ECS
 {
-
 	struct ComponentBase
 	{
 		virtual ~ComponentBase() = default;
@@ -25,12 +24,9 @@ namespace Engine::Core::ECS
 		float farClipPlane{ 10.0f };
 		bool isOrtho{false};
 		float distance{ 5.0f };
-
 		glm::vec3 position{0.0f,0.0f,5.0f};
-
 		glm::mat4 projectionMat{1.0f};
 		glm::mat4 viewMat{1.0f};
-
 	};
 
 	struct OrbitalCameraComponent : public ComponentBase
@@ -40,6 +36,11 @@ namespace Engine::Core::ECS
 		float roll{};
 	};
 
+	struct ExternalCameraComponent : public ComponentBase
+	{
+		Entity entityWithCamera{};
+	};
+
 	//change this to add more keybindings
 	struct PlayerController : ComponentBase
 	{
@@ -47,8 +48,8 @@ namespace Engine::Core::ECS
 		KeyCode strafeRight{ KeyCode::D };
 		KeyCode forward{ KeyCode::W };
 		KeyCode backward{ KeyCode::S };
-
 		float speed{ 5.0f };
+		float turnSensitivity{ 5.0f };
 		glm::vec3 baseForward{ 0.0f,0.0f,-1.0f };
 	};
 
@@ -63,7 +64,6 @@ namespace Engine::Core::ECS
 	{
 		MeshComponent() = default;
 		MeshComponent(Engine::Core::MeshData* mesh) : meshData(mesh) {}
-
 		Engine::Core::MeshData* meshData{ nullptr };
 	};
 
@@ -71,7 +71,6 @@ namespace Engine::Core::ECS
 	{
 		ShaderComponent() = default;
 		ShaderComponent(Engine::Core::ShaderData* shader) : shaderData(shader) {}
-
 		Engine::Core::ShaderData* shaderData{ nullptr };
 	};
 
@@ -79,7 +78,6 @@ namespace Engine::Core::ECS
 	{
 		MaterialComponent() = default;
 		MaterialComponent(ShaderData* _shader, MaterialData* _material) : shader{ _shader }, material{ _material } {}
-
 		~MaterialComponent() = default;
 
 		ShaderData* shader{ nullptr };
@@ -91,5 +89,9 @@ namespace Engine::Core::ECS
 		glm::vec2 sensitivity{ 0.07f,0.05f };
 	};
 
-
+	struct StaticPointLightComponent : ComponentBase
+	{
+		glm::vec3 color{};
+		float radius{};
+	};
 }

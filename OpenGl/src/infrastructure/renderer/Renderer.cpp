@@ -45,6 +45,49 @@ void Engine::Infra::Renderer::loadShaders(std::vector<Core::ShaderData*>& shader
 	}
 }
 
+void Engine::Infra::Renderer::loadLights(std::vector<StaticPointLightResource>& staticLights)
+{
+	//must be loaded after shaders?
+	StaticPointLight lights[MAX_LIGHTS];
+
+	size_t lightsToCopy = std::min(staticLights.size(), static_cast<size_t>(MAX_LIGHTS));
+	for (size_t i = 0; i < lightsToCopy; ++i) {
+		auto lightCpu = staticLights[i];
+		StaticPointLight lightGpu
+		{
+			.posRad = {lightCpu.position, lightCpu.radius},
+			.color = {lightCpu.color, 1.0f}
+		};
+
+		lights[i] = lightGpu;
+	}
+
+	UboStaticPointLightData uboData{};
+
+	std::memcpy(uboData.lights, lights, sizeof(lights));
+	uboData.activeLightCount = static_cast<int>(lightsToCopy);
+
+	GLuint UBO;
+	glGenBuffers(1, &UBO);
+	glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(UboStaticPointLightData), &uboData, GL_STATIC_DRAW);
+
+	GLuint bindingPoint{ 0 };
+	glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, UBO);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	for (const auto& [shaderData, shader] : gpuShaderCache)
+	{
+		GLuint blockIndex = glGetUniformBlockIndex(shader->Id, "LightBlock");
+
+		if (blockIndex != GL_INVALID_INDEX)
+		{
+			glUniformBlockBinding(shader->Id, blockIndex, bindingPoint);
+		}
+	}
+}
+
 void Engine::Infra::Renderer::submit(RenderCommand command)
 {
 	if (!gpuMeshCache.contains(command.mesh))

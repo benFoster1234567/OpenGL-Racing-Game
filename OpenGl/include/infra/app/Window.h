@@ -11,7 +11,7 @@ namespace Engine::Infra
 {
 
 
-    class alignas(16) Window
+    class Window
     {
     private:
 

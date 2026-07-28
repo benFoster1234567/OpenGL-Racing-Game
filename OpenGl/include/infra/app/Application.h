@@ -19,7 +19,6 @@ namespace Engine::Infra
 		std::unique_ptr<Window> window;
 
 	public:
-
 		Application();
 		~Application() = default;
 		
@@ -30,10 +29,8 @@ namespace Engine::Infra
 		void setupImportCallbacks();
 		void importAssets();
 		void submitEngineRenderQueueToRenderer();
-		void setupInput();
-
-
 		void run();
+
 	};
 
 }

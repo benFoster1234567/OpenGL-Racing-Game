@@ -14,6 +14,28 @@
 
 namespace Engine::Infra 
 {
+	constexpr uint32_t MAX_LIGHTS = 100;
+
+	struct StaticPointLightResource
+	{
+		glm::vec3 position{ 0.0f };
+		glm::vec3 color{ 0.0f };
+		float radius{ 0.0f };
+	};
+
+	struct StaticPointLight
+	{
+		glm::vec4 posRad = { 0.0f,0.0f,0.0f, 10.0f };
+		glm::vec4 color = { 1.0f,1.0f,1.0f, 1.0f };
+	};
+
+	struct UboStaticPointLightData
+	{
+		StaticPointLight lights[100];
+		int activeLightCount;
+		int padding[3];
+	};
+
 	struct RenderCommand
 	{
 		glm::mat4 view;
@@ -23,8 +45,6 @@ namespace Engine::Infra
 		Core::MeshData* mesh;
 	};
 
-
-
 	enum PolygonMode
 	{
 		FILL, LINE
@@ -33,14 +53,11 @@ namespace Engine::Infra
 	class Renderer
 	{
 	private:
-		
 		std::vector<RenderCommand> renderQueue;
-
 		std::map<Core::MeshData*, std::unique_ptr<GpuMesh>> gpuMeshCache{};
 		std::map<Core::TextureData*, std::unique_ptr<GpuTexture>> gpuTextureCache{};
 		void cacheShader(Core::ShaderData* shaderData);
 		void cacheMesh(Core::MeshData* meshData);
-
 		int polygonMode = LINE;
 
 	public:
@@ -49,6 +66,7 @@ namespace Engine::Infra
 
 		void loadMeshes(std::vector<Core::MeshData*>& meshes);
 		void loadShaders(std::vector<Core::ShaderData*>& shaders);
+		void loadLights(std::vector<StaticPointLightResource>& staticLights);
 		void submit(RenderCommand command);
 
 		void setPolygonMode(int m) { polygonMode = m; }
@@ -59,9 +77,7 @@ namespace Engine::Infra
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
 
-		std::map<Core::ShaderData*, std::unique_ptr<GpuShader>> gpuShaderCache{}; 
-
+		std::map<Core::ShaderData*, std::unique_ptr<GpuShader>> gpuShaderCache{};
 		void flush();
 	};
-
 }
