@@ -48,7 +48,7 @@ namespace Engine::Core {
 			};
 		}
 
-		void processCommand(ImportCommand cmd, AssetManager& am);
+		void processCommand(const ImportCommand& cmd, AssetManager& am);
 		void populateAssetManager(AssetManager& am);
 
 	};
