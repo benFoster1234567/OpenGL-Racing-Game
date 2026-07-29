@@ -1,7 +1,7 @@
 #include "core/assets/AssetManager.h"
 #include "core/assets/AssetPipeline.h"
 
-void Engine::Core::AssetPipeline::processCommand(ImportCommand cmd, AssetManager& am)
+void Engine::Core::AssetPipeline::processCommand(const ImportCommand& cmd, AssetManager& am)
 {
 	auto it = import.find(cmd.typeId);
 	if (it != import.end())
