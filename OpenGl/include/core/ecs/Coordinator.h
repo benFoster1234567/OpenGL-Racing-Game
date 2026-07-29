@@ -88,6 +88,12 @@ namespace Engine::Core::ECS
 		}
 
 		template<typename T>
+		T* getSystem()
+		{
+			return systemRegistry->getSystem<T>();
+		}
+
+		template<typename T>
 		void setSystemSignature(Signature signature)
 		{
 			systemRegistry->template setSignature<T>(signature); 

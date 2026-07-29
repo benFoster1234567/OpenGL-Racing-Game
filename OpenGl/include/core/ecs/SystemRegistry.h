@@ -24,6 +24,14 @@ namespace Engine::Core::ECS
 			return static_cast<T*>(systems[typeId].get());
 		}
 
+		template <std::derived_from<System> T>
+		T* getSystem()
+		{
+			std::type_index tid(typeid(T));
+			assert(systems.contains(tid) && "System used before registered.");
+			return static_cast<T*>(systems[tid].get());
+		}
+
 		template<class T>
 		void setSignature(Signature signature)
 		{
