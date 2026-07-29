@@ -44,6 +44,14 @@ in vec3 vertexPosition;
 
 out vec4 FragColor;
 
+float sqDist(vec3 a, vec3 b)
+{
+    float dx = a.x - b.x;
+    float dy = a.y - b.y;
+    float dz = a.z - b.z;
+    return dx*dx + dy*dy + dz*dz;
+}
+
 void main()
 {
     vec3 N = normalize(vertexNormal);
@@ -59,6 +67,7 @@ void main()
 
     for (int i = 0; i < ub.activeLightCount; i++)
     {
+        StaticPointLight curLight = ub.lights[i];
         vec3 lightPosWorld = ub.lights[i].posRad.xyz;
         float radius = ub.lights[i].posRad.w;
 
@@ -79,7 +88,10 @@ void main()
             specular = vec4(0.0);
         }
 
-        fColor.xyz += diffuse.xyz + specular.xyz;
+        
+        float invDistSquared = 1/sqDist(curLight.posRad.xyz, vertexPosition);
+
+        fColor.xyz += invDistSquared*(diffuse.xyz + specular.xyz);
     }
 
     fColor.w = 1.0;
