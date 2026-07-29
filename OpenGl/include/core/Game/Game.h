@@ -51,22 +51,17 @@ namespace Engine::Core::Game
 	class MainGame : public Game
 	{
 	private:
-		ECS::RenderDispatcherOrbitalCamera* renderDispatcher{};
-		ECS::MouseControlSystem* mouseControl{};
-		ECS::RenderDispatcherExternalCamera* externalCameraSystem{};
-		ECS::KeyControlSystem* keyControlSystem{};
-		ECS::StaticLightRenderSetupSystem* lightRenderer{};
 
 		ECS::Entity playerEntity{};
 		ECS::Entity gridEntity{};
 		ECS::Entity lightEntity{ };
 		void registerSystems()
 		{
-			renderDispatcher = coordinator.registerSystem<ECS::RenderDispatcherOrbitalCamera>();
-			externalCameraSystem = coordinator.registerSystem<ECS::RenderDispatcherExternalCamera>();
-			keyControlSystem = coordinator.registerSystem<ECS::KeyControlSystem>();
-			mouseControl = coordinator.registerSystem<ECS::MouseControlSystem>();
-			lightRenderer = coordinator.registerSystem<ECS::StaticLightRenderSetupSystem>();
+			coordinator.registerSystem<ECS::RenderDispatcherOrbitalCamera>();
+			coordinator.registerSystem<ECS::RenderDispatcherExternalCamera>();
+			coordinator.registerSystem<ECS::KeyControlSystem>();
+			coordinator.registerSystem<ECS::MouseControlSystem>();
+			coordinator.registerSystem<ECS::StaticLightRenderSetupSystem>();
 		}
 
 		void registerComponents()
@@ -159,22 +154,28 @@ namespace Engine::Core::Game
 			return entity;
 		}
 
-		ECS::Entity setupLightEntity()
+		ECS::Entity setupLightEntity(ECS::TransformComponent transform)
 		{
 			ECS::Entity entity = coordinator.createEntity();
 
-			ECS::TransformComponent transform{};
 			ECS::StaticPointLightComponent lightComp{};
 			lightComp.color = { 1,1,1 };
 			lightComp.radius = 10.0f;
 
-			transform.position = { 1,2,0 };
-
-			coordinator.addComponent(entity, ECS::TransformComponent{});
+			coordinator.addComponent(entity, transform);
 			coordinator.addComponent(entity, lightComp);
 
 			return entity;
 		}
+
+		ECS::Entity setupLightEntity()
+		{
+			ECS::TransformComponent transform{};
+			transform.position = { 1,2,0 };
+
+			return setupLightEntity(transform);
+		}
+
 
 	public:
 		using Game::Game;
@@ -188,11 +189,16 @@ namespace Engine::Core::Game
 			playerEntity = setupPlayerEntity();
 			gridEntity = setupGridEntity(playerEntity);
 			lightEntity = setupLightEntity();
+
+			ECS::TransformComponent t{};
+			t.position = { 10,1,-1 };
+
+			auto lightEntity2 = setupLightEntity(t);
 		}
 
 		void setupLights(std::vector<ECS::StaticPointLightRendererData>& lightSetupQueueOut)
 		{
-			lightRenderer->fill(coordinator, lightSetupQueueOut);
+			coordinator.getSystem<ECS::StaticLightRenderSetupSystem>()->fill(coordinator, lightSetupQueueOut);
 		}
 
 		void shutdown() override
@@ -203,10 +209,10 @@ namespace Engine::Core::Game
 		//update systems here
 		void update(float aspect, MouseInputResource mouseState, float deltaTime) override
 		{
-			mouseControl->update(coordinator, mouseState);
-			externalCameraSystem->update(coordinator, aspect);
-			renderDispatcher->update(coordinator, aspect);
-			keyControlSystem->update(coordinator, inputHandler, deltaTime);
+			coordinator.getSystem<ECS::MouseControlSystem>()->update(coordinator, mouseState);
+			coordinator.getSystem<ECS::RenderDispatcherExternalCamera>()->update(coordinator, aspect);
+			coordinator.getSystem<ECS::RenderDispatcherOrbitalCamera>()->update(coordinator, aspect);
+			coordinator.getSystem<ECS::KeyControlSystem>()->update(coordinator, inputHandler, deltaTime);
 		}
 	};
 

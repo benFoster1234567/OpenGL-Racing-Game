@@ -172,10 +172,10 @@ void Engine::Infra::Application::run()
 	engine.publishAssets(); //sends to gpu
 	std::vector<Engine::Core::ECS::StaticPointLightRendererData> lightData{};
 
-
-
+	//TODO: Tidy this up
 	engine.setUpGame();
 	engine.fillStaticLightVector(lightData);
+
 	std::vector<StaticPointLightResource> pointLights{};
 	for (const auto& light : lightData)
 	{
