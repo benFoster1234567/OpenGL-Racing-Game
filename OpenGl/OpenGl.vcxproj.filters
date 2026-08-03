@@ -33,9 +33,6 @@
     <ClCompile Include="src\infrastructure\renderer\assets\GpuShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\AssetManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\infrastructure\renderer\assets\GPUTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -87,6 +84,9 @@
     <ClCompile Include="include\core\ecs\Systems.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\core\AssetManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\Tester.h">
@@ -135,9 +135,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\core\engine\Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\core\assets\AssetPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\core\assets\ShaderData.h">
@@ -200,6 +197,9 @@
     <ClInclude Include="include\core\assets\TextureManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\core\assets\AssetPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Notes.txt" />
@@ -209,6 +209,7 @@
     <None Include="assets\shaders\shader.glsl" />
     <None Include="assets\shaders\gridShader.glsl" />
     <None Include="assets\materials\testMaterial.mtl" />
+    <None Include="assets\materials\cubeMaterial.mtl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\materials\textures\testTextures.jpg">

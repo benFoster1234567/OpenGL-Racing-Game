@@ -121,7 +121,8 @@ namespace Engine::Core::Game
 			ECS::ShaderComponent shader{};
 			assetManager.getShader(shader.shaderData, "shader");
 			ECS::PlayerController playerController{};
-			playerController.turnSensitivity = 50;
+			playerController.turnSensitivity = 100;
+			playerController.speed = 5;
 
 			ECS::MouseInputSettings mis{};
 			mis.sensitivity = { 20,15 };
@@ -174,13 +175,35 @@ namespace Engine::Core::Game
 			return entity;
 		}
 
-		ECS::Entity setupLightEntity(ECS::TransformComponent transform)
+		ECS::Entity setupCubeEntity(ECS::Entity cameraEntity)
+		{
+			ECS::Entity entity = coordinator.createEntity();
+			ECS::MeshComponent mesh{};
+			assetManager.getMesh(mesh.meshData, "cube");
+			ECS::ShaderComponent shader{};
+			assetManager.getShader(shader.shaderData, "shader");
+			ECS::TransformComponent transform{};
+			transform.scale = { 5.5f,0.2f,5.5f };
+			transform.position = { 0.0f,-1.0f,0.0f };	
+			ECS::ExternalCameraComponent extCamComp{};
+			extCamComp.entityWithCamera = cameraEntity;
+			ECS::MaterialDataComponent matComp{};
+			assetManager.getMaterial(matComp.material, "cubeMaterial");
+			coordinator.addComponent(entity, transform);
+			coordinator.addComponent(entity, mesh);
+			coordinator.addComponent(entity, shader);
+			coordinator.addComponent(entity, extCamComp);
+			coordinator.addComponent(entity, matComp);
+			return entity;
+		}
+
+		ECS::Entity setupLightEntity(ECS::TransformComponent transform, float radius = 10.0f)
 		{
 			ECS::Entity entity = coordinator.createEntity();
 
 			ECS::StaticPointLightComponent lightComp{};
 			lightComp.color = { 1,1,1 };
-			lightComp.radius = 10.0f;
+			lightComp.radius = radius;
 
 			coordinator.addComponent(entity, transform);
 			coordinator.addComponent(entity, lightComp);
@@ -193,7 +216,7 @@ namespace Engine::Core::Game
 			ECS::TransformComponent transform{};
 			transform.position = { 1,2,0 };
 
-			return setupLightEntity(transform);
+			return setupLightEntity(transform, 20.0f);
 		}
 
 
@@ -208,10 +231,21 @@ namespace Engine::Core::Game
 
 			playerEntity = setupPlayerEntity();
 			gridEntity = setupGridEntity(playerEntity);
+			auto cubeEntity = setupCubeEntity(playerEntity);
 			lightEntity = setupLightEntity();
 
+			for (int i = -5; i < 5; ++i)
+			{
+				for (int j = -5; j < 5; ++j)
+				{
+					ECS::TransformComponent t{};
+					t.position = { static_cast<float>(i * 4.0f),2.5f,static_cast<float>(j * 2.0f) };
+					auto lightEntity2 = setupLightEntity(t);
+				}
+			}
+
 			ECS::TransformComponent t{};
-			t.position = { 10,1,-1 };
+			t.position = { 5,1,-1 };
 
 			auto lightEntity2 = setupLightEntity(t);
 		}

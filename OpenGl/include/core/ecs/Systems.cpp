@@ -105,25 +105,34 @@ void Engine::Core::ECS::KeyControlSystem::update(Coordinator& coordinator, const
 		float rotAngle = 0.0f;
 		glm::quat rotQuat;
 
-		if (inputHandler.keyPressed(int(inputKeys.strafeLeft)))
-		{
-			rotAngle += inputKeys.turnSensitivity * deltaTime;
-		}
-
-		if (inputHandler.keyPressed(int(inputKeys.strafeRight)))
-		{
-			rotAngle -= inputKeys.turnSensitivity * deltaTime;
-		}
+		float speed = 5;
 
 		if (inputHandler.keyPressed(int(inputKeys.forward)))
 		{
-			forwards.z = deltaTime*5;
+			forwards.z = deltaTime * speed;
 		}
 
 		if (inputHandler.keyPressed(int(inputKeys.backward)))
 		{
-			forwards.z = -deltaTime*5;
+			forwards.z = -deltaTime * speed;
 		}
+
+		if (forwards.z == 0.0f)
+		{
+			continue;
+		}
+		auto turnFactor = normalize(forwards).z;
+
+		if (inputHandler.keyPressed(int(inputKeys.strafeLeft)))
+		{
+			rotAngle += inputKeys.turnSensitivity * deltaTime * turnFactor;
+		}
+
+		if (inputHandler.keyPressed(int(inputKeys.strafeRight)))
+		{
+			rotAngle -= inputKeys.turnSensitivity * deltaTime * turnFactor;
+		}
+
 
 		rotQuat = glm::angleAxis(glm::radians(rotAngle), rotAxis);
 		rotQuat *= transform.rotation;

@@ -135,6 +135,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="include\core\ecs\Systems.cpp" />
+    <ClCompile Include="src\core\AssetManager.cpp" />
     <ClCompile Include="src\core\ecs\EntityRegistry.cpp" />
     <ClCompile Include="src\core\MeshData.cpp" />
     <ClCompile Include="src\core\ecs\ComponentRegistry.cpp" />
@@ -149,7 +150,6 @@
     <ClCompile Include="src\infrastructure\renderer\assets\ImportFuncs.cpp" />
     <ClCompile Include="src\infrastructure\app\GlfwKeyHandler.cpp" />
     <ClCompile Include="src\core\AssetPipeline.cpp" />
-    <ClCompile Include="src\core\AssetManager.cpp" />
     <ClCompile Include="src\infrastructure\renderer\assets\GPUTexture.cpp" />
     <ClCompile Include="src\core\KeyboardInput.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -160,8 +160,8 @@
     <ClCompile Include="tests\Tester.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\core\assets\AssetPipeline.h" />
     <ClInclude Include="include\core\assets\AssetManager.h" />
+    <ClInclude Include="include\core\assets\AssetPipeline.h" />
     <ClInclude Include="include\core\assets\MeshFactory.h" />
     <ClInclude Include="include\core\assets\ShaderData.h" />
     <ClInclude Include="include\core\assets\TextureManager.h" />
@@ -203,6 +203,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\materials\testMaterial.mtl" />
+    <None Include="assets\materials\cubeMaterial.mtl" />
     <None Include="assets\shaders\gridShader.glsl" />
     <None Include="assets\shaders\shader.glsl" />
     <None Include="shaders\shader.glsl" />

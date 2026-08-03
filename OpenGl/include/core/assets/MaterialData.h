@@ -4,6 +4,7 @@
 #include "ShaderData.h"
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/vector_float4.hpp>
+#include <optional>
 
 namespace Engine::Core 
 {
@@ -27,6 +28,12 @@ namespace Engine::Core
 		float ni{ 1.0f };
 		float d{ 1.0f };
 		int illum{ 2 };
+
+		std::optional<std::string> mapKaPath{};
+		std::optional<std::string> mapKdPath{};
+		std::optional<std::string> mapKsPath{};
+		std::optional<std::string> mapKePath{};
+		std::optional<std::string> mapBumpPath{};
 
 	private:
 		std::string name;

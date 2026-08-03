@@ -42,7 +42,9 @@ void Engine::Infra::Application::submitEngineRenderQueueToRenderer()
 void Engine::Infra::Application::importAssets()
 {
 	engine.assetPipeline.submit<Core::MaterialData>("assets/materials/testMaterial.mtl", "testMaterial");
+	engine.assetPipeline.submit<Core::MaterialData>("assets/materials/cubeMaterial.mtl", "cubeMaterial");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/bunny.obj", "bunny");
+	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/cube.obj", "cube");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/shader.glsl", "shader");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/gridShader.glsl", "gridShader");
 	engine.createAssetManager();
@@ -227,8 +229,8 @@ void Engine::Infra::Application::run()
 		engine.zeroMouse();
 
 		renderer.flush();
-		//debugConsoleUi->prepareFrame();
-		//debugConsoleUi->render();
+		debugConsoleUi->prepareFrame();
+		debugConsoleUi->render();
 
 		window->swapBuffers();
 	}

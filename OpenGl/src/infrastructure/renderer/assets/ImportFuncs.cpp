@@ -72,7 +72,6 @@ Engine::Core::MeshData Engine::Infra::ImportFuncs::importMeshData(const std::str
 		}
 	}
 
-	//This is going to be slow...
 	vertexPoints.data = verts;
 	vertexPoints.index = 0;
 	vertexPoints.size = 3;
@@ -146,6 +145,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			ss >> ns;
 			materialData.ns = ns;
 		}
+		
 		else if (firstWord == "Ni")
 		{
 			ss >> std::skipws;
@@ -153,6 +153,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			ss >> ni;
 			materialData.ni = ni;
 		}
+		
 		else if (firstWord == "d")
 		{
 			ss >> std::skipws;
@@ -160,6 +161,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			ss >> d;
 			materialData.d = d;
 		}
+		
 		else if (firstWord == "illum")
 		{
 			ss >> std::skipws;
@@ -167,6 +169,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			ss >> illum;
 			materialData.illum = illum;
 		}
+		
 		else if (firstWord == "Ka")
 		{
 			std::string vecStr;
@@ -174,6 +177,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			glm::vec3 ka = stringToVec3(vecStr);
 			materialData.ka = ka;
 		}
+		
 		else if (firstWord == "Kd")
 		{
 			std::string vecStr;
@@ -181,6 +185,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			glm::vec3 kd = stringToVec3(vecStr);
 			materialData.kd = kd;
 		}
+		
 		else if (firstWord == "Ks")
 		{
 			std::string vecStr;
@@ -188,6 +193,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			glm::vec3 ks = stringToVec3(vecStr);
 			materialData.ks = ks;
 		}
+		
 		else if (firstWord == "Ke")
 		{
 			std::string vecStr;
@@ -195,7 +201,36 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			glm::vec3 ke = stringToVec3(vecStr);
 			materialData.ke = ke;
 		}
+		
+		else if (firstWord == "map_Kd")
+		{
+			std::string texturePath;
+			ss >> texturePath;
+			materialData.mapKdPath = texturePath;
+		}
+	
+		else if (firstWord == "map_Ks")
+		{
+			std::string texturePath;
+			ss >> texturePath;
+			materialData.mapKsPath = texturePath;
+		}
+		
+		else if (firstWord == "map_Ke")
+		{
+			std::string texturePath;
+			ss >> texturePath;
+			materialData.mapKePath = texturePath;
+		}
+		
+		else if (firstWord == "map_Bump" || firstWord == "bump")
+		{
+			std::string texturePath;
+			ss >> texturePath;
+			materialData.mapBumpPath = texturePath;
+		}
 	}
+
 	materialFile.close();
 	return materialData;
 }

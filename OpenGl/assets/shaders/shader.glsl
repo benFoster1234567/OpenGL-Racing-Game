@@ -7,11 +7,11 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-
-
 out vec4 normOut;
 out vec3 vertexNormal;   
 out vec3 vertexPosition; 
+
+
 
 void main()
 {
@@ -26,13 +26,13 @@ void main()
 #endif
 
 #ifdef FRAGMENT_SHADER
-
+ 
 #define MAX_LIGHTS 100
 struct StaticPointLight {
     vec4 posRad; 
     vec4 color;  
 };
-
+ 
 struct Material 
 {
     vec3 ambient;
@@ -41,27 +41,34 @@ struct Material
     vec3 emission;
     float shininess;
 };
-
+ 
 layout (std140) uniform LightBlock {
     StaticPointLight lights[MAX_LIGHTS];
     int activeLightCount;
 } ub;
 
+highp float intensity = 1.5;
+
 uniform mat4 view; 
 uniform Material material;
-
+ 
 in vec4 normOut;    
 in vec3 vertexNormal;
 in vec3 vertexPosition;
-
+ 
 out vec4 FragColor;
-
+ 
 float sqDist(vec3 a, vec3 b)
 {
     float dx = a.x - b.x;
     float dy = a.y - b.y;
     float dz = a.z - b.z;
     return dx*dx + dy*dy + dz*dz;
+}
+
+float noise(vec2 co) 
+{
+    return fract(tan(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }
 
 void main()
@@ -76,35 +83,40 @@ void main()
     vec4 ambientProduct = vec4(material.ambient, 1.0);
     float shininess = material.shininess;
     vec4 fColor = ambientProduct;
-
-    for (int i = 0; i < ub.activeLightCount; i++)
+     for (int i = 0; i < ub.activeLightCount; i++)
     {
         StaticPointLight curLight = ub.lights[i];
-        vec3 lightPosWorld = ub.lights[i].posRad.xyz;
-        float radius = ub.lights[i].posRad.w;
+        vec3 lightPosWorld = curLight.posRad.xyz;
+        float radius = curLight.posRad.w;
 
         vec3 fL = lightPosWorld - vertexPosition;
-        vec3 L = normalize(fL);
-
+        float d2 = sqDist(lightPosWorld, vertexPosition);
+        float d = sqrt(d2);
+        
+        vec3 L = fL / (d + 0.0001); 
         vec3 H = normalize(L + E);
 
         float Kd = max(dot(L, N), 0.0);
-        vec4 diffuseProduct = ub.lights[i].color * vec4(material.diffuse, 1.0);
-        vec4 diffuse = Kd * diffuseProduct;
+        vec4 diffuse = Kd * curLight.color * vec4(material.diffuse, 1.0);
 
         float Ks = pow(max(dot(N, H), 0.0), shininess);
-        vec4 specularProduct = ub.lights[i].color * vec4(material.specular, 1.0);
-        vec4 specular = Ks * specularProduct;
-
+        vec4 specular = Ks * curLight.color * vec4(material.specular, 1.0);
         if (dot(L, N) <= 0.0) specular = vec4(0.0);
 
-        float invDistSquared = 1/sqDist(curLight.posRad.xyz, vertexPosition);
-
-        fColor.xyz += invDistSquared*(diffuse.xyz + specular.xyz);
+        float attenuation = 1.0 / (d2 + 1.0); 
+        
+        float window = clamp(1.0 - (d / radius), 0.0, 1.0);
+        window = window * window;
+        
+        fColor.xyz += intensity * attenuation * window * (diffuse.xyz + specular.xyz);
     }
 
     fColor.w = 1.0;
-    FragColor = fColor;
-}
+    fColor += (noise(gl_FragCoord.xy) - 0.5) / 255.0;
 
+    // Maps linear space calculations into 8-bit monitor friendly color space
+    //FragColor.rgb = pow(fColor.rgb, vec3(1.0 / 2.2));
+    FragColor.rgb = fColor.rgb;
+    FragColor.a = 1.0;
+}
 #endif

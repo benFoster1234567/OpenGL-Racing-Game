@@ -38,9 +38,9 @@ namespace Engine::Core
 
 		// Retrieves a mesh by name
 		void getMesh(MeshData*& meshOut, const std::string& name);
-		void getMaterial(MaterialData* matOut, const std::string& name);
+		void getMaterial(MaterialData*& matOut, const std::string& name);
 		void getShader(ShaderData*& shaderOut, const std::string& name);
-		void getTexture(TextureData* texOut, const std::string& name);
+		void getTexture(TextureData*& texOut, const std::string& name);
 
 		void addAsset(const std::string& name, AssetVariant&& asset);
 

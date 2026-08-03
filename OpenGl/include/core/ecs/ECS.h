@@ -10,7 +10,7 @@ namespace Engine::Core::ECS
 	const size_t MAX_ENTITIES = 1000;
 	
 	using ComponentType = std::uint8_t;
-	const ComponentType MAX_COMPONENTS = 32;
+	const ComponentType MAX_COMPONENTS = 128;
 
 	using Signature = std::bitset<MAX_COMPONENTS>;
 }

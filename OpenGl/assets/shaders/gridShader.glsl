@@ -20,16 +20,6 @@ void main()
 
 #define MAX_LIGHTS 100
 
-//struct StaticPointLight {
-//    vec4 posRad; 
-//    vec4 color;  
-//};
-//
-//layout (std140) uniform LightBlock {
-//    StaticPointLight lights[MAX_LIGHTS];
-//    int activeLightCount;
-//} ub;
-
 uniform mat4 view; 
 
 out vec4 FragColor;

@@ -19,7 +19,7 @@ unsigned int Texture::loadTexture(const char* filename)
 	ilEnable(IL_ORIGIN_SET);
 	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 	success = ilLoadImage((ILstring)filename);
-
+	 
 	if (!success) {
 		printf("Couldn't load the following texture file: %s", filename);
 		// The operation was not sucessfull hence free image and texture 

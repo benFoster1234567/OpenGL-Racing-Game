@@ -23,7 +23,7 @@ void Engine::Core::AssetManager::getMesh(MeshData*& meshOut, const std::string& 
 	}
 }
 
-void Engine::Core::AssetManager::getMaterial(MaterialData* matOut, const std::string& name)
+void Engine::Core::AssetManager::getMaterial(MaterialData*& matOut, const std::string& name)
 {
 	if (materialMap.contains(name)) matOut = materialMap[name].get();
 	else
@@ -47,7 +47,7 @@ void Engine::Core::AssetManager::getShader(ShaderData*& shaderOut, const std::st
 	}
 }
 
-void Engine::Core::AssetManager::getTexture(TextureData* texOut, const std::string& name)
+void Engine::Core::AssetManager::getTexture(TextureData*& texOut, const std::string& name)
 {
 	if (textureMap.contains(name)) texOut = textureMap[name].get();
 	else texOut = nullptr;
