@@ -4,24 +4,23 @@
 #include <string>
 #include <stdexcept>
 
-#include "core/Patterns.h"
 namespace Engine::Core
 {
-	using TextureId = std::size_t;
+	using TextureIdx = std::size_t;
 
-	class TextureFileNameRegistry : public Patterns::Singleton<TextureFileNameRegistry>
+	class TextureFileNameRegistry 
 	{
 	private:
-		const TextureId MAX_TEXTURES{ 100 };
-		TextureId nextId{ 0 };
-		std::unordered_map<std::string, TextureId> filePathToId{};
-		std::unordered_map<TextureId, std::string> idToFilePath{};
-
+		const TextureIdx MAX_TEXTURES{ 100 };
+		TextureIdx nextId{ 0 };
+		std::unordered_map<std::string, TextureIdx> filePathToId{};
+		std::unordered_map<TextureIdx, std::string> idToFilePath{};
+		friend class AssetManager;
 	public:
 		
-		TextureId addNewTexture(std::string filePath)
+		TextureIdx addNewTexture(std::string filePath)
 		{
-			TextureId currentId{ nextId };
+			TextureIdx currentId{ nextId };
 			if (filePathToId.contains(filePath))
 			{
 				throw std::runtime_error("Failed to load texture. Texture was already imported");
@@ -33,7 +32,7 @@ namespace Engine::Core
 			nextId++;
 		}
 
-		TextureId getTextureId(std::string filePath)
+		TextureIdx getTextureId(std::string filePath)
 		{
 			if (!filePathToId.contains(filePath))
 			{
@@ -43,7 +42,7 @@ namespace Engine::Core
 			return filePathToId[filePath];
 		}
 
-		std::string getFilePath(TextureId id)
+		std::string getFilePath(TextureIdx id)
 		{
 			if (!idToFilePath.contains(id))
 			{

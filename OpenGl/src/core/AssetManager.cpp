@@ -47,12 +47,6 @@ void Engine::Core::AssetManager::getShader(ShaderData*& shaderOut, const std::st
 	}
 }
 
-void Engine::Core::AssetManager::getTexture(TextureData*& texOut, const std::string& name)
-{
-	if (textureMap.contains(name)) texOut = textureMap[name].get();
-	else texOut = nullptr;
-}
-
 void Engine::Core::AssetManager::addAsset(const std::string& name, AssetVariant&& asset)
 {
 	std::visit([this, &name](auto&& arg)
@@ -95,6 +89,17 @@ void Engine::Core::AssetManager::meshList(std::vector<MeshData*>& meshesOut)
 	for (auto& [key, val] : meshMap)
 	{
 		meshesOut.push_back(val.get());
+	}
+}
+
+void Engine::Core::AssetManager::textureList(std::vector<TextureInfo>& texturesOut)
+{
+	for (const auto& [filePath, textureId] : textureFileNameRegistry.filePathToId)
+	{
+		TextureInfo info{};
+		info.filePath = filePath;
+		info.textureId = textureId;
+		texturesOut.push_back(info);
 	}
 }
 

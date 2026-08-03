@@ -23,10 +23,16 @@ namespace Engine::Core {
 		std::type_index typeId;
 	};
 
+	struct TextureImportCommand
+	{
+		std::string path{};
+	};
+
 	class AssetPipeline
 	{
 	private:
 		std::stack<ImportCommand> queue;
+		std::stack<TextureImportCommand> textureQueue;
 		std::unordered_map<std::type_index, std::function<AssetVariant(const std::string&, const std::string&)>> import;
 	public:
 		AssetPipeline() = default;
@@ -39,6 +45,12 @@ namespace Engine::Core {
 			queue.push({ .path = path, .assetName = assetName, .typeId = typeid(T) });
 		}
 		
+		template<>
+		void submit<TextureData>(const std::string& path, const std::string& assetName)
+		{
+			textureQueue.push({ .path = path });
+		}
+
 		template<typename T>
 		void registerImportCallback(std::function<std::unique_ptr<T>(const std::string&, const std::string&)> func)
 		{
@@ -51,13 +63,18 @@ namespace Engine::Core {
 		void processCommand(const ImportCommand& cmd, AssetManager& am)
 		{
 			auto it = import.find(cmd.typeId);
-			if (it != import.end())
-			{
-				am.addAsset(cmd.assetName, it->second(cmd.path, cmd.assetName));
-			}
+			if (it == import.end()) return;
+			am.addAsset(cmd.assetName, it->second(cmd.path, cmd.assetName));
 		}
+
 		void populateAssetManager(AssetManager& am)
 		{
+			while (!textureQueue.empty())
+			{
+				TextureImportCommand tcmd = textureQueue.top();
+				textureQueue.pop();
+				am.textureFileNameRegistry.addNewTexture(tcmd.path);
+			}
 
 			while (!queue.empty())
 			{
@@ -65,6 +82,7 @@ namespace Engine::Core {
 				queue.pop();
 				processCommand(icmd, am);
 			}
+
 		}
 
 	};

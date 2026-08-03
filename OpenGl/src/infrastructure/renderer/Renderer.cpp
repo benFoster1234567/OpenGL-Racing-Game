@@ -54,15 +54,15 @@ void Engine::Infra::Renderer::cacheShader(Core::ShaderData* shaderData)
 	gpuShaderCache.emplace(shaderData, std::move(gpuShader));
 }
 
-void Engine::Infra::Renderer::loadTextureFromFile(const std::string& filePath, const std::string& name)
+void Engine::Infra::Renderer::loadTextureFromFile(const std::string& filePath, Core::TextureIdx textureIdx)
 {
-	if (textureNameToId.contains(name))
+	if (textureIdxToId.contains(textureIdx))
 	{
 		throw std::runtime_error("Failed to load texture. Name already exists in cache");
 	}
 
 	unsigned int textureId = loadTexture(filePath.c_str());
-	textureNameToId[name] = textureId;
+	textureIdxToId[textureIdx] = textureId;
 }
 
 void Engine::Infra::Renderer::loadMeshes(std::vector<Core::MeshData*>& meshes)
@@ -87,6 +87,14 @@ void Engine::Infra::Renderer::loadShaders(std::vector<Core::ShaderData*>& shader
 		//std::cout << "shader name: " << shader->name << "\n";
 		cacheShader(shader);
 		gpuShaderCache[shader]->compileShaders();
+	}
+}
+
+void Engine::Infra::Renderer::loadTextures(std::vector<Core::TextureInfo>& textures)
+{
+	for (const auto& texture : textures)
+	{
+		loadTextureFromFile(texture.filePath, texture.textureId);
 	}
 }
 

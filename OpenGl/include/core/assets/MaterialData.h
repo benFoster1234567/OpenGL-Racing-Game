@@ -5,21 +5,13 @@
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/vector_float4.hpp>
 #include <optional>
+#include "TextureFileNameRegistry.h"
 
 namespace Engine::Core 
 {
 
-	struct MaterialInfo
+	struct MaterialData
 	{
-		glm::vec4 diffuse{};
-		glm::vec4 ambient{};
-		glm::vec4 specular{};
-
-	};
-
-	class MaterialData
-	{
-	public:
 		float ns{0.0f};
 		glm::vec3 ka{ 1.0f, 1.0f, 1.0f };
 		glm::vec3 kd{ 1.0f, 1.0f, 1.0f };
@@ -29,13 +21,11 @@ namespace Engine::Core
 		float d{ 1.0f };
 		int illum{ 2 };
 
-		std::optional<std::string> mapKaPath{};
-		std::optional<std::string> mapKdPath{};
-		std::optional<std::string> mapKsPath{};
-		std::optional<std::string> mapKePath{};
-		std::optional<std::string> mapBumpPath{};
-
-	private:
 		std::string name;
+		std::string mapKaPath;
+		std::string mapKdPath;
+		std::string mapKsPath;
+		std::string mapKePath;
+		std::string mapBumpPath;
 	};
 }

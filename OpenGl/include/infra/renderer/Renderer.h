@@ -60,7 +60,7 @@ namespace Engine::Infra
 		std::vector<RenderCommand> renderQueue;
 		std::map<Core::MeshData*, std::unique_ptr<GpuMesh>> gpuMeshCache{};
 		std::map<Core::TextureData*, std::unique_ptr<GpuTexture>> gpuTextureCache{};
-		std::map<std::string, unsigned int> textureNameToId{};
+		std::map<Core::TextureIdx, unsigned int> textureIdxToId{}; // Maps texture index to OpenGL texture ID. We can change this to a span set if we want to avoid the map overhead.
 		void cacheShader(Core::ShaderData* shaderData);
 		void cacheMesh(Core::MeshData* meshData);
 		int polygonMode = LINE;
@@ -68,14 +68,21 @@ namespace Engine::Infra
 		unsigned int loadTexture(const char* filename);
 
 	public:
-		Renderer() = default;
+		Renderer()
+		{
+			ilInit();
+			iluInit();
+			ilutRenderer(ILUT_OPENGL);
+		}
 		~Renderer() = default;
 
-		void loadTextureFromFile(const std::string& filePath, const std::string& name);
+		void loadTextureFromFile(const std::string& filePath, Core::TextureIdx textureId);
 
 		void loadMeshes(std::vector<Core::MeshData*>& meshes);
 		void loadShaders(std::vector<Core::ShaderData*>& shaders);
+		void loadTextures(std::vector<Core::TextureInfo>& textures);
 		void loadLights(std::vector<StaticPointLightResource>& staticLights);
+
 		void submit(RenderCommand command);
 
 		void setPolygonMode(int m) { polygonMode = m; }

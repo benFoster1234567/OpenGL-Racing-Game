@@ -38,15 +38,13 @@ void Engine::Core::EngineSystem::createAssetManager()
 {
 	size_t initialShaders = assetManager.shaderMap.size();
 	size_t initialMeshes = assetManager.meshMap.size();
-	size_t initialTextures = assetManager.textureMap.size();
 
 	assetPipeline.populateAssetManager(assetManager);
 
 	size_t addedShaders = assetManager.shaderMap.size() - initialShaders;
 	size_t addedMeshes = assetManager.meshMap.size() - initialMeshes;
-	size_t addedTextures = assetManager.textureMap.size() - initialTextures;
 
-	if (addedShaders == 0 && addedMeshes == 0 && addedTextures == 0)
+	if (addedShaders == 0 && addedMeshes == 0)
 	{
 		throw std::runtime_error("Nothing was imported during asset refresh!");
 	}

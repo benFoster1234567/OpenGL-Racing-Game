@@ -27,8 +27,9 @@ namespace Engine::Infra
 		void setupDebugCommands();
 		void setupWindowCallbacks();
 		void setupImportCallbacks();
+		
 		void importAssets();
-		void submitEngineRenderQueueToRenderer();
+		void sendTexturesToRenderer();
 		void run();
 
 	};

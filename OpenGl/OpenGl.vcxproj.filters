@@ -188,13 +188,10 @@
     <ClInclude Include="include\core\ecs\StaticPointLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\assets\MeshFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\infra\engine\AssetImporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\assets\TextureManager.h">
+    <ClInclude Include="include\core\assets\TextureFileNameRegistry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\core\assets\AssetPipeline.h">

@@ -33,10 +33,6 @@ Engine::Infra::Application::Application()
 	setupDebugCommands();
 }
 
-void Engine::Infra::Application::submitEngineRenderQueueToRenderer()
-{
-
-}
 
 //all asset import calls go here
 void Engine::Infra::Application::importAssets()
@@ -47,6 +43,7 @@ void Engine::Infra::Application::importAssets()
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/cube.obj", "cube");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/shader.glsl", "shader");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/gridShader.glsl", "gridShader");
+	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/testTextures.jpg", "uvChecker");
 	engine.createAssetManager();
 	Core::MaterialData* testMaterial = nullptr;
 	engine.assetManager.getMaterial(testMaterial,"testMaterial");
@@ -54,6 +51,13 @@ void Engine::Infra::Application::importAssets()
 	{
 		throw std::runtime_error("Failed to load testMaterial");
 	}
+}
+
+void Engine::Infra::Application::sendTexturesToRenderer()
+{
+	std::vector<Core::TextureInfo> textureList;
+	engine.assetManager.textureList(textureList);
+	renderer.loadTextures(textureList);
 }
 
 //all debug command lambdas are setup here
@@ -188,6 +192,7 @@ void Engine::Infra::Application::run()
 	setupImportCallbacks();
 	importAssets();
 	engine.publishAssets(); //sends to gpu
+	sendTexturesToRenderer();
 	std::vector<Engine::Core::ECS::StaticPointLightRendererData> lightData{};
 
 	//TODO: Tidy this up
