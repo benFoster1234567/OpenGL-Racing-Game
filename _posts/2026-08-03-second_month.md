@@ -16,7 +16,15 @@ After implementing lights into my renderer via a uniform buffer object, I was ab
 
 ![Imported model]({{ "/resources/images/Screenshot 2026-08-03 140816.png" | relative_url }})
 
+Architecture Issues With the Asset Pipeline
+===========================================
+
+The asset pipeline currently has a weird design. When wanting to import textures, the normal import function won't work, since I wanted to use DevIL to import textures and then use OpenGL to create the texture object. This meant that the actual file loading would take place in the renderer, which is awkward but I think it makes the most sense.
+
 Current Goals
 ================
 
-- 
+- Get texture system working, including diffuse, normal and specular mapping.
+- Add a way to edit the game objects in the scene through some sort of config file.
+- Implement shadows in the Blinn-Phong shader.
+- Migrate to a more robust build system, such as CMake or Meson, to make building the engine easier and more cross-platform.
