@@ -24,7 +24,7 @@ The asset pipeline currently has a weird design. When wanting to import textures
 Current Goals
 ================
 
-- Get texture system working, including diffuse, normal and specular mapping.
-- Add a way to edit the game objects in the scene through some sort of config file.
-- Implement shadows in the Blinn-Phong shader.
-- Migrate to a more robust build system, such as CMake or Meson, to make building the engine easier and more cross-platform.
+* Get texture system working, including diffuse, normal and specular mapping.
+* Add a way to edit the game objects in the scene through some sort of config file.
+* Implement shadows in the Blinn-Phong shader.
+* Migrate to a more robust build system, such as CMake or Meson, to make building the engine easier and more cross-platform.
