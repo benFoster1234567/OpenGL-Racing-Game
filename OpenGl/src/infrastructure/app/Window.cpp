@@ -158,6 +158,19 @@ void Engine::Infra::Window::updateDeltaTime()
 	float currentFrame = static_cast<float>(glfwGetTime());
 	times.deltaTime = currentFrame - times.lastTime;
 	times.lastTime = currentFrame;
+	
+	static float interval = 0.0f;
+
+	interval += times.deltaTime;
+
+	if (interval >= 5.0f)
+	{
+
+	float deltaT = times.deltaTime != 0 ? times.deltaTime: 1.0f;
+
+	std::cout << "fps: " << 1/deltaT << "\n";
+	interval = 0.0f;
+	}
 }
 
 void Window::onKey(int key, int scancode, int action, int mods)

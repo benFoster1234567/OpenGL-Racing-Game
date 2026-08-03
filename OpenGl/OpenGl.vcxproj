@@ -80,6 +80,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Users\flami\source\repos\benFoster1234567\OpenGL-Racing-Game\OpenGl\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -95,6 +96,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Users\flami\source\repos\benFoster1234567\OpenGL-Racing-Game\OpenGl\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -108,7 +110,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\flami\source\repos\benFoster1234567\OpenGL-Racing-Game\OpenGl\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -124,6 +126,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Users\flami\source\repos\benFoster1234567\OpenGL-Racing-Game\OpenGl\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -161,6 +164,7 @@
     <ClInclude Include="include\core\assets\AssetManager.h" />
     <ClInclude Include="include\core\assets\MeshFactory.h" />
     <ClInclude Include="include\core\assets\ShaderData.h" />
+    <ClInclude Include="include\core\assets\TextureManager.h" />
     <ClInclude Include="include\core\ecs\Component.h" />
     <ClInclude Include="include\core\ecs\ComponentArray.h" />
     <ClInclude Include="include\core\ecs\ComponentRegistry.h" />
@@ -195,12 +199,16 @@
     <ClInclude Include="include\core\assets\TextureData.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="layout.txt" />
     <Text Include="Notes.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\materials\testMaterial.mtl" />
+    <None Include="assets\shaders\gridShader.glsl" />
     <None Include="assets\shaders\shader.glsl" />
     <None Include="shaders\shader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\materials\textures\testTextures.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -14,6 +14,7 @@
 #include <utility>
 #include <variant>
 #include <algorithm>
+#include "TextureManager.h"
 
 
 namespace Engine::Core 
@@ -42,7 +43,7 @@ namespace Engine::Core
 		void getTexture(TextureData* texOut, const std::string& name);
 
 		void addAsset(const std::string& name, AssetVariant&& asset);
-		
+
 		void shaderList(std::vector<ShaderData*>& shadersOut);
 		void meshList(std::vector<MeshData*>& meshesOut);
 

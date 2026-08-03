@@ -9,6 +9,12 @@ void Engine::Core::ECS::RenderDispatcherOrbitalCamera::update(Coordinator& coord
 		const auto& meshData = coordinator.getComponent<MeshComponent>(entity);
 		const auto& shaderData = coordinator.getComponent<ShaderComponent>(entity);
 		const auto& orbitalCam = coordinator.getComponent<OrbitalCameraComponent>(entity);
+		const auto& material = coordinator.getComponent<MaterialDataComponent>(entity);
+
+		if (material.material == nullptr)
+		{
+			throw std::runtime_error("MaterialDataComponent is null for entity " + std::to_string(entity));
+		}
 
 		glm::mat4 projectionMat = glm::perspective(glm::radians(70.0f), aspect, 0.1f, 1000.0f);
 		cameraComp.projectionMat = projectionMat;
@@ -23,7 +29,8 @@ void Engine::Core::ECS::RenderDispatcherOrbitalCamera::update(Coordinator& coord
 			, .projection = projectionMat
 			, .modelTransform = transformMat
 			, .shader = shaderData.shaderData
-			, .mesh = meshData.meshData });
+			, .mesh = meshData.meshData
+			, .material = material.material });
 	}
 }
 
@@ -61,6 +68,13 @@ void Engine::Core::ECS::RenderDispatcherExternalCamera::update(Coordinator& coor
 		const auto& transform = coordinator.getComponent<TransformComponent>(entity);
 		const auto& meshData = coordinator.getComponent<MeshComponent>(entity);
 		const auto& shaderData = coordinator.getComponent<ShaderComponent>(entity);
+		const auto& material = coordinator.getComponent<MaterialDataComponent>(entity);
+
+
+		if (material.material == nullptr)
+		{
+			throw std::runtime_error("MaterialDataComponent is null for entity " + std::to_string(entity));
+		}
 
 		glm::mat4 projectionMat = cameraComp.projectionMat;
 		glm::mat4 viewMat = cameraComp.viewMat;
@@ -74,7 +88,8 @@ void Engine::Core::ECS::RenderDispatcherExternalCamera::update(Coordinator& coor
 			, .projection = projectionMat
 			, .modelTransform = transformMat
 			, .shader = shaderData.shaderData
-			, .mesh = meshData.meshData });
+			, .mesh = meshData.meshData 
+			, .material = material.material });
 	}
 }
 
@@ -92,22 +107,22 @@ void Engine::Core::ECS::KeyControlSystem::update(Coordinator& coordinator, const
 
 		if (inputHandler.keyPressed(int(inputKeys.strafeLeft)))
 		{
-			rotAngle -= inputKeys.turnSensitivity;
+			rotAngle += inputKeys.turnSensitivity * deltaTime;
 		}
 
 		if (inputHandler.keyPressed(int(inputKeys.strafeRight)))
 		{
-			rotAngle += inputKeys.turnSensitivity;
+			rotAngle -= inputKeys.turnSensitivity * deltaTime;
 		}
 
 		if (inputHandler.keyPressed(int(inputKeys.forward)))
 		{
-			forwards.z = +0.01f;
+			forwards.z = deltaTime*5;
 		}
 
 		if (inputHandler.keyPressed(int(inputKeys.backward)))
 		{
-			forwards.z = -0.01f;
+			forwards.z = -deltaTime*5;
 		}
 
 		rotQuat = glm::angleAxis(glm::radians(rotAngle), rotAxis);
@@ -131,5 +146,22 @@ void Engine::Core::ECS::StaticLightRenderSetupSystem::fill(Coordinator& coordina
 		rd.radius = light.radius;
 
 		queue.push_back(rd);
+	}
+}
+
+void Engine::Core::ECS::PhysicsSystem::update(Coordinator& coordinator, float deltaTime)
+{
+	for (Entity entity : entities)
+	{
+		MotionPropertiesComponent& motionProps = coordinator.getComponent<MotionPropertiesComponent>(entity);
+		TransformComponent& transform = coordinator.getComponent<TransformComponent>(entity);
+
+		float t{ deltaTime };
+
+		glm::vec3 deltaVelocity = motionProps.acceleration * t;
+		glm::vec3 deltaPos = t * (motionProps.velocity + (0.5f * motionProps.acceleration * t));
+
+		motionProps.velocity += deltaVelocity;
+		transform.position += deltaPos;
 	}
 }

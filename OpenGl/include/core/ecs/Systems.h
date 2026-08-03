@@ -17,6 +17,7 @@ namespace Engine::Core::ECS
 		glm::mat4 modelTransform{1.0f};
 		ShaderData* shader{};
 		MeshData* mesh{};
+		MaterialData* material{};
 	};
 
 	class RenderDispatcher : public System
@@ -65,4 +66,9 @@ namespace Engine::Core::ECS
 		void fill(Coordinator& coordinator, std::vector<StaticPointLightRendererData>& queue);
 	};
 
+	class PhysicsSystem : public System
+	{
+	public:
+		void update(Coordinator& coordinator, float deltaTime);
+	};
 }

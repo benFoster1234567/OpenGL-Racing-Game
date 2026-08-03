@@ -52,9 +52,10 @@ namespace Engine::Core::Game
 	{
 	private:
 
-		ECS::Entity playerEntity{};
-		ECS::Entity gridEntity{};
+		ECS::Entity playerEntity{ };
+		ECS::Entity gridEntity{ };
 		ECS::Entity lightEntity{ };
+
 		void registerSystems()
 		{
 			coordinator.registerSystem<ECS::RenderDispatcherOrbitalCamera>();
@@ -75,6 +76,7 @@ namespace Engine::Core::Game
 			coordinator.registerComponent<ECS::PlayerController>();
 			coordinator.registerComponent<ECS::StaticPointLightComponent>();
 			coordinator.registerComponent<ECS::ExternalCameraComponent>();
+			coordinator.registerComponent<ECS::MaterialDataComponent>();
 		}
 
 		void defineSystemSignatures()
@@ -95,6 +97,7 @@ namespace Engine::Core::Game
 
 			ECS::Signature externalCamSig{};
 
+			externalCamSig.set(coordinator.getComponentType<ECS::MaterialDataComponent>());
 			externalCamSig.set(coordinator.getComponentType<ECS::TransformComponent>());
 			externalCamSig.set(coordinator.getComponentType<ECS::MeshComponent>());
 			externalCamSig.set(coordinator.getComponentType<ECS::ShaderComponent>());
@@ -118,14 +121,27 @@ namespace Engine::Core::Game
 			ECS::ShaderComponent shader{};
 			assetManager.getShader(shader.shaderData, "shader");
 			ECS::PlayerController playerController{};
+			playerController.turnSensitivity = 50;
+
+			ECS::MouseInputSettings mis{};
+			mis.sensitivity = { 20,15 };
+
+			ECS::MaterialDataComponent matComp{};
+			assetManager.getMaterial(matComp.material, "testMaterial");
+
+			if (matComp.material == nullptr)
+			{
+				throw std::runtime_error("MaterialDataComponent is null for entity " + std::to_string(entity));
+			}
 
 			coordinator.addComponent(entity, mesh);
 			coordinator.addComponent(entity, ECS::TransformComponent{});
 			coordinator.addComponent(entity, ECS::CameraComponent{});
 			coordinator.addComponent(entity, shader);
 			coordinator.addComponent(entity, ECS::OrbitalCameraComponent{});
-			coordinator.addComponent(entity, ECS::MouseInputSettings{});
+			coordinator.addComponent(entity, mis);
 			coordinator.addComponent(entity, playerController);
+			coordinator.addComponent(entity, matComp);
 
 			return entity;
 		}
@@ -135,7 +151,7 @@ namespace Engine::Core::Game
 			ECS::Entity entity = coordinator.createEntity();
 
 			ECS::ShaderComponent shader{};
-			assetManager.getShader(shader.shaderData, "shader");
+			assetManager.getShader(shader.shaderData, "gridShader");
 
 			ECS::MeshComponent gridMesh{};
 			assetManager.getMesh(gridMesh.meshData, "grid");
@@ -146,10 +162,14 @@ namespace Engine::Core::Game
 			ECS::ExternalCameraComponent extCamComp{};
 			extCamComp.entityWithCamera = cameraEntity;
 
+			ECS::MaterialDataComponent matComp{};
+			assetManager.getMaterial(matComp.material, "testMaterial");
+
 			coordinator.addComponent(entity, gridMesh);
 			coordinator.addComponent(entity, shader);
 			coordinator.addComponent(entity, gridTransform);
 			coordinator.addComponent(entity, extCamComp);
+			coordinator.addComponent(entity, matComp);
 
 			return entity;
 		}

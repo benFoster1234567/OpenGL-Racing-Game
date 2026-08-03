@@ -41,9 +41,17 @@ void Engine::Infra::Application::submitEngineRenderQueueToRenderer()
 //all asset import calls go here
 void Engine::Infra::Application::importAssets()
 {
+	engine.assetPipeline.submit<Core::MaterialData>("assets/materials/testMaterial.mtl", "testMaterial");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/bunny.obj", "bunny");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/shader.glsl", "shader");
+	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/gridShader.glsl", "gridShader");
 	engine.createAssetManager();
+	Core::MaterialData* testMaterial = nullptr;
+	engine.assetManager.getMaterial(testMaterial,"testMaterial");
+	if (!testMaterial)
+	{
+		throw std::runtime_error("Failed to load testMaterial");
+	}
 }
 
 //all debug command lambdas are setup here
@@ -144,6 +152,12 @@ void Engine::Infra::Application::setupImportCallbacks()
 	{
 		return std::make_unique<Core::ShaderData>(Infra::ImportFuncs::importShaderData(path, name));
 	});
+
+	engine.assetPipeline.registerImportCallback<Core::MaterialData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::MaterialData>
+	{
+		return std::make_unique<Core::MaterialData>(Infra::ImportFuncs::importMaterialData(path, name));
+	});
+
 }
 
 void Engine::Infra::Application::run()
@@ -163,9 +177,11 @@ void Engine::Infra::Application::run()
 
 	Engine::Core::ECS::RenderDispatcher::sendRenderInfo.subscribe([&](Engine::Core::ECS::RenderOutput output)
 		{
-			RenderCommand rc = { .view = output.view, .projection = output.projection, .modelTransform = output.modelTransform, .shader = output.shader, .mesh = output.mesh };
+			RenderCommand rc = { .view = output.view, .projection = output.projection, .modelTransform = output.modelTransform, .shader = output.shader, .mesh = output.mesh,.material = output.material };
 			renderer.submit(rc);
 		});
+
+	renderer.setPolygonMode(0);
 
 	setupImportCallbacks();
 	importAssets();
@@ -188,7 +204,7 @@ void Engine::Infra::Application::run()
 	}
 
 	renderer.loadLights(pointLights);
-
+	glfwSwapInterval(0); 
 	window->disableCursor();
 
 	while (!window->shouldClose())
@@ -198,22 +214,22 @@ void Engine::Infra::Application::run()
 
 		renderer.clear();
 
-		window->updateDeltaTime();
-		
 		float currentWidth = static_cast<float>(window->getWidth());
 		float currentHeight = static_cast<float>(window->getHeight());
-		
+
 		double x{}, y{};
 		window->updateDeltaTime();
 		window->getMousePosition(x, y);
 		engine.updateAspect(currentWidth / currentHeight);
+		engine.updateDeltaTime(window->deltaTime());
 		engine.updateMouse(x, y);
 		engine.updateGame();
 		engine.zeroMouse();
 
 		renderer.flush();
-		debugConsoleUi->prepareFrame();
-		debugConsoleUi->render();
+		//debugConsoleUi->prepareFrame();
+		//debugConsoleUi->render();
+
 		window->swapBuffers();
 	}
 

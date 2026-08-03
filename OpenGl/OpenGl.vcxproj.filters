@@ -197,13 +197,22 @@
     <ClInclude Include="include\infra\engine\AssetImporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\core\assets\TextureManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="layout.txt" />
     <Text Include="Notes.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.glsl" />
     <None Include="assets\shaders\shader.glsl" />
+    <None Include="assets\shaders\gridShader.glsl" />
+    <None Include="assets\materials\testMaterial.mtl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\materials\textures\testTextures.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -26,7 +26,11 @@ void Engine::Core::AssetManager::getMesh(MeshData*& meshOut, const std::string& 
 void Engine::Core::AssetManager::getMaterial(MaterialData* matOut, const std::string& name)
 {
 	if (materialMap.contains(name)) matOut = materialMap[name].get();
-	else matOut = nullptr;
+	else
+	{
+		std::cout << "Nom material found!\n";
+		matOut = nullptr;
+	}
 }
 
 void Engine::Core::AssetManager::getShader(ShaderData*& shaderOut, const std::string& name)
@@ -63,6 +67,11 @@ void Engine::Core::AssetManager::addAsset(const std::string& name, AssetVariant&
 			if constexpr (std::is_same_v<T, std::unique_ptr<ShaderData>>)
 			{
 				shaderMap[name] = std::move(arg);
+			}
+
+			if constexpr (std::is_same_v<T, std::unique_ptr<MaterialData>>)
+			{
+				materialMap[name] = std::move(arg);
 			}
 
 		}, std::move(asset));

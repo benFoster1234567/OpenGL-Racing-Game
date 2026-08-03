@@ -7,6 +7,7 @@ void Engine::Infra::DebugConsoleUi::queueUiDraw()
 
 	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_Always);
+	ImGui::SetNextWindowBgAlpha(0.0f);
 	ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
 	
 	if (ImGui::InputText("##input", commandBuffer, sizeof(commandBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
@@ -33,6 +34,20 @@ void Engine::Infra::DebugConsoleUi::queueUiDraw()
 	ImGui::EndChild();
 
 	ImGui::End();
+
+	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always);
+	ImGui::SetNextWindowBgAlpha(0.0f); // Make background transparent
+
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration |
+		ImGuiWindowFlags_NoInputs |
+		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_NoFocusOnAppearing;
+
+	if (ImGui::Begin("CornerOverlay", nullptr, flags)) {
+		ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+	}
+	ImGui::End();
+
 }
 
 void Engine::Infra::DebugConsoleUi::appendResults(std::string r)

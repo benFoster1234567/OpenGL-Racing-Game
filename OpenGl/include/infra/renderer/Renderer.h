@@ -11,6 +11,9 @@
 #include "core/assets/AssetManager.h"
 
 #include <glm/ext/matrix_float4x4.hpp>
+#include <IL/il.h>
+#include <IL/ilu.h>
+#include <IL/ilut.h>
 
 namespace Engine::Infra 
 {
@@ -43,6 +46,7 @@ namespace Engine::Infra
 		glm::mat4 modelTransform;
 		Core::ShaderData* shader;
 		Core::MeshData* mesh;
+		Core::MaterialData* material;
 	};
 
 	enum PolygonMode
@@ -56,13 +60,18 @@ namespace Engine::Infra
 		std::vector<RenderCommand> renderQueue;
 		std::map<Core::MeshData*, std::unique_ptr<GpuMesh>> gpuMeshCache{};
 		std::map<Core::TextureData*, std::unique_ptr<GpuTexture>> gpuTextureCache{};
+		std::map<std::string, unsigned int> textureNameToId{};
 		void cacheShader(Core::ShaderData* shaderData);
 		void cacheMesh(Core::MeshData* meshData);
 		int polygonMode = LINE;
 
+		unsigned int loadTexture(const char* filename);
+
 	public:
 		Renderer() = default;
 		~Renderer() = default;
+
+		void loadTextureFromFile(const std::string& filePath, const std::string& name);
 
 		void loadMeshes(std::vector<Core::MeshData*>& meshes);
 		void loadShaders(std::vector<Core::ShaderData*>& shaders);

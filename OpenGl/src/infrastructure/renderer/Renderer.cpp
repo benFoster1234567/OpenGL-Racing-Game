@@ -13,11 +13,56 @@ void Engine::Infra::Renderer::cacheMesh(Core::MeshData* meshData)
 	gpuMeshCache.emplace(meshData, std::move(gpuMesh));
 }
 
+unsigned int Engine::Infra::Renderer::loadTexture(const char* filename) 
+{
+	ILboolean success;
+	unsigned int imageID;
+	ilGenImages(1, &imageID);
+
+	ilBindImage(imageID); /* Binding of DevIL image name */
+	ilEnable(IL_ORIGIN_SET);
+	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+	success = ilLoadImage((ILstring)filename);
+
+	if (!success) {
+		printf("Couldn't load the following texture file: %s", filename);
+		ilDeleteImages(1, &imageID);
+		return 0;
+	}
+
+	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+
+	GLuint tid;
+	glGenTextures(1, &tid);
+	glBindTexture(GL_TEXTURE_2D, tid);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, ilGetData());
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	ilDeleteImages(1, &imageID);
+	return tid;
+}
+
 void Engine::Infra::Renderer::cacheShader(Core::ShaderData* shaderData)
 {
 	auto gpuShader = std::make_unique<GpuShader>(shaderData);
 
 	gpuShaderCache.emplace(shaderData, std::move(gpuShader));
+}
+
+void Engine::Infra::Renderer::loadTextureFromFile(const std::string& filePath, const std::string& name)
+{
+	if (textureNameToId.contains(name))
+	{
+		throw std::runtime_error("Failed to load texture. Name already exists in cache");
+	}
+
+	unsigned int textureId = loadTexture(filePath.c_str());
+	textureNameToId[name] = textureId;
 }
 
 void Engine::Infra::Renderer::loadMeshes(std::vector<Core::MeshData*>& meshes)
@@ -50,7 +95,7 @@ void Engine::Infra::Renderer::loadLights(std::vector<StaticPointLightResource>& 
 	//must be loaded after shaders?
 	StaticPointLight lights[MAX_LIGHTS];
 
-	size_t lightsToCopy = std::min(staticLights.size(), static_cast<size_t>(MAX_LIGHTS));
+	size_t lightsToCopy = (std::min)(staticLights.size(), static_cast<size_t>(MAX_LIGHTS));
 	for (size_t i = 0; i < lightsToCopy; ++i) {
 		auto lightCpu = staticLights[i];
 		StaticPointLight lightGpu
@@ -127,7 +172,19 @@ void Engine::Infra::Renderer::flush()
 		auto v = glGetUniformLocation(shader->getId(), "view");
 		auto m = glGetUniformLocation(shader->getId(), "model");
 
+		auto d = glGetUniformLocation(shader->getId(), "material.diffuse");
+		auto a = glGetUniformLocation(shader->getId(), "material.ambient");
+		auto s = glGetUniformLocation(shader->getId(), "material.specular");
+		auto k = glGetUniformLocation(shader->getId(), "material.shininess");
+		auto e = glGetUniformLocation(shader->getId(), "material.emission");
+
 		assert(!(p == -1 || v == -1 || m == -1) && "error sending mvp to shader");
+
+		glUniform3fv(d, 1, glm::value_ptr(command.material->kd));
+		glUniform3fv(a, 1, glm::value_ptr(command.material->ka));
+		glUniform3fv(s, 1, glm::value_ptr(command.material->ks));
+		glUniform3fv(e, 1, glm::value_ptr(command.material->ke));
+		glUniform1f(k, command.material->ns);
 
 		glUniformMatrix4fv(p, 1, GL_FALSE, glm::value_ptr(command.projection));
 		glUniformMatrix4fv(v, 1, GL_FALSE, glm::value_ptr(command.view));

@@ -48,8 +48,24 @@ namespace Engine::Core {
 			};
 		}
 
-		void processCommand(const ImportCommand& cmd, AssetManager& am);
-		void populateAssetManager(AssetManager& am);
+		void processCommand(const ImportCommand& cmd, AssetManager& am)
+		{
+			auto it = import.find(cmd.typeId);
+			if (it != import.end())
+			{
+				am.addAsset(cmd.assetName, it->second(cmd.path, cmd.assetName));
+			}
+		}
+		void populateAssetManager(AssetManager& am)
+		{
+
+			while (!queue.empty())
+			{
+				Engine::Core::ImportCommand icmd = queue.top();
+				queue.pop();
+				processCommand(icmd, am);
+			}
+		}
 
 	};
 

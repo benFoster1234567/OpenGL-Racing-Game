@@ -109,3 +109,93 @@ Engine::Core::ShaderData Engine::Infra::ImportFuncs::importShaderData(const std:
 	Core::ShaderData sd(name, path, shaderStream.str());
 	return sd;
 }
+
+Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const std::string& path, const std::string& name)
+{
+	std::ifstream materialFile(path);
+
+	Core::MaterialData materialData{};
+
+	if (!materialFile.is_open())
+	{
+		std::cerr << "Failed to open material file: " << path << std::endl;
+		return Engine::Core::MaterialData{};
+	}
+
+	std::string line;
+
+	auto stringToVec3 = [](const std::string& str) -> glm::vec3
+		{
+			std::istringstream iss(str);
+			glm::vec3 vec;
+			iss >> vec.x >> vec.y >> vec.z;
+			return vec;
+		};
+
+	while (std::getline(materialFile, line))
+	{
+		std::stringstream ss(line);
+		std::string firstWord;
+
+		ss >> firstWord;
+
+		if (firstWord == "Ns")
+		{
+			ss >> std::skipws;
+			float ns;
+			ss >> ns;
+			materialData.ns = ns;
+		}
+		else if (firstWord == "Ni")
+		{
+			ss >> std::skipws;
+			float ni;
+			ss >> ni;
+			materialData.ni = ni;
+		}
+		else if (firstWord == "d")
+		{
+			ss >> std::skipws;
+			float d;
+			ss >> d;
+			materialData.d = d;
+		}
+		else if (firstWord == "illum")
+		{
+			ss >> std::skipws;
+			int illum;
+			ss >> illum;
+			materialData.illum = illum;
+		}
+		else if (firstWord == "Ka")
+		{
+			std::string vecStr;
+			std::getline(ss, vecStr);
+			glm::vec3 ka = stringToVec3(vecStr);
+			materialData.ka = ka;
+		}
+		else if (firstWord == "Kd")
+		{
+			std::string vecStr;
+			std::getline(ss, vecStr);
+			glm::vec3 kd = stringToVec3(vecStr);
+			materialData.kd = kd;
+		}
+		else if (firstWord == "Ks")
+		{
+			std::string vecStr;
+			std::getline(ss, vecStr);
+			glm::vec3 ks = stringToVec3(vecStr);
+			materialData.ks = ks;
+		}
+		else if (firstWord == "Ke")
+		{
+			std::string vecStr;
+			std::getline(ss, vecStr);
+			glm::vec3 ke = stringToVec3(vecStr);
+			materialData.ke = ke;
+		}
+	}
+	materialFile.close();
+	return materialData;
+}

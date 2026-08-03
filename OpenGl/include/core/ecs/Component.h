@@ -94,4 +94,18 @@ namespace Engine::Core::ECS
 		glm::vec3 color{};
 		float radius{};
 	};
+
+	struct MotionPropertiesComponent : ComponentBase
+	{
+		glm::vec3 velocity{};
+		glm::vec3 acceleration{};
+	};
+
+	struct MaterialDataComponent : ComponentBase
+	{
+		MaterialDataComponent() = default;
+		MaterialDataComponent(MaterialData* _material) : material{ _material } {}
+		~MaterialDataComponent() = default;
+		MaterialData* material{ nullptr };
+	};
 }

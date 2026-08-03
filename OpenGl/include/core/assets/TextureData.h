@@ -11,6 +11,7 @@ namespace Engine::Core
 	private:
 		std::string type{};
 		std::string path{};
+		std::string name{};
 	public:
 		TextureData() = default;
 

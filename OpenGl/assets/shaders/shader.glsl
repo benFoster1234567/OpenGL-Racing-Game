@@ -7,6 +7,8 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+
+
 out vec4 normOut;
 out vec3 vertexNormal;   
 out vec3 vertexPosition; 
@@ -31,12 +33,22 @@ struct StaticPointLight {
     vec4 color;  
 };
 
+struct Material 
+{
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    vec3 emission;
+    float shininess;
+};
+
 layout (std140) uniform LightBlock {
     StaticPointLight lights[MAX_LIGHTS];
     int activeLightCount;
 } ub;
 
 uniform mat4 view; 
+uniform Material material;
 
 in vec4 normOut;    
 in vec3 vertexNormal;
@@ -61,8 +73,8 @@ void main()
 
     vec3 E = normalize(cameraPosWorld - vertexPosition);
     
-    vec4 ambientProduct = vec4(0.0, 0.0, 0.0, 1.0);
-    float shininess = 10.0;
+    vec4 ambientProduct = vec4(material.ambient, 1.0);
+    float shininess = material.shininess;
     vec4 fColor = ambientProduct;
 
     for (int i = 0; i < ub.activeLightCount; i++)
@@ -77,18 +89,15 @@ void main()
         vec3 H = normalize(L + E);
 
         float Kd = max(dot(L, N), 0.0);
-        vec4 diffuseProduct = ub.lights[i].color;
+        vec4 diffuseProduct = ub.lights[i].color * vec4(material.diffuse, 1.0);
         vec4 diffuse = Kd * diffuseProduct;
 
         float Ks = pow(max(dot(N, H), 0.0), shininess);
-        vec4 specularProduct = vec4(1.0, 1.0, 1.0, 1.0);
+        vec4 specularProduct = ub.lights[i].color * vec4(material.specular, 1.0);
         vec4 specular = Ks * specularProduct;
 
-        if (dot(L, N) <= 0.0) {
-            specular = vec4(0.0);
-        }
+        if (dot(L, N) <= 0.0) specular = vec4(0.0);
 
-        
         float invDistSquared = 1/sqDist(curLight.posRad.xyz, vertexPosition);
 
         fColor.xyz += invDistSquared*(diffuse.xyz + specular.xyz);
