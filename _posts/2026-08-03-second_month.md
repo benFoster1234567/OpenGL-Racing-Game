@@ -12,6 +12,6 @@ First things first, I have implemented a basic version of the entity component s
 Blinn-Phong Shader
 =====================
 
-After implementing lights into my renderer via a uniform buffer object, I was able to implement a basic Blinn-Phong shader. So far there are no shadows, but I plan to implement these later. Initially after writing the shader I noticed some horrible banding. I mitigated mostly mitigated this using a simple noise algorithm, which I will likely replace with a better solution later. The shader is also currently using solid colors in place of diffuse textures, but I plan to implement textures, normal mapping and specular mapping later.
+After implementing lights into my renderer via a uniform buffer object, I was able to implement a basic Blinn-Phong shader. So far there are no shadows, but I plan to implement these later. Initially after writing the shader I noticed some horrible banding. I mostly mitigated this using a simple noise algorithm, which I will likely replace with a better solution later. The shader is also currently using solid colors in place of diffuse textures, but I plan to implement textures, normal mapping and specular mapping later.
 
 ![Imported model]({{ "/resources/images/Screenshot 2026-08-03 140816.png" | relative_url }})
