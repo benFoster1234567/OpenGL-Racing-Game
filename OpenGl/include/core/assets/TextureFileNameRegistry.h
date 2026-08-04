@@ -6,7 +6,7 @@
 
 namespace Engine::Core
 {
-	using TextureIdx = std::size_t;
+	using TextureIdx = int;
 
 	class TextureFileNameRegistry 
 	{
