@@ -36,9 +36,9 @@ namespace Engine::Core
 		std::unordered_map<std::string, std::unique_ptr<MaterialData>> materialMap{};
 		std::unordered_map<std::string, std::unique_ptr<ShaderData>> shaderMap{};
 
-
 		friend class EngineSystem;
 		friend class AssetPipeline;
+
 	public:
 	
 		AssetManager();
@@ -52,7 +52,8 @@ namespace Engine::Core
 		void getShader(ShaderData*& shaderOut, const std::string& name);
 		//texture retrieval is handled by an external library in the infrastructure layer, so we don't store textures in the asset manager. The texture manager handles texture indices which represent the textures. These are sent to the render pipeline to indicate which textures to use for rendering.
 		//void getTexture(TextureData*& texOut, const std::string& name);
-		void getTexture(TextureIdx& texOut, const std::string& name);
+		void getTexture(TextureIdx& texOut, const std::string& filePath);
+
 
 		void addAsset(const std::string& name, AssetVariant&& asset);
 
