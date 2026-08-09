@@ -4,8 +4,6 @@
 #include "core/assets/ShaderData.h"
 #include <variant>
 
-
-
 Engine::Core::AssetManager::AssetManager()
 {
 	meshMap["grid"] = std::make_unique<GridData>();
@@ -45,6 +43,11 @@ void Engine::Core::AssetManager::getShader(ShaderData*& shaderOut, const std::st
 		std::cout << "No shader found when trying to return : " << name << "\n";
 		shaderOut = nullptr;
 	}
+}
+
+void Engine::Core::AssetManager::getTexture(TextureIdx& texOut, const std::string& filePath)
+{
+	texOut = textureFileNameRegistry.getTextureId(filePath);
 }
 
 void Engine::Core::AssetManager::addAsset(const std::string& name, AssetVariant&& asset)

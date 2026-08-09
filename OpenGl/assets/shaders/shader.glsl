@@ -68,39 +68,32 @@ float sqDist(vec3 a, vec3 b)
 
 float noise(vec2 co) 
 {
-    return fract(tan(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }
 
 void main()
 {
-    vec3 N = normalize(vertexNormal);
-
-    mat4 invView = inverse(view);
-    vec3 cameraPosWorld = invView[3].xyz; 
-
-    vec3 E = normalize(cameraPosWorld - vertexPosition);
-    
-    vec4 ambientProduct = vec4(material.ambient, 1.0);
-    float shininess = material.shininess;
-    vec4 fColor = ambientProduct;
+    highp vec3 N = normalize(vertexNormal);
+    highp mat4 invView = inverse(view);
+    highp vec3 cameraPosWorld = invView[3].xyz; 
+    highp vec3 E = normalize(cameraPosWorld - vertexPosition);
+    highp vec4 ambientProduct = vec4(material.ambient, 1.0);
+    highp float shininess = material.shininess;
+    highp vec4 fColor = ambientProduct;
      for (int i = 0; i < ub.activeLightCount; i++)
     {
         StaticPointLight curLight = ub.lights[i];
-        vec3 lightPosWorld = curLight.posRad.xyz;
-        float radius = curLight.posRad.w;
-
-        vec3 fL = lightPosWorld - vertexPosition;
-        float d2 = sqDist(lightPosWorld, vertexPosition);
-        float d = sqrt(d2);
-        
-        vec3 L = fL / (d + 0.0001); 
-        vec3 H = normalize(L + E);
-
-        float Kd = max(dot(L, N), 0.0);
-        vec4 diffuse = Kd * curLight.color * vec4(material.diffuse, 1.0);
-
-        float Ks = pow(max(dot(N, H), 0.0), shininess);
-        vec4 specular = Ks * curLight.color * vec4(material.specular, 1.0);
+        highp vec3 lightPosWorld = curLight.posRad.xyz;
+        highp float radius = curLight.posRad.w;
+        highp vec3 fL = lightPosWorld - vertexPosition;
+        highp float d2 = sqDist(lightPosWorld, vertexPosition);
+        highp float d = sqrt(d2);
+        highp vec3 L = fL / (d + 0.0001); 
+        highp vec3 H = normalize(L + E);
+        highp float Kd = max(dot(L, N), 0.0);
+        highp vec4 diffuse = Kd * curLight.color * vec4(material.diffuse, 1.0);
+        highp float Ks = pow(max(dot(N, H), 0.0), shininess);
+        highp vec4 specular = Ks * curLight.color * vec4(material.specular, 1.0);
         if (dot(L, N) <= 0.0) specular = vec4(0.0);
 
         float attenuation = 1.0 / (d2 + 1.0); 

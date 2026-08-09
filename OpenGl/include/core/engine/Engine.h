@@ -48,7 +48,7 @@ namespace Engine::Core
 	private:
 		float deltaTime{};
 		float aspect{};
-		Game::MainGame game;
+		Game::TestScene game;
 	
 	public:
 

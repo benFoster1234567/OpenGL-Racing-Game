@@ -41,6 +41,7 @@ void Engine::Infra::Application::importAssets()
 	engine.assetPipeline.submit<Core::MaterialData>("assets/materials/cubeMaterial.mtl", "cubeMaterial");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/bunny.obj", "bunny");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/cube.obj", "cube");
+	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/car.obj", "car");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/shader.glsl", "shader");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/gridShader.glsl", "gridShader");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/testTextures.jpg", "uvChecker");

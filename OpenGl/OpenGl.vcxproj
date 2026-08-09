@@ -162,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="include\core\assets\AssetManager.h" />
     <ClInclude Include="include\core\assets\AssetPipeline.h" />
+    <ClInclude Include="include\core\assets\MaterialRenderData.h" />
     <ClInclude Include="include\core\assets\ShaderData.h" />
     <ClInclude Include="include\core\assets\TextureFileNameRegistry.h" />
     <ClInclude Include="include\core\ecs\Component.h" />

@@ -7,14 +7,14 @@
 
 namespace Engine::Core::Game
 {
-	using GameId = uint8_t;
+	using SceneId = uint8_t;
 
 	struct PlayerEntityCommand
 	{
 		ECS::Entity entity{};
 	};
 
-	class Game
+	class Scene
 	{
 	protected:
 		ECS::Coordinator coordinator{};
@@ -23,18 +23,18 @@ namespace Engine::Core::Game
 
 	public:
 
-		Game(AssetManager& _assetManager, InputBridge& _inputHandler) : 
+		Scene(AssetManager& _assetManager, InputBridge& _inputHandler) : 
 			assetManager(_assetManager), 
 			inputHandler(_inputHandler)
 		{ 
-			static GameId currentId = 0;
+			static SceneId currentId = 0;
 			id = currentId;
 			currentId++;
 		}
 
-		virtual ~Game() = default;
+		virtual ~Scene() = default;
 
-		GameId id;
+		SceneId id;
 
 		//import assets, setup entities, components, and systems
 		virtual void setup() = 0;
@@ -48,7 +48,7 @@ namespace Engine::Core::Game
 	};
 
 
-	class MainGame : public Game
+	class TestScene : public Scene
 	{
 	private:
 
@@ -117,7 +117,7 @@ namespace Engine::Core::Game
 			ECS::Entity entity = coordinator.createEntity();
 		
 			ECS::MeshComponent mesh{};
-			assetManager.getMesh(mesh.meshData, "bunny");
+			assetManager.getMesh(mesh.meshData, "car");
 			ECS::ShaderComponent shader{};
 			assetManager.getShader(shader.shaderData, "shader");
 			ECS::PlayerController playerController{};
@@ -129,6 +129,9 @@ namespace Engine::Core::Game
 
 			ECS::MaterialDataComponent matComp{};
 			assetManager.getMaterial(matComp.material, "testMaterial");
+			ECS::TransformComponent transform{};
+
+			transform.scale = { 0.1f,0.1f,0.1f };
 
 			if (matComp.material == nullptr)
 			{
@@ -136,7 +139,7 @@ namespace Engine::Core::Game
 			}
 
 			coordinator.addComponent(entity, mesh);
-			coordinator.addComponent(entity, ECS::TransformComponent{});
+			coordinator.addComponent(entity, transform);
 			coordinator.addComponent(entity, ECS::CameraComponent{});
 			coordinator.addComponent(entity, shader);
 			coordinator.addComponent(entity, ECS::OrbitalCameraComponent{});
@@ -165,7 +168,6 @@ namespace Engine::Core::Game
 
 			ECS::MaterialDataComponent matComp{};
 			assetManager.getMaterial(matComp.material, "testMaterial");
-
 			coordinator.addComponent(entity, gridMesh);
 			coordinator.addComponent(entity, shader);
 			coordinator.addComponent(entity, gridTransform);
@@ -221,7 +223,7 @@ namespace Engine::Core::Game
 
 
 	public:
-		using Game::Game;
+		using Scene::Scene;
 
 		void setup() override
 		{
@@ -234,9 +236,9 @@ namespace Engine::Core::Game
 			auto cubeEntity = setupCubeEntity(playerEntity);
 			lightEntity = setupLightEntity();
 
-			for (int i = -5; i < 5; ++i)
+			for (int i = -5; i < 3; ++i)
 			{
-				for (int j = -5; j < 5; ++j)
+				for (int j = -5; j < 3; ++j)
 				{
 					ECS::TransformComponent t{};
 					t.position = { static_cast<float>(i * 4.0f),2.5f,static_cast<float>(j * 2.0f) };

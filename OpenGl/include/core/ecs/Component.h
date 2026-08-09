@@ -48,7 +48,7 @@ namespace Engine::Core::ECS
 		KeyCode strafeRight{ KeyCode::D };
 		KeyCode forward{ KeyCode::W };
 		KeyCode backward{ KeyCode::S };
-		float speed{ 5.0f };
+		float speed{ 0.0f };
 		float turnSensitivity{ 5.0f };
 		glm::vec3 baseForward{ 0.0f,0.0f,-1.0f };
 	};
@@ -59,6 +59,8 @@ namespace Engine::Core::ECS
 		glm::quat rotation{ 1.0f, 0.0f, 0.0f, 0.0f };
 		glm::vec3 scale{ 1.0f, 1.0f, 1.0f };
 	};
+
+
 
 	struct MeshComponent : public ComponentBase
 	{
@@ -107,5 +109,16 @@ namespace Engine::Core::ECS
 		MaterialDataComponent(MaterialData* _material) : material{ _material } {}
 		~MaterialDataComponent() = default;
 		MaterialData* material{ nullptr };
+	};
+
+	struct CarControllerComponent : ComponentBase
+	{
+		KeyCode forward{ KeyCode::W };
+		KeyCode backward{ KeyCode::S };
+		KeyCode turnLeft{ KeyCode::A };
+		KeyCode turnRight{ KeyCode::D };
+		float accelerationRate{ 5.0f };
+		float turnRate{ 2.0f };
+		float frictionFactor{ 0.9f };
 	};
 }

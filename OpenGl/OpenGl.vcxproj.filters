@@ -197,6 +197,9 @@
     <ClInclude Include="include\core\assets\AssetPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\core\assets\MaterialRenderData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Notes.txt" />

@@ -70,7 +70,6 @@ void Engine::Core::ECS::RenderDispatcherExternalCamera::update(Coordinator& coor
 		const auto& shaderData = coordinator.getComponent<ShaderComponent>(entity);
 		const auto& material = coordinator.getComponent<MaterialDataComponent>(entity);
 
-
 		if (material.material == nullptr)
 		{
 			throw std::runtime_error("MaterialDataComponent is null for entity " + std::to_string(entity));
@@ -95,52 +94,68 @@ void Engine::Core::ECS::RenderDispatcherExternalCamera::update(Coordinator& coor
 
 void Engine::Core::ECS::KeyControlSystem::update(Coordinator& coordinator, const InputBridge& inputHandler, float deltaTime)
 {
-	//TODO: fix broken keyHeld method
 	for (auto entity : entities)
 	{
-		const auto& inputKeys = coordinator.getComponent<PlayerController>(entity);
+		auto& inputKeys = coordinator.getComponent<PlayerController>(entity);
 		auto& transform = coordinator.getComponent<TransformComponent>(entity);
-		glm::vec3 rotAxis{ 0.0f,1.0f,0.0f };
-		glm::vec3 forwards{ 0,0,0 };
-		float rotAngle = 0.0f;
-		glm::quat rotQuat;
 
-		float speed = 5;
+		glm::vec3 rotAxis{ 0.0f, 1.0f, 0.0f };
+		glm::vec3 forwards{ 0.0f, 0.0f, 0.0f };
+		float rotAngle = 0.0f;
+
+		float accelerationRate = 5.0f;
+		float decelerationRate = 4.0f;
+		float speedMax = 10.0f;
 
 		if (inputHandler.keyPressed(int(inputKeys.forward)))
 		{
-			forwards.z = deltaTime * speed;
+			inputKeys.speed += accelerationRate * deltaTime;
 		}
-
-		if (inputHandler.keyPressed(int(inputKeys.backward)))
+		else if (inputHandler.keyPressed(int(inputKeys.backward)))
 		{
-			forwards.z = -deltaTime * speed;
+			inputKeys.speed -= accelerationRate * deltaTime;
 		}
-
-		if (forwards.z == 0.0f)
+		else
 		{
-			continue;
+			inputKeys.speed = glm::mix(inputKeys.speed, 0.0f, decelerationRate * deltaTime);
+			if (glm::abs(inputKeys.speed) < 0.01f)
+			{
+				inputKeys.speed = 0.0f;
+			}
 		}
-		auto turnFactor = normalize(forwards).z;
 
-		if (inputHandler.keyPressed(int(inputKeys.strafeLeft)))
+		inputKeys.speed = glm::clamp(inputKeys.speed, -speedMax, speedMax);
+
+
+
+		if (glm::abs(inputKeys.speed) > 0.01f)
 		{
-			rotAngle += inputKeys.turnSensitivity * deltaTime * turnFactor;
+			float turnFactor = glm::clamp(inputKeys.speed* 0.5f, -1.0f, 1.0f);
+
+			turnFactor *= glm::abs(turnFactor);
+
+			if (inputHandler.keyPressed(int(inputKeys.strafeLeft)))
+			{
+				rotAngle += inputKeys.turnSensitivity * deltaTime * turnFactor;
+			}
+			if (inputHandler.keyPressed(int(inputKeys.strafeRight)))
+			{
+				rotAngle -= inputKeys.turnSensitivity * deltaTime * turnFactor;
+			}
+
+			if (glm::abs(rotAngle) > 0.001f)
+			{
+				glm::quat deltaRot = glm::angleAxis(glm::radians(rotAngle), rotAxis);
+				transform.rotation = deltaRot * transform.rotation;
+				transform.rotation = glm::normalize(transform.rotation);
+			}
+
+			forwards.z = inputKeys.speed * deltaTime;
+			transform.position += transform.rotation * forwards;
 		}
-
-		if (inputHandler.keyPressed(int(inputKeys.strafeRight)))
-		{
-			rotAngle -= inputKeys.turnSensitivity * deltaTime * turnFactor;
-		}
-
-
-		rotQuat = glm::angleAxis(glm::radians(rotAngle), rotAxis);
-		rotQuat *= transform.rotation;
-		forwards = rotQuat * forwards;
-		transform.position += forwards;
-		transform.rotation = rotQuat;
 	}
 }
+
 
 void Engine::Core::ECS::StaticLightRenderSetupSystem::fill(Coordinator& coordinator, std::vector<StaticPointLightRendererData>& queue)
 {
