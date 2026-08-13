@@ -45,9 +45,17 @@ void Engine::Core::AssetManager::getShader(ShaderData*& shaderOut, const std::st
 	}
 }
 
-void Engine::Core::AssetManager::getTexture(TextureIdx& texOut, const std::string& filePath)
+void Engine::Core::AssetManager::getTexture(TextureData*& texOut, const std::string& name)
 {
-	texOut = textureFileNameRegistry.getTextureId(filePath);
+	if (!textureMap.contains(name))
+	{
+		std::cout << "No texture found when trying to return : " << name << "\n";
+		texOut = nullptr;
+		return;
+	}
+
+	texOut = textureMap[name].get();
+	std::cout << "Texture found: " << name << "\n";
 }
 
 void Engine::Core::AssetManager::addAsset(const std::string& name, AssetVariant&& asset)
@@ -69,6 +77,11 @@ void Engine::Core::AssetManager::addAsset(const std::string& name, AssetVariant&
 			if constexpr (std::is_same_v<T, std::unique_ptr<MaterialData>>)
 			{
 				materialMap[name] = std::move(arg);
+			}
+
+			if constexpr (std::is_same_v<T, std::unique_ptr<TextureData>>)
+			{
+				textureMap[name] = std::move(arg);
 			}
 
 		}, std::move(asset));
@@ -95,14 +108,11 @@ void Engine::Core::AssetManager::meshList(std::vector<MeshData*>& meshesOut)
 	}
 }
 
-void Engine::Core::AssetManager::textureList(std::vector<TextureInfo>& texturesOut)
+void Engine::Core::AssetManager::textureList(std::vector<TextureData*>& texturesOut)
 {
-	for (const auto& [filePath, textureId] : textureFileNameRegistry.filePathToId)
+	for (const auto& [name, texture] : textureMap)
 	{
-		TextureInfo info{};
-		info.filePath = filePath;
-		info.textureId = textureId;
-		texturesOut.push_back(info);
+		texturesOut.push_back(texture.get());
 	}
 }
 

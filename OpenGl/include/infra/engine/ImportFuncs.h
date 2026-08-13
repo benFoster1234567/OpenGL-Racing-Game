@@ -7,8 +7,8 @@
 
 namespace Engine::Infra::ImportFuncs
 {
-	Engine::Core::MeshData importMeshData(const std::string& path, const std::string& name);
+	Engine::Core::MeshData importMeshDataTOL(const std::string& path, const std::string& name);
 	Engine::Core::ShaderData importShaderData(const std::string& path, const std::string& name);
-	Engine::Core::TextureData importTextureData(const std::string& path, const std::string& name);
+	Engine::Core::TextureData importTextureDataDevIL(const std::string& path, const std::string& name);
 	Engine::Core::MaterialData importMaterialData(const std::string& path, const std::string& name);
 }

@@ -57,8 +57,8 @@ void Engine::Infra::Application::importAssets()
 void Engine::Infra::Application::sendTexturesToRenderer()
 {
 	std::vector<Core::TextureInfo> textureList;
-	engine.assetManager.textureList(textureList);
-	renderer.loadTextures(textureList);
+	//engine.assetManager.textureList(textureList);
+	//renderer.loadTextures(textureList);
 }
 
 //all debug command lambdas are setup here
@@ -152,7 +152,7 @@ void Engine::Infra::Application::setupImportCallbacks()
 {
 	engine.assetPipeline.registerImportCallback<Core::MeshData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::MeshData>
 	{
-		return std::make_unique<Core::MeshData>(Infra::ImportFuncs::importMeshData(path, name));
+		return std::make_unique<Core::MeshData>(Infra::ImportFuncs::importMeshDataTOL(path, name));
 	});
 
 	engine.assetPipeline.registerImportCallback<Core::ShaderData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::ShaderData>
@@ -165,6 +165,10 @@ void Engine::Infra::Application::setupImportCallbacks()
 		return std::make_unique<Core::MaterialData>(Infra::ImportFuncs::importMaterialData(path, name));
 	});
 
+	engine.assetPipeline.registerImportCallback<Core::TextureData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::TextureData>
+	{
+		return std::make_unique<Core::TextureData>(Infra::ImportFuncs::importTextureDataDevIL(path, name));
+	});
 }
 
 void Engine::Infra::Application::run()

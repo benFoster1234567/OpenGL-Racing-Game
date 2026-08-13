@@ -149,7 +149,6 @@
     <ClCompile Include="src\infrastructure\renderer\assets\GPUMesh.cpp" />
     <ClCompile Include="src\infrastructure\renderer\assets\ImportFuncs.cpp" />
     <ClCompile Include="src\infrastructure\app\GlfwKeyHandler.cpp" />
-    <ClCompile Include="src\core\AssetPipeline.cpp" />
     <ClCompile Include="src\infrastructure\renderer\assets\GPUTexture.cpp" />
     <ClCompile Include="src\core\KeyboardInput.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -195,6 +194,7 @@
     <ClInclude Include="include\infra\app\Window.h" />
     <ClInclude Include="include\infra\renderer\Renderer.h" />
     <ClInclude Include="include\infra\renderer\assets\GpuShader.h" />
+    <ClInclude Include="include\SparseSet.h" />
     <ClInclude Include="tests\Tester.h" />
     <ClInclude Include="include\core\assets\TextureData.h" />
   </ItemGroup>

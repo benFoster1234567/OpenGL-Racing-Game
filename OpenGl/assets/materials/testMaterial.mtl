@@ -8,4 +8,4 @@ Ks 1.00000 1.00000 1.00000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.0000
-map_Kd /assets/materials/textures/testTextures.jpg
+map_Kd textures/testTextures.jpg

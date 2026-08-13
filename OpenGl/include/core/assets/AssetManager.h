@@ -19,8 +19,6 @@
 
 namespace Engine::Core 
 {
-
-
 	using AssetVariant = std::variant<std::monostate, std::unique_ptr<MeshData>, std::unique_ptr<TextureData>, std::unique_ptr<MaterialData>, std::unique_ptr<ShaderData>>;
 
 	struct TextureInfo
@@ -35,6 +33,9 @@ namespace Engine::Core
 		std::unordered_map<std::string, std::unique_ptr<MeshData>> meshMap{};
 		std::unordered_map<std::string, std::unique_ptr<MaterialData>> materialMap{};
 		std::unordered_map<std::string, std::unique_ptr<ShaderData>> shaderMap{};
+		std::unordered_map<std::string, std::unique_ptr<TextureData>> textureMap{};
+
+		std::unordered_map<std::string, std::string> textureFilePathToNameMap{};
 
 		friend class EngineSystem;
 		friend class AssetPipeline;
@@ -44,22 +45,17 @@ namespace Engine::Core
 		AssetManager();
 		~AssetManager();
 
-		TextureFileNameRegistry textureFileNameRegistry{};
-
 		// Retrieves a mesh by name
 		void getMesh(MeshData*& meshOut, const std::string& name);
 		void getMaterial(MaterialData*& matOut, const std::string& name);
 		void getShader(ShaderData*& shaderOut, const std::string& name);
-		//texture retrieval is handled by an external library in the infrastructure layer, so we don't store textures in the asset manager. The texture manager handles texture indices which represent the textures. These are sent to the render pipeline to indicate which textures to use for rendering.
-		//void getTexture(TextureData*& texOut, const std::string& name);
-		void getTexture(TextureIdx& texOut, const std::string& filePath);
-
+		void getTexture(TextureData*& texOut, const std::string& name);
 
 		void addAsset(const std::string& name, AssetVariant&& asset);
 
 		void shaderList(std::vector<ShaderData*>& shadersOut);
 		void meshList(std::vector<MeshData*>& meshesOut);
-		void textureList(std::vector<TextureInfo>& texturesOut);
+		void textureList(std::vector<TextureData*>& texturesOut);
 
 	};
 

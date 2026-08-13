@@ -8,9 +8,10 @@
 #include <fstream>
 #include <sstream>
 #include <core/assets/ShaderData.h>
+#include <IL/il.h>
 
 
-Engine::Core::MeshData Engine::Infra::ImportFuncs::importMeshData(const std::string& path, const std::string& name)
+Engine::Core::MeshData Engine::Infra::ImportFuncs::importMeshDataTOL(const std::string& path, const std::string& name)
 {
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
@@ -109,6 +110,56 @@ Engine::Core::ShaderData Engine::Infra::ImportFuncs::importShaderData(const std:
 	return sd;
 }
 
+// later I should refactor this to support more options.
+Engine::Core::TextureData Engine::Infra::ImportFuncs::importTextureDataDevIL(const std::string& path, const std::string& name)
+{
+	static bool isDevILInitialized = false;
+
+	if (!isDevILInitialized) {
+		ilInit();
+		ilEnable(IL_ORIGIN_SET);
+		ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+		isDevILInitialized = true;
+	}
+
+	ILuint imageID;
+
+	ilGenImages(1, &imageID);
+
+	ilBindImage(imageID);
+
+	if (!ilLoadImage(reinterpret_cast<const ILchar*>(path.c_str()))) 
+	{
+		std::cerr << "Failed to open material file: " << path << std::endl;
+		return Engine::Core::TextureData{};
+	}
+
+	if (!ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE)) 
+	{
+		std::cerr << "Failed to convert image: " << path << std::endl;
+		return Engine::Core::TextureData{};
+	}
+
+	Engine::Core::TextureData textureData{};
+	textureData.width = ilGetInteger(IL_IMAGE_WIDTH);
+	textureData.height = ilGetInteger(IL_IMAGE_HEIGHT);
+	textureData.channels = 4;
+	textureData.name = name;
+
+	ILubyte* data = ilGetData();
+	
+	if (data)
+	{
+		size_t numPixels = static_cast<size_t>(textureData.width) * textureData.height;
+		size_t dataSize = numPixels * textureData.channels;
+		textureData.pixels.assign(data, data + dataSize);
+	}
+	
+	ilDeleteImages(1, &imageID);
+
+	return textureData;
+}
+
 Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const std::string& path, const std::string& name)
 {
 	std::ifstream materialFile(path);
@@ -201,7 +252,14 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			glm::vec3 ke = stringToVec3(vecStr);
 			materialData.ke = ke;
 		}
-		
+
+		else
+		{
+			std::string texturePath;
+			ss >> texturePath;
+			materialData.setMapFilePath(firstWord, texturePath);
+		}
+		/*
 		else if (firstWord == "map_Kd")
 		{
 			std::string texturePath;
@@ -228,7 +286,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			std::string texturePath;
 			ss >> texturePath;
 			materialData.mapBumpPath = texturePath;
-		}
+		}*/
 	}
 
 	materialFile.close();

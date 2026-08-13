@@ -1,16 +1,3 @@
-//required steps:
-/*
-* bind import callbacks
-* import assets/create assetManager
-* setup ecs systems
-* subscribe to RenderDispatcher system so that the render commands are created after every iteration
-* in the loop:
-* call update aspect
-* call update mouse
-* call updateSystems - this will update the components and send the render data to the renderer for each entity bound.
-* 
-* 
-*/
 
 #pragma once
 
@@ -48,6 +35,7 @@ namespace Engine::Core
 	private:
 		float deltaTime{};
 		float aspect{};
+		
 		Game::TestScene game;
 	
 	public:
@@ -60,37 +48,22 @@ namespace Engine::Core
 		{
 		}
 
-		void setUpGame()
-		{
-			game.setup();
-		}
+		void setUpGame() { game.setup(); }
+
 		void fillStaticLightVector(std::vector<ECS::StaticPointLightRendererData>& lights);
+
 		EventDispatcher<std::vector<ShaderData*>> shaderDispatcher{};
 		EventDispatcher<std::vector<MeshData*>> meshDispatcher{};
+		EventDispatcher<std::vector<TextureData*>> textureDispatcher{};
 
 		void createAssetManager();
 		void publishAssets();
-
-		void updateDeltaTime(float dt)
-		{
-			deltaTime = dt;
-		}
-
-		void updateAspect(float a) 
-		{ 
-			aspect = a;
-		}
-
+		void updateDeltaTime(float dt) { deltaTime = dt; }
+		void updateAspect(float a) { aspect = a; }
 		void updateMouse( double xpos, double ypos);
-
 		void zeroMouse();
-
-		void updateGame()
-		{
-			game.update(aspect, inputHandler.mouseState, deltaTime);
-		}
-
+		void updateGame() { game.update(aspect, inputHandler.mouseState, deltaTime); }
 		void updateInputState();
-		
+
 	};
 }
