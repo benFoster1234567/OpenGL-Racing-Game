@@ -13,40 +13,6 @@ void Engine::Infra::Renderer::cacheMesh(Core::MeshData* meshData)
 	gpuMeshCache.emplace(meshData, std::move(gpuMesh));
 }
 
-unsigned int Engine::Infra::Renderer::loadTexture(const char* filename) 
-{
-	ILboolean success;
-	unsigned int imageID;
-	ilGenImages(1, &imageID);
-
-	ilBindImage(imageID); /* Binding of DevIL image name */
-	ilEnable(IL_ORIGIN_SET);
-	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-	success = ilLoadImage((ILstring)filename);
-
-	if (!success) {
-		printf("Couldn't load the following texture file: %s", filename);
-		ilDeleteImages(1, &imageID);
-		return 0;
-	}
-
-	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
-
-	GLuint tid;
-	glGenTextures(1, &tid);
-	glBindTexture(GL_TEXTURE_2D, tid);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), 0,
-		GL_RGBA, GL_UNSIGNED_BYTE, ilGetData());
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	ilDeleteImages(1, &imageID);
-	return tid;
-}
-
 void Engine::Infra::Renderer::cacheShader(Core::ShaderData* shaderData)
 {
 	auto gpuShader = std::make_unique<GpuShader>(shaderData);
@@ -54,15 +20,11 @@ void Engine::Infra::Renderer::cacheShader(Core::ShaderData* shaderData)
 	gpuShaderCache.emplace(shaderData, std::move(gpuShader));
 }
 
-void Engine::Infra::Renderer::loadTextureFromFile(const std::string& filePath, Core::TextureIdx textureIdx)
+void Engine::Infra::Renderer::cacheTexture(Core::TextureData* textureData)
 {
-	if (textureIdxToId.contains(textureIdx))
-	{
-		throw std::runtime_error("Failed to load texture. Name already exists in cache");
-	}
 
-	unsigned int textureId = loadTexture(filePath.c_str());
-	textureIdxToId[textureIdx] = textureId;
+	auto gpuTexture = std::make_unique<GpuTexture>(textureData);
+	gpuTextureCache.emplace(textureData, std::move(gpuTexture));
 }
 
 void Engine::Infra::Renderer::loadMeshes(std::vector<Core::MeshData*>& meshes)
@@ -90,11 +52,12 @@ void Engine::Infra::Renderer::loadShaders(std::vector<Core::ShaderData*>& shader
 	}
 }
 
-void Engine::Infra::Renderer::loadTextures(std::vector<Core::TextureInfo>& textures)
+void Engine::Infra::Renderer::loadTextures(std::vector<Core::TextureData*>& textures)
 {
 	for (const auto& texture : textures)
 	{
-		loadTextureFromFile(texture.filePath, texture.textureId);
+		cacheTexture(texture);
+		gpuTextureCache[texture]->genTexture();
 	}
 }
 

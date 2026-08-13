@@ -62,10 +62,11 @@ namespace Engine::Infra
 		std::map<Core::TextureData*, std::unique_ptr<GpuTexture>> gpuTextureCache{};
 		std::map<Core::TextureIdx, unsigned int> textureIdxToId{}; // Maps texture index to OpenGL texture ID. We can change this to a span set if we want to avoid the map overhead.
 		void cacheShader(Core::ShaderData* shaderData);
+		void cacheTexture(Core::TextureData* textureData);
 		void cacheMesh(Core::MeshData* meshData);
 		int polygonMode = LINE;
 
-		unsigned int loadTexture(const char* filename);
+		//unsigned int loadTexture(const char* filename);
 
 	public:
 		Renderer()
@@ -76,11 +77,9 @@ namespace Engine::Infra
 		}
 		~Renderer() = default;
 
-		void loadTextureFromFile(const std::string& filePath, Core::TextureIdx textureId);
-
 		void loadMeshes(std::vector<Core::MeshData*>& meshes);
 		void loadShaders(std::vector<Core::ShaderData*>& shaders);
-		void loadTextures(std::vector<Core::TextureInfo>& textures);
+		void loadTextures(std::vector<Core::TextureData*>& textures);
 		void loadLights(std::vector<StaticPointLightResource>& staticLights);
 
 		void submit(RenderCommand command);
