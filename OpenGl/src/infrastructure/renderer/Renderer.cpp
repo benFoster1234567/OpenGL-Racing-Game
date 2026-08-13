@@ -137,6 +137,7 @@ void Engine::Infra::Renderer::flush()
 
 		GpuMesh* mesh = gpuMeshCache[command.mesh].get();
 		GpuShader* shader = gpuShaderCache[command.shader].get();
+		GpuTexture* diffuse = gpuTextureCache[command.material->mapTextures[int(Core::MaterialData::MapType::Diffuse)]].get();
 		glUseProgram(shader->getId());
 
 		auto p = glGetUniformLocation(shader->getId(), "projection");
@@ -150,16 +151,20 @@ void Engine::Infra::Renderer::flush()
 		auto e = glGetUniformLocation(shader->getId(), "material.emission");
 
 		assert(!(p == -1 || v == -1 || m == -1) && "error sending mvp to shader");
-
+		
 		glUniform3fv(d, 1, glm::value_ptr(command.material->kd));
 		glUniform3fv(a, 1, glm::value_ptr(command.material->ka));
 		glUniform3fv(s, 1, glm::value_ptr(command.material->ks));
 		glUniform3fv(e, 1, glm::value_ptr(command.material->ke));
 		glUniform1f(k, command.material->ns);
 
+
+
 		glUniformMatrix4fv(p, 1, GL_FALSE, glm::value_ptr(command.projection));
 		glUniformMatrix4fv(v, 1, GL_FALSE, glm::value_ptr(command.view));
 		glUniformMatrix4fv(m, 1, GL_FALSE, glm::value_ptr(command.modelTransform));
+
+		diffuse->bind();
 
 		mesh->draw();
 	}

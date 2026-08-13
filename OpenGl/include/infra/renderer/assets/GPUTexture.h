@@ -53,7 +53,9 @@ namespace Engine::Infra
             //genTexture();
 		}
 
-
-		void bind();
+        void bind()
+        {
+            glBindTexture(GL_TEXTURE_2D, id);
+        }
 	};
 }

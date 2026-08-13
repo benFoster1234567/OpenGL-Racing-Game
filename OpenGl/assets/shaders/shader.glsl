@@ -2,6 +2,7 @@
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNorm;
+layout (location = 2) in vec2 aTex;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -10,7 +11,7 @@ uniform mat4 projection;
 out vec4 normOut;
 out vec3 vertexNormal;   
 out vec3 vertexPosition; 
-
+out vec2 texCoord;
 
 
 void main()
@@ -20,7 +21,8 @@ void main()
 
     normOut = vec4(aNorm, 1.0);
     vertexNormal = mat3(model) * aNorm; 
-    vertexPosition = worldPos.xyz;      
+    vertexPosition = worldPos.xyz;    
+    texCoord = aTex;
 }
 
 #endif
@@ -47,6 +49,8 @@ layout (std140) uniform LightBlock {
     int activeLightCount;
 } ub;
 
+uniform sampler2D diffuseTexture;
+
 highp float intensity = 1.5;
 
 uniform mat4 view; 
@@ -55,7 +59,7 @@ uniform Material material;
 in vec4 normOut;    
 in vec3 vertexNormal;
 in vec3 vertexPosition;
- 
+in vec2 texCoord;
 out vec4 FragColor;
  
 float sqDist(vec3 a, vec3 b)
@@ -79,6 +83,7 @@ void main()
     highp vec3 E = normalize(cameraPosWorld - vertexPosition);
     highp vec4 ambientProduct = vec4(material.ambient, 1.0);
     highp float shininess = material.shininess;
+    highp vec4 texdifcolor = texture(diffuseTexture, texCoord); 
     highp vec4 fColor = ambientProduct;
      for (int i = 0; i < ub.activeLightCount; i++)
     {
@@ -91,7 +96,7 @@ void main()
         highp vec3 L = fL / (d + 0.0001); 
         highp vec3 H = normalize(L + E);
         highp float Kd = max(dot(L, N), 0.0);
-        highp vec4 diffuse = Kd * curLight.color * vec4(material.diffuse, 1.0);
+        highp vec4 diffuse = Kd * curLight.color * vec4(texdifcolor.rgb, 1.0);
         highp float Ks = pow(max(dot(N, H), 0.0), shininess);
         highp vec4 specular = Ks * curLight.color * vec4(material.specular, 1.0);
         if (dot(L, N) <= 0.0) specular = vec4(0.0);

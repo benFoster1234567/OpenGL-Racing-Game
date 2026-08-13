@@ -186,6 +186,12 @@ void Engine::Infra::Application::run()
 			std::cout << "load meshes invoked!\n";
 		});
 
+	engine.textureDispatcher.subscribe([&](std::vector<Engine::Core::TextureData*> textureList)
+		{
+			renderer.loadTextures(textureList);
+			std::cout << "load textures invoked!\n";
+		});
+
 	Engine::Core::ECS::RenderDispatcher::sendRenderInfo.subscribe([&](Engine::Core::ECS::RenderOutput output)
 		{
 			RenderCommand rc = { .view = output.view, .projection = output.projection, .modelTransform = output.modelTransform, .shader = output.shader, .mesh = output.mesh,.material = output.material };

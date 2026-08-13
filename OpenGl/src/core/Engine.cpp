@@ -5,10 +5,13 @@
 
 void Engine::Core::EngineSystem::publishAssets()
 {
+	std::vector<TextureData*> textureList{};
+	assetManager.textureList(textureList);
 	std::vector<ShaderData*> shaderList{};
 	assetManager.shaderList(shaderList);
 	std::vector<MeshData*> meshList{};
 	assetManager.meshList(meshList);
+	textureDispatcher.invoke(textureList);
 	shaderDispatcher.invoke(shaderList);
 	meshDispatcher.invoke(meshList);
 }

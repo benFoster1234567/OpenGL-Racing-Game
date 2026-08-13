@@ -33,9 +33,6 @@
     <ClCompile Include="src\infrastructure\renderer\assets\GpuShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\infrastructure\renderer\assets\GPUTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\infrastructure\app\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

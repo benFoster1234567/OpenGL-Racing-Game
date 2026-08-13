@@ -149,7 +149,6 @@
     <ClCompile Include="src\infrastructure\renderer\assets\GPUMesh.cpp" />
     <ClCompile Include="src\infrastructure\renderer\assets\ImportFuncs.cpp" />
     <ClCompile Include="src\infrastructure\app\GlfwKeyHandler.cpp" />
-    <ClCompile Include="src\infrastructure\renderer\assets\GPUTexture.cpp" />
     <ClCompile Include="src\core\KeyboardInput.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\infrastructure\app\Window.cpp" />
