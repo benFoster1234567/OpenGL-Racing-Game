@@ -172,6 +172,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 		return Engine::Core::MaterialData{};
 	}
 
+	materialData.name = name;
 	std::string line;
 
 	auto stringToVec3 = [](const std::string& str) -> glm::vec3

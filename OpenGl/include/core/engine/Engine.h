@@ -64,6 +64,7 @@ namespace Engine::Core
 		void zeroMouse();
 		void updateGame() { game.update(aspect, inputHandler.mouseState, deltaTime); }
 		void updateInputState();
+		void setTextureUvTiling(std::string textureName, glm::vec2 uvTiling);
 
 	};
 }

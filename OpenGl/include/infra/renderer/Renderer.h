@@ -54,6 +54,8 @@ namespace Engine::Infra
 		FILL, LINE
 	};
 
+
+
 	class Renderer
 	{
 	private:
@@ -64,9 +66,14 @@ namespace Engine::Infra
 		void cacheShader(Core::ShaderData* shaderData);
 		void cacheTexture(Core::TextureData* textureData);
 		void cacheMesh(Core::MeshData* meshData);
+		void drawLights(Core::ShaderData* lightShader, size_t lightCount);
 		int polygonMode = LINE;
+		size_t activeLightCount = 0;
+		GLuint emptyVao{ 0 }; // for debug positions and such
+		GLuint ubo{ 0 };
 
-		//unsigned int loadTexture(const char* filename);
+
+		GpuShader* DebugLightShader = nullptr;
 
 	public:
 		Renderer()
@@ -81,7 +88,7 @@ namespace Engine::Infra
 		void loadShaders(std::vector<Core::ShaderData*>& shaders);
 		void loadTextures(std::vector<Core::TextureData*>& textures);
 		void loadLights(std::vector<StaticPointLightResource>& staticLights);
-
+		void renderLights();
 		void submit(RenderCommand command);
 
 		void setPolygonMode(int m) { polygonMode = m; }

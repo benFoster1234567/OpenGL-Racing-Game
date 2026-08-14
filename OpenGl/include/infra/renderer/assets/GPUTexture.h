@@ -10,7 +10,6 @@ namespace Engine::Infra
 	public:
 		GLuint id{ 0 };
 		Core::TextureData* texture = nullptr;
-	public:
 		void genTexture()
 		{
 			if (texture->pixels.empty())
@@ -46,12 +45,16 @@ namespace Engine::Infra
 
         }
 
-	public:
-
 		GpuTexture(Core::TextureData* _texture) : texture{ _texture } 
 		{
-            //genTexture();
 		}
+
+        ~GpuTexture()
+        {
+            if (id != 0) {
+                glDeleteTextures(1, &id); // Cleanup VRAM leak
+            }
+        }
 
         void bind()
         {

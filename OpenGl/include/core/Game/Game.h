@@ -117,7 +117,7 @@ namespace Engine::Core::Game
 			ECS::Entity entity = coordinator.createEntity();
 		
 			ECS::MeshComponent mesh{};
-			assetManager.getMesh(mesh.meshData, "car");
+			assetManager.getMesh(mesh.meshData, "bunny");
 			ECS::ShaderComponent shader{};
 			assetManager.getShader(shader.shaderData, "shader");
 			ECS::PlayerController playerController{};
@@ -131,7 +131,7 @@ namespace Engine::Core::Game
 			assetManager.getMaterial(matComp.material, "testMaterial");
 			ECS::TransformComponent transform{};
 
-			transform.scale = { 0.1f,0.1f,0.1f };
+			transform.scale = { 2,2,2 };
 
 			if (matComp.material == nullptr)
 			{
@@ -236,15 +236,15 @@ namespace Engine::Core::Game
 			auto cubeEntity = setupCubeEntity(playerEntity);
 			lightEntity = setupLightEntity();
 
-			for (int i = -5; i < 3; ++i)
+			/*for (int i = -2; i < 2; ++i)
 			{
-				for (int j = -5; j < 3; ++j)
+				for (int j = -2; j < 2; ++j)
 				{
 					ECS::TransformComponent t{};
-					t.position = { static_cast<float>(i * 4.0f),2.5f,static_cast<float>(j * 2.0f) };
+					t.position = { static_cast<float>(i * 4.0f),2.5f,static_cast<float>(j * 4.0f) };
 					auto lightEntity2 = setupLightEntity(t);
 				}
-			}
+			}*/
 
 			ECS::TransformComponent t{};
 			t.position = { 5,1,-1 };

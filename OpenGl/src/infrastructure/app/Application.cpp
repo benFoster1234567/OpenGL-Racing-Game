@@ -44,7 +44,10 @@ void Engine::Infra::Application::importAssets()
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/car.obj", "car");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/shader.glsl", "shader");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/gridShader.glsl", "gridShader");
+	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/lightDebuggerShader.glsl", "lightDebugShader");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/testTextures.jpg", "uvChecker");
+	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0068.gif", "tileSpecular");
+	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0066.gif", "tileDiffuse");
 	engine.createAssetManager();
 	Core::MaterialData* testMaterial = nullptr;
 	engine.assetManager.getMaterial(testMaterial,"testMaterial");
@@ -245,6 +248,7 @@ void Engine::Infra::Application::run()
 		engine.zeroMouse();
 
 		renderer.flush();
+		//renderer.renderLights();
 		debugConsoleUi->prepareFrame();
 		debugConsoleUi->render();
 

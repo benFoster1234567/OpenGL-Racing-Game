@@ -8,18 +8,16 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-out vec4 normOut;
 out vec3 vertexNormal;   
 out vec3 vertexPosition; 
 out vec2 texCoord;
-
 
 void main()
 {
     vec4 worldPos = model * vec4(aPos, 1.0);
     gl_Position = projection * view * worldPos;
 
-    normOut = vec4(aNorm, 1.0);
+    // Transform vertex normal by model orientation matrix
     vertexNormal = mat3(model) * aNorm; 
     vertexPosition = worldPos.xyz;    
     texCoord = aTex;
@@ -37,10 +35,10 @@ struct StaticPointLight {
  
 struct Material 
 {
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    vec3 emission;
+    sampler2D ambient;
+    sampler2D diffuse;
+    sampler2D specular;
+    sampler2D normal;
     float shininess;
 };
  
@@ -49,72 +47,65 @@ layout (std140) uniform LightBlock {
     int activeLightCount;
 } ub;
 
-uniform sampler2D diffuseTexture;
-
-highp float intensity = 1.5;
-
 uniform mat4 view; 
 uniform Material material;
  
-in vec4 normOut;    
 in vec3 vertexNormal;
 in vec3 vertexPosition;
 in vec2 texCoord;
-out vec4 FragColor;
- 
-float sqDist(vec3 a, vec3 b)
-{
-    float dx = a.x - b.x;
-    float dy = a.y - b.y;
-    float dz = a.z - b.z;
-    return dx*dx + dy*dy + dz*dz;
-}
 
-float noise(vec2 co) 
+out vec4 FragColor;
+
+float attenuate(float d, float r)
 {
-    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+    float a = 1 - pow(d/r, 4);
+    return (a*a) / ((d*d)+1);
 }
 
 void main()
 {
-    highp vec3 N = normalize(vertexNormal);
-    highp mat4 invView = inverse(view);
-    highp vec3 cameraPosWorld = invView[3].xyz; 
-    highp vec3 E = normalize(cameraPosWorld - vertexPosition);
-    highp vec4 ambientProduct = vec4(material.ambient, 1.0);
-    highp float shininess = material.shininess;
-    highp vec4 texdifcolor = texture(diffuseTexture, texCoord); 
-    highp vec4 fColor = ambientProduct;
-     for (int i = 0; i < ub.activeLightCount; i++)
-    {
-        StaticPointLight curLight = ub.lights[i];
-        highp vec3 lightPosWorld = curLight.posRad.xyz;
-        highp float radius = curLight.posRad.w;
-        highp vec3 fL = lightPosWorld - vertexPosition;
-        highp float d2 = sqDist(lightPosWorld, vertexPosition);
-        highp float d = sqrt(d2);
-        highp vec3 L = fL / (d + 0.0001); 
-        highp vec3 H = normalize(L + E);
-        highp float Kd = max(dot(L, N), 0.0);
-        highp vec4 diffuse = Kd * curLight.color * vec4(texdifcolor.rgb, 1.0);
-        highp float Ks = pow(max(dot(N, H), 0.0), shininess);
-        highp vec4 specular = Ks * curLight.color * vec4(material.specular, 1.0);
-        if (dot(L, N) <= 0.0) specular = vec4(0.0);
+    vec2 uTiling = vec2(10.0,10.0);
+    vec2 tiledUV = texCoord * uTiling;
 
-        float attenuation = 1.0 / (d2 + 1.0); 
+    vec3 ambientColor  = texture(material.ambient, tiledUV).rgb;
+    vec3 diffuseColor  = texture(material.diffuse, tiledUV).rgb;
+    vec3 specularColor = texture(material.specular,tiledUV).rgb;
+    
+    vec3 normal = normalize(vertexNormal);
+
+    mat4 invView = inverse(view);
+    vec3 cameraPosWorld = invView[3].xyz;
+    vec3 viewDir = normalize(cameraPosWorld - vertexPosition);
+
+    vec3 colorOut = ambientColor * 0.1; // Base ambient contribution
+
+    for (int i = 0; i < ub.activeLightCount; i++)
+    {
+        StaticPointLight light = ub.lights[i];
+        vec3 lightPos   = light.posRad.xyz;
+        float radius    = light.posRad.w;
+        vec3 lightColor = light.color.rgb;
+
+        vec3 lightDir = lightPos - vertexPosition;
         
-        float window = clamp(1.0 - (d / radius), 0.0, 1.0);
-        window = window * window;
+        float distance = length(lightDir);
+
+        float attenuation = attenuate(distance, radius);
         
-        fColor.xyz += intensity * attenuation * window * (diffuse.xyz + specular.xyz);
+        vec3 L = normalize(lightDir);
+        vec3 E = normalize(viewDir);
+        vec3 H = normalize(L + E);
+
+        float Kd = max(dot(normal, L), 0.0);
+        float Ks = pow(max(dot(normal, H), 0.0), material.shininess);
+
+        vec3 diffuse = Kd * diffuseColor;
+        vec3 specular = Ks * specularColor;
+
+        colorOut += (diffuse + specular) * attenuation;
     }
 
-    fColor.w = 1.0;
-    fColor += (noise(gl_FragCoord.xy) - 0.5) / 255.0;
-
-    // Maps linear space calculations into 8-bit monitor friendly color space
-    //FragColor.rgb = pow(fColor.rgb, vec3(1.0 / 2.2));
-    FragColor.rgb = fColor.rgb;
+    FragColor.rgb = pow(colorOut, vec3(1.0));
     FragColor.a = 1.0;
 }
 #endif

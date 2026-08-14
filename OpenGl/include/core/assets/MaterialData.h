@@ -6,12 +6,13 @@
 #include <glm/ext/vector_float4.hpp>
 #include <optional>
 #include <array>
+#include <algorithm>
 
 namespace Engine::Core 
 {
 	struct MaterialData
 	{
-		static constexpr size_t MAX_MAPTYPES = 6;
+		static constexpr size_t MAX_MAPTYPES = 7;
 		enum class MapType : std::size_t
 		{
 			None = 0,
@@ -22,6 +23,20 @@ namespace Engine::Core
 			Emission = 5,
 			Ambient = 6
 		};
+
+		std::string name{ "[material name goes here]" };
+
+		float ns{ 0.0f };
+		glm::vec3 ka{ 1.0f, 1.0f, 1.0f };
+		glm::vec3 kd{ 1.0f, 1.0f, 1.0f };
+		glm::vec3 ks{ 1.0f, 1.0f, 1.0f };
+		glm::vec3 ke{ 0.0f, 0.0f, 0.0f };
+		float ni{ 1.0f };
+		float d{ 1.0f };
+		int illum{ 2 };
+
+		std::array <std::string, MAX_MAPTYPES> mapFilePaths{};
+		std::array <TextureData*, MAX_MAPTYPES> mapTextures{};
 
 		static MapType getMapTypeFromString(std::string mapName)
 		{
@@ -42,7 +57,7 @@ namespace Engine::Core
 				stringMap["Emission"] = MapType::Emission;
 			}
 
-			if (!stringMap.contains(mapName)) 
+			if (!stringMap.contains(mapName))
 			{
 				return MapType::None;
 			}
@@ -50,26 +65,54 @@ namespace Engine::Core
 			return stringMap[mapName];
 		}
 
-		std::string name{"[material name goes here]"};
-
-		float ns{0.0f};
-		glm::vec3 ka{ 1.0f, 1.0f, 1.0f };
-		glm::vec3 kd{ 1.0f, 1.0f, 1.0f };
-		glm::vec3 ks{ 1.0f, 1.0f, 1.0f };
-		glm::vec3 ke{ 0.0f, 0.0f, 0.0f };
-		float ni{ 1.0f };
-		float d{ 1.0f };
-		int illum{ 2 };
-
-		std::array <std::string, MAX_MAPTYPES> mapFilePaths{};
-		std::array <TextureData*, MAX_MAPTYPES> mapTextures{};
-
 		bool setMapFilePath(std::string mapName, std::string filePath)
 		{
 			MapType mapType = getMapTypeFromString(mapName);
 			if (mapType == MapType::None) return false;
 			mapFilePaths[int(mapType)] = filePath;
 			return true;
+		}
+
+		glm::vec3 getMatColor(const MaterialData::MapType& type) const
+		{
+			switch (type)
+			{
+			case MapType::Ambient:
+				return ka;
+				break;
+			case MapType::Diffuse:
+				return kd;
+				break;
+			case MapType::Specular:
+				return ks;
+				break;
+			case MapType::Emission:
+				return ke;
+				break;
+			case MapType::Normal:
+				return { 0.5f, 0.5f, 1.0f };
+			case MapType::None:
+			default:
+				return glm::vec3{ 0.0f };
+				break;
+			};
+			return glm::vec3{ 0.0f };
+
+		}
+
+		glm::vec3 getMatColor(std::string mapName) const
+		{
+			static auto contains = [](std::string str, const std::string& search) -> bool
+				{
+					std::transform(str.begin(), str.end(), str.begin(),
+						[](unsigned char c) { return std::tolower(c); });
+					return str.find(search) != std::string::npos;
+				};
+
+			MapType type = getMapTypeFromString(mapName);
+
+			return getMatColor(mapName);
+
 		}
 	};
 }

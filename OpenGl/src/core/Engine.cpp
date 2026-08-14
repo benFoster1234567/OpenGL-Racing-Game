@@ -31,6 +31,13 @@ void Engine::Core::EngineSystem::updateInputState()
 	inputHandler.updateKeyboard();
 }
 
+void Engine::Core::EngineSystem::setTextureUvTiling(std::string textureName, glm::vec2 uvTiling)
+{
+	TextureData* texture = nullptr;
+	assetManager.getTexture(texture, textureName);
+	texture->uvTiling = uvTiling;
+}
+
 void Engine::Core::EngineSystem::fillStaticLightVector(std::vector<ECS::StaticPointLightRendererData>& lights)
 {
 	game.setupLights(lights);

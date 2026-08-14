@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{74c3a50a-064a-40d2-8d7d-d0a1a6ecd601}</ProjectGuid>
-    <RootNamespace>OpenGl</RootNamespace>
+    <ProjectGuid>{a061d24f-cec7-44be-9ae3-95158368cadb}</ProjectGuid>
+    <RootNamespace>Tests</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -70,9 +70,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Label="Vcpkg">
-    <VcpkgEnableManifest>true</VcpkgEnableManifest>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -80,12 +77,14 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\flami\source\repos\benFoster1234567\OpenGL-Racing-Game\OpenGl\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Manifest>
+      <EnableSegmentHeap>true</EnableSegmentHeap>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -96,12 +95,14 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\flami\source\repos\benFoster1234567\OpenGL-Racing-Game\OpenGl\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Manifest>
+      <EnableSegmentHeap>true</EnableSegmentHeap>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -110,12 +111,14 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\flami\source\repos\benFoster1234567\OpenGL-Racing-Game\OpenGl\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Manifest>
+      <EnableSegmentHeap>true</EnableSegmentHeap>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -126,89 +129,17 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\flami\source\repos\benFoster1234567\OpenGL-Racing-Game\OpenGl\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Manifest>
+      <EnableSegmentHeap>true</EnableSegmentHeap>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\core\ecs\Systems.cpp" />
-    <ClCompile Include="src\core\AssetManager.cpp" />
-    <ClCompile Include="src\core\ecs\EntityRegistry.cpp" />
-    <ClCompile Include="src\core\MeshData.cpp" />
-    <ClCompile Include="src\core\ecs\ComponentRegistry.cpp" />
-    <ClCompile Include="src\core\ecs\SystemRegistry.cpp" />
-    <ClCompile Include="src\core\ecs\ComponentArray.cpp" />
-    <ClCompile Include="src\core\MaterialData.cpp" />
-    <ClCompile Include="src\core\ShaderData.cpp" />
-    <ClCompile Include="src\core\Engine.cpp" />
-    <ClCompile Include="src\infrastructure\app\Application.cpp" />
-    <ClCompile Include="src\infrastructure\engine\DebugConsoleUI.cpp" />
-    <ClCompile Include="src\infrastructure\renderer\assets\GPUMesh.cpp" />
-    <ClCompile Include="src\infrastructure\renderer\assets\ImportFuncs.cpp" />
-    <ClCompile Include="src\infrastructure\app\GlfwKeyHandler.cpp" />
-    <ClCompile Include="src\core\KeyboardInput.cpp" />
-    <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\infrastructure\app\Window.cpp" />
-    <ClCompile Include="src\infrastructure\renderer\Renderer.cpp" />
-    <ClCompile Include="tests\RunTests.cpp" />
-    <ClCompile Include="src\infrastructure\renderer\assets\GpuShader.cpp" />
-    <ClCompile Include="tests\Tester.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\core\assets\AssetManager.h" />
-    <ClInclude Include="include\core\assets\AssetPipeline.h" />
-    <ClInclude Include="include\core\assets\MaterialRenderData.h" />
-    <ClInclude Include="include\core\assets\ShaderData.h" />
-    <ClInclude Include="include\core\assets\TextureFileNameRegistry.h" />
-    <ClInclude Include="include\core\ecs\Component.h" />
-    <ClInclude Include="include\core\ecs\ComponentArray.h" />
-    <ClInclude Include="include\core\ecs\ComponentRegistry.h" />
-    <ClInclude Include="include\core\ecs\Coordinator.h" />
-    <ClInclude Include="include\core\ecs\ECS.h" />
-    <ClInclude Include="include\core\ecs\EntityRegistry.h" />
-    <ClInclude Include="include\core\ecs\StaticPointLight.h" />
-    <ClInclude Include="include\core\ecs\System.h" />
-    <ClInclude Include="include\core\ecs\SystemRegistry.h" />
-    <ClInclude Include="include\core\ecs\Systems.h" />
-    <ClInclude Include="include\core\engine\Engine.h" />
-    <ClInclude Include="include\core\events\EventDispatcher.h" />
-    <ClInclude Include="include\core\Game\Game.h" />
-    <ClInclude Include="include\core\Physics.h" />
-    <ClInclude Include="include\infra\app\Application.h" />
-    <ClInclude Include="include\infra\engine\AssetImporter.h" />
-    <ClInclude Include="include\infra\engine\DebugConsoleUI.h" />
-    <ClInclude Include="include\infra\engine\ImportFuncs.h" />
-    <ClInclude Include="include\infra\app\GlfwKeyHandler.h" />
-    <ClInclude Include="include\infra\renderer\assets\GPUMesh.h" />
-    <ClInclude Include="include\infra\renderer\assets\GPUTexture.h" />
-    <ClInclude Include="include\core\input\KeyboardInput.h" />
-    <ClInclude Include="include\core\input\Keys.h" />
-    <ClInclude Include="include\core\assets\MaterialData.h" />
-    <ClInclude Include="include\core\assets\MeshData.h" />
-    <ClInclude Include="include\core\Patterns.h" />
-    <ClInclude Include="include\infra\app\Window.h" />
-    <ClInclude Include="include\infra\renderer\Renderer.h" />
-    <ClInclude Include="include\infra\renderer\assets\GpuShader.h" />
-    <ClInclude Include="include\SparseSet.h" />
-    <ClInclude Include="tests\Tester.h" />
-    <ClInclude Include="include\core\assets\TextureData.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Notes.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="assets\materials\testMaterial.mtl" />
-    <None Include="assets\materials\cubeMaterial.mtl" />
-    <None Include="assets\shaders\gridShader.glsl" />
-    <None Include="assets\shaders\lightDebuggerShader.glsl" />
-    <None Include="assets\shaders\shader.glsl" />
-    <None Include="shaders\shader.glsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="assets\materials\textures\testTextures.jpg" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

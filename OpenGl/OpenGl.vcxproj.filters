@@ -140,9 +140,6 @@
     <ClInclude Include="include\infra\engine\ImportFuncs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\infra\engine\CameraInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\infra\engine\DebugConsoleUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -207,6 +204,7 @@
     <None Include="assets\shaders\gridShader.glsl" />
     <None Include="assets\materials\testMaterial.mtl" />
     <None Include="assets\materials\cubeMaterial.mtl" />
+    <None Include="assets\shaders\lightDebuggerShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\materials\textures\testTextures.jpg">

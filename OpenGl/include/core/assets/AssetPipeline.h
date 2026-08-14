@@ -34,6 +34,37 @@ namespace Engine::Core {
 	private:
 		std::stack<ImportCommand> queue;
 		std::unordered_map<std::type_index, std::function<AssetVariant(const std::string&, const std::string&)>> import;
+
+		static void createSolidColorTexture(TextureData*& texOut, glm::vec3 color)
+		{
+			texOut->width = 1;
+			texOut->height = 1;
+			texOut->channels = 4;
+			auto& pixelData = texOut->pixels;
+			pixelData.clear();
+			pixelData.push_back(color.x * 255);
+			pixelData.push_back(color.y * 255);
+			pixelData.push_back(color.z * 255);
+		}
+
+		static std::string addSolidColorTexMap( MaterialData* material
+			, MaterialData::MapType type
+			, AssetManager& assetManager )
+		{
+			std::string textureName = material->name + "_" + std::to_string(int(type));
+			glm::vec3 color = material->getMatColor(type);
+			std::unique_ptr<TextureData> newTexture = std::make_unique<TextureData>();
+			TextureData* newTexPtr = newTexture.get();
+			createSolidColorTexture(newTexPtr, color);
+			assetManager.addAsset(textureName, std::move(newTexture));
+			TextureData* td = nullptr;
+			assetManager.getTexture(td, textureName);
+
+			assert(td != nullptr);
+
+			return textureName;
+		}
+
 	public:
 		AssetPipeline() = default;
 
@@ -116,19 +147,27 @@ namespace Engine::Core {
 				{
 					std::string partialPath = mat.get()->mapFilePaths[i];
 					std::string textureName;
+					MaterialData::MapType mapType = MaterialData::MapType(i);
 
-					if (partialPath == "" || partialPath.empty()) continue;
-
-					std::string filePath = "assets/materials/" + partialPath;
-					std::cout << mat.get()->name << ": file path for map " << i << ": " << filePath << "\n";
-
-					if (!am.textureFilePathToNameMap.contains(filePath))
+					if (partialPath == "" || partialPath.empty())
 					{
-						std::cerr << "Texture name not found for filepath: " << filePath << "\n";
-						continue;
+						std::cout << "No map found, creating new texture";
+						textureName = addSolidColorTexMap(mat.get(), mapType, am);
 					}
 					
-					textureName = am.textureFilePathToNameMap[filePath];
+					else
+					{
+						std::string filePath = "assets/materials/" + partialPath;
+						std::cout << mat.get()->name << ": file path for map " << i << ": " << filePath << "\n";
+
+						if (!am.textureFilePathToNameMap.contains(filePath))
+						{
+							std::cerr << "Texture name not found for filepath: " << filePath << "\n";
+							continue;
+						}
+
+						textureName = am.textureFilePathToNameMap[filePath];
+					}
 
 					if (!am.textureMap.contains(textureName))
 					{

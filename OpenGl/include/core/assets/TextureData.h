@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <cstddef>
-
+#include <glm/vec2.hpp>
 namespace Engine::Core
 {
 	struct TextureData
@@ -12,6 +12,8 @@ namespace Engine::Core
 		unsigned int channels{0};
 		std::vector<uint8_t> pixels{};
 		std::string name{""};
+
+		glm::vec2 uvTiling{ 1.0f,1.0f };
 	};
 }
 

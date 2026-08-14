@@ -1,12 +1,13 @@
 # Blender MTL File: 'None'
 # Material Count: 1
 cubeMaterial Material
-Ns 300
+Ns 500
 Ka 0.00000 0.0000 0.0000
-Kd 0.0000 1.0000 1.00000
+Kd 0.0000 1.0000 0.00000
 Ks 1.00000 1.00000 1.000000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd textures/testTextures.jpg
+map_Kd textures/pic0066.gif
+map_Ks textures/pic0068.gif
