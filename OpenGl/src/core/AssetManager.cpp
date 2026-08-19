@@ -6,37 +6,37 @@
 
 Engine::Core::AssetManager::AssetManager()
 {
-	meshMap["grid"] = std::make_unique<GridData>();
+
 }
 
 Engine::Core::AssetManager::~AssetManager() = default;
 
-void Engine::Core::AssetManager::getMesh(MeshData*& meshOut, const std::string& name)
+void Engine::Core::AssetManager::get(MeshData*& meshOut, const std::string& name)
 {
-	if (meshMap.contains(name)) meshOut = meshMap[name].get();
+	if (meshes.contains(name)) meshOut = meshes.get(name);
 	else
 	{
-		std::cout << "Nom mesh found!\n";
+		std::cout << "No mesh found!\n";
 		meshOut = nullptr;
 	}
 }
 
-void Engine::Core::AssetManager::getMaterial(MaterialData*& matOut, const std::string& name)
+void Engine::Core::AssetManager::get(MaterialData*& matOut, const std::string& name)
 {
-	if (materialMap.contains(name)) matOut = materialMap[name].get();
+	if (materials.contains(name)) matOut = materials.get(name);
 	else
 	{
-		std::cout << "Nom material found!\n";
+		std::cout << "No material found!\n";
 		matOut = nullptr;
 	}
 }
 
-void Engine::Core::AssetManager::getShader(ShaderData*& shaderOut, const std::string& name)
+void Engine::Core::AssetManager::get(ShaderData*& shaderOut, const std::string& name)
 {
-	if (shaderMap.contains(name))
+	if (shaders.contains(name))
 	{
 		std::cout << "Shader " << name << "found!\n";
-		shaderOut = shaderMap[name].get();
+		shaderOut = shaders.get(name);
 	}
 	else 
 	{
@@ -45,17 +45,37 @@ void Engine::Core::AssetManager::getShader(ShaderData*& shaderOut, const std::st
 	}
 }
 
-void Engine::Core::AssetManager::getTexture(TextureData*& texOut, const std::string& name)
+void Engine::Core::AssetManager::get(TextureData*& texOut, const std::string& name)
 {
-	if (!textureMap.contains(name))
+	if (!textures.contains(name))
 	{
 		std::cout << "No texture found when trying to return : " << name << "\n";
 		texOut = nullptr;
 		return;
 	}
 
-	texOut = textureMap[name].get();
+	texOut = textures.get(name);
 	std::cout << "Texture found: " << name << "\n";
+}
+
+Engine::Core::MeshData* Engine::Core::AssetManager::getMesh(MeshId meshId)
+{
+	return meshes.get(meshId);
+}
+
+Engine::Core::MaterialData* Engine::Core::AssetManager::getMaterial(MaterialId materialId)
+{
+	return materials.get(materialId);
+}
+
+Engine::Core::ShaderData* Engine::Core::AssetManager::getShader(ShaderId shaderId)
+{
+	return shaders.get(shaderId);
+}
+
+Engine::Core::TextureData* Engine::Core::AssetManager::getTexture(TextureId textureId)
+{
+	return textures.get(textureId);
 }
 
 void Engine::Core::AssetManager::addAsset(const std::string& name, AssetVariant&& asset)
@@ -66,55 +86,44 @@ void Engine::Core::AssetManager::addAsset(const std::string& name, AssetVariant&
 
 			if constexpr (std::is_same_v < T, std::unique_ptr<MeshData>>)
 			{
-				meshMap[name] = std::move(arg);
+				meshes.add(std::move(arg), name);
 			}
 
 			if constexpr (std::is_same_v<T, std::unique_ptr<ShaderData>>)
 			{
-				shaderMap[name] = std::move(arg);
+				shaders.add(std::move(arg), name);
 			}
 
 			if constexpr (std::is_same_v<T, std::unique_ptr<MaterialData>>)
 			{
-				materialMap[name] = std::move(arg);
+				materials.add(std::move(arg), name);
 			}
 
 			if constexpr (std::is_same_v<T, std::unique_ptr<TextureData>>)
 			{
-				textureMap[name] = std::move(arg);
+				textures.add(std::move(arg), name);
 			}
+
+			else if constexpr (std::is_same_v<T, std::monostate>) { /* do nothing */ }
 
 		}, std::move(asset));
 }
 
-void Engine::Core::AssetManager::shaderList(std::vector<ShaderData*>& shadersOut)
+std::vector<Engine::Core::ShaderData*> Engine::Core::AssetManager::shaderList()
 {
-	for (const auto& s : shaderMap)
-	{
-		ShaderData* shader = s.second.get();
-
-		if (shader != NULL)
-		{
-			shadersOut.push_back(shader);
-		}
-	}
+	return shaders.getRawPointerList();
 }
 
-void Engine::Core::AssetManager::meshList(std::vector<MeshData*>& meshesOut)
+std::vector<Engine::Core::MeshData*> Engine::Core::AssetManager::meshList()
 {
-	for (auto& [key, val] : meshMap)
-	{
-		meshesOut.push_back(val.get());
-	}
+	return meshes.getRawPointerList();
 }
 
-void Engine::Core::AssetManager::textureList(std::vector<TextureData*>& texturesOut)
+std::vector<Engine::Core::TextureData*> Engine::Core::AssetManager::textureList()
 {
-	for (const auto& [name, texture] : textureMap)
-	{
-		texturesOut.push_back(texture.get());
-	}
+	return textures.getRawPointerList();;
 }
+
 
 
 

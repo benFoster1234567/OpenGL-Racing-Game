@@ -1,11 +1,14 @@
 #pragma once
+
+#include "IsUniquePtr.h"
+
 template <typename T, size_t SparseMax = 256, size_t Capacity = 128>
 class SparseSet
 {
 private:
+	std::vector<size_t> denseToSparse;
 	std::vector<size_t> sparse;
 	std::vector<T> dense;
-	std::vector<size_t> denseToSparse;
 	size_t size{ 0 };
 public:
 	SparseSet()
@@ -14,17 +17,42 @@ public:
 		dense.reserve(Capacity);
 		denseToSparse.reserve(Capacity);
 	}
+
+	bool contains(size_t index)
+	{
+		return sparse[index] != Capacity;
+	}
+
 	void insert(size_t index, const T& value)
 	{
 		if (index >= SparseMax || size >= Capacity)
 		{
 			throw std::out_of_range("Index out of bounds or capacity exceeded");
 		}
+
 		if (sparse[index] != Capacity)
 		{
 			throw std::runtime_error("Element already exists at this index");
 		}
+
 		dense.push_back(value);
+		denseToSparse.push_back(index);
+		sparse[index] = size;
+		size++;
+	}
+	void insert(size_t index, T&& value)
+	{
+		if (index >= SparseMax || size >= Capacity)
+		{
+			throw std::out_of_range("Index out of bounds or capacity exceeded");
+		}
+
+		if (sparse[index] != Capacity)
+		{
+			throw std::runtime_error("Element already exists at this index");
+		}
+
+		dense.push_back(std::move(value));
 		denseToSparse.push_back(index);
 		sparse[index] = size;
 		size++;
@@ -39,7 +67,16 @@ public:
 		size_t denseIndex = sparse[index];
 		size_t lastSparseIndex = denseToSparse[size - 1];
 
-		dense[denseIndex] = dense[size - 1];
+		if constexpr (IsUniquePtr<T>)
+		{
+			dense[denseIndex] = std::move(dense[size - 1]);
+		}
+
+		else
+		{
+			dense[denseIndex] = dense[size - 1];
+		}
+
 		sparse[lastSparseIndex] = denseIndex;
 		denseToSparse[denseIndex] = lastSparseIndex;
 		
@@ -66,4 +103,37 @@ public:
 		}
 		return dense[sparse[index]];
 	}
+
+	auto begin() 
+	{ 
+		return dense.begin(); 
+	}
+
+	auto end() 
+	{ 
+		return dense.end(); 
+	}
+
+	auto begin() const 
+	{ 
+		return dense.begin(); 
+	}
+	
+	auto end() const 
+	{ 
+		return dense.end(); 
+	}
+
+	auto cbegin() const 
+	{ 
+		return dense.cbegin(); 
+	}
+	
+	auto cend()   const 
+	{ 
+		return dense.cend(); 
+	}
+
+
+
 };

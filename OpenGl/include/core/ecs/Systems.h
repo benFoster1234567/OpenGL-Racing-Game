@@ -9,9 +9,6 @@
 
 namespace Engine::Core::ECS
 {
-
-
-
 	struct RenderOutput
 	{
 		glm::mat4 view{1.0f};

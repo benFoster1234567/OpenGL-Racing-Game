@@ -58,7 +58,7 @@ namespace Engine::Core {
 			createSolidColorTexture(newTexPtr, color);
 			assetManager.addAsset(textureName, std::move(newTexture));
 			TextureData* td = nullptr;
-			assetManager.getTexture(td, textureName);
+			assetManager.get(td, textureName);
 
 			assert(td != nullptr);
 
@@ -134,10 +134,6 @@ namespace Engine::Core {
 
 				bool imported = processCommand(icmd, am);
 
-				if (imported && icmd.typeId == textureType)
-				{
-					am.textureFilePathToNameMap[icmd.path] = icmd.assetName;
-				}
 			}
 
 			//filling materials with texture pointers
