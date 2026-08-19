@@ -56,8 +56,9 @@ namespace Engine::Infra
             }
         }
 
-        void bind()
+        void bind(GLuint slot = 0)
         {
+            glActiveTexture(GL_TEXTURE0 + slot); // Select texture slot (GL_TEXTURE0, GL_TEXTURE1, etc.)
             glBindTexture(GL_TEXTURE_2D, id);
         }
 	};

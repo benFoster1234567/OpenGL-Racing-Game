@@ -168,6 +168,7 @@ void Engine::Core::ECS::StaticLightRenderSetupSystem::fill(Coordinator& coordina
 		rd.color = light.color;
 		rd.position = transform.position;
 		rd.radius = light.radius;
+		rd.intensity = light.intensity;
 
 		queue.push_back(rd);
 	}

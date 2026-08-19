@@ -194,6 +194,24 @@
     <ClInclude Include="include\SparseSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\infra\renderer\Framebuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\renderer\DepthMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\renderer\Shadows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\renderer\Quad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\renderer\DepthCubeMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\renderer\ShadowCubeMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Notes.txt" />
@@ -205,6 +223,10 @@
     <None Include="assets\materials\testMaterial.mtl" />
     <None Include="assets\materials\cubeMaterial.mtl" />
     <None Include="assets\shaders\lightDebuggerShader.glsl" />
+    <None Include="assets\shaders\shadows.glsl" />
+    <None Include="assets\shaders\depthBufferOut.glsl" />
+    <None Include="assets\shaders\pointShadow.glsl" />
+    <None Include="assets\shaders\depthCubeShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\materials\textures\testTextures.jpg">

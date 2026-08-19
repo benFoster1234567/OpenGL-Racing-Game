@@ -199,14 +199,14 @@ namespace Engine::Core::Game
 			return entity;
 		}
 
-		ECS::Entity setupLightEntity(ECS::TransformComponent transform, float radius = 10.0f)
+		ECS::Entity setupLightEntity(ECS::TransformComponent transform, float radius = 10.0f, float intensity = 10.0f)
 		{
 			ECS::Entity entity = coordinator.createEntity();
 
 			ECS::StaticPointLightComponent lightComp{};
 			lightComp.color = { 1,1,1 };
 			lightComp.radius = radius;
-
+			lightComp.intensity = intensity;
 			coordinator.addComponent(entity, transform);
 			coordinator.addComponent(entity, lightComp);
 
@@ -216,7 +216,7 @@ namespace Engine::Core::Game
 		ECS::Entity setupLightEntity()
 		{
 			ECS::TransformComponent transform{};
-			transform.position = { 1,2,0 };
+			transform.position = { 3,4,0 };
 
 			return setupLightEntity(transform, 20.0f);
 		}
@@ -232,22 +232,10 @@ namespace Engine::Core::Game
 			defineSystemSignatures();
 
 			playerEntity = setupPlayerEntity();
-			gridEntity = setupGridEntity(playerEntity);
 			auto cubeEntity = setupCubeEntity(playerEntity);
-			lightEntity = setupLightEntity();
-
-			/*for (int i = -2; i < 2; ++i)
-			{
-				for (int j = -2; j < 2; ++j)
-				{
-					ECS::TransformComponent t{};
-					t.position = { static_cast<float>(i * 4.0f),2.5f,static_cast<float>(j * 4.0f) };
-					auto lightEntity2 = setupLightEntity(t);
-				}
-			}*/
 
 			ECS::TransformComponent t{};
-			t.position = { 5,1,-1 };
+			t.position = { 4,3,-1 };
 
 			auto lightEntity2 = setupLightEntity(t);
 		}

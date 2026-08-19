@@ -51,6 +51,7 @@ void Engine::Infra::Renderer::loadMeshes(std::vector<Core::MeshData*>& meshes)
 		gpuMeshCache[mesh]->genBuffers();
 	}
 
+	screenQuad.create();
 	std::cout << c << " meshes loaded!\n";
 }
 
@@ -64,8 +65,20 @@ void Engine::Infra::Renderer::loadShaders(std::vector<Core::ShaderData*>& shader
 		{
 			DebugLightShader = gpuShaderCache[shader].get();
 		}
+		else if (shader->name == "shadowMap")
+		{
+			shadowShader = gpuShaderCache[shader].get();
+			std::cout << "shadow shader found!\n";
+		}
+		else if (shader->name == "depthBuffer")
+		{
+			depthShader = gpuShaderCache[shader].get();
+			std::cout << "depth shader found!\n";
+		}
+
 		gpuShaderCache[shader]->compileShaders();
 	}
+
 }
 
 void Engine::Infra::Renderer::loadTextures(std::vector<Core::TextureData*>& textures)
@@ -79,6 +92,7 @@ void Engine::Infra::Renderer::loadTextures(std::vector<Core::TextureData*>& text
 
 void Engine::Infra::Renderer::loadLights(std::vector<StaticPointLightResource>& staticLights)
 {
+	staticPointLights = staticLights;
 	glEnable(GL_PROGRAM_POINT_SIZE);
 	//must be loaded after shaders?
 	StaticPointLight lights[MAX_LIGHTS];
@@ -91,7 +105,7 @@ void Engine::Infra::Renderer::loadLights(std::vector<StaticPointLightResource>& 
 		StaticPointLight lightGpu
 		{
 			.posRad = {lightCpu.position, lightCpu.radius},
-			.color = {lightCpu.color, 1.0f}
+			.color = {lightCpu.color, lightCpu.intensity}
 		};
 
 		lights[i] = lightGpu;
@@ -145,89 +159,135 @@ void Engine::Infra::Renderer::submit(RenderCommand command)
 	renderQueue.push_back(command);
 }
 
-void Engine::Infra::Renderer::flush()
-{
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT_AND_BACK, polygonMode == LINE? GL_LINE : GL_FILL);
 
+
+void Engine::Infra::Renderer::flush(size_t w , size_t h)
+{
+
+	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_CULL_FACE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	shadowShader->use();
+	shadowMap.bindFramebuffer();
+	glViewport(0, 0, shadowMap.getWidth(), shadowMap.getHeight());
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	StaticPointLightResource light = staticPointLights[0];
 	for (const auto& command : renderQueue)
 	{
+		configureShadowShadersAndMatrices(command, light);
+		gpuMeshCache[command.mesh]->draw();
+	}
+	shadowMap.unbindFrameBuffer();
 
-		if (!command.material) {
-			std::cerr << "Render command has a null material pointer!\n";
-			continue;
-		}
+	glDisable(GL_CULL_FACE); 
+	glDisable(GL_DEPTH_TEST);
+	glViewport(0, 0, w, h);
+	glEnable(GL_DEPTH_TEST);
 
-		if (!gpuMeshCache.contains(command.mesh))
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	switch (renderMode)
+	{
+	case 0:
+		for (const auto& command : renderQueue)
 		{
-			std::cerr << "no mesh exists on the gpu with name: " << command.mesh->name << "\nMesh needs to be submitted at the start of the program";
-			exit(1);
-		}
 
-		if (!gpuShaderCache.contains(command.shader))
+			if (!command.material) {
+				std::cerr << "Render command has a null material pointer!\n";
+				continue;
+			}
+
+			if (!gpuMeshCache.contains(command.mesh))
+			{
+				std::cerr << "no mesh exists on the gpu with name: " << command.mesh->name << "\nMesh needs to be submitted at the start of the program";
+				exit(1);
+			}
+
+			if (!gpuShaderCache.contains(command.shader))
+			{
+				std::cerr << "no shader exists on the gpu with name: " << command.shader->name << "\nShader needs to be submitted at the start of the program";
+				exit(1);
+			}
+
+			if (command.shader == nullptr)
+			{
+				throw std::runtime_error("shader is null");
+			}
+
+			GpuMesh* mesh = gpuMeshCache[command.mesh].get();
+			GpuShader* shader = gpuShaderCache[command.shader].get();
+
+			GpuTexture* ambient = gpuTextureCache[command.material->mapTextures[int(Core::MaterialData::MapType::Ambient)]].get();
+			GpuTexture* diffuse = gpuTextureCache[command.material->mapTextures[int(Core::MaterialData::MapType::Diffuse)]].get();
+			GpuTexture* specular = gpuTextureCache[command.material->mapTextures[int(Core::MaterialData::MapType::Specular)]].get();
+			GpuTexture* normal = gpuTextureCache[command.material->mapTextures[int(Core::MaterialData::MapType::Normal)]].get();
+
+			if (diffuse == nullptr)
+			{
+				throw std::runtime_error("diffuse is null");
+			}
+
+			if (ambient == nullptr)
+			{
+				throw std::runtime_error("ambient is null: " + command.material->name);
+			}
+
+			glUseProgram(shader->getId());
+
+			auto projectionMatrixLocation = glGetUniformLocation(shader->getId(), "projection");
+			auto viewMatrixLocation = glGetUniformLocation(shader->getId(), "view");
+			auto modelMatrixLocation = glGetUniformLocation(shader->getId(), "model");
+
+			assert(!(projectionMatrixLocation == -1 || viewMatrixLocation == -1 || modelMatrixLocation == -1) && "error sending mvp to shader");
+			
+			auto shadowMapLocation = glGetUniformLocation(shader->getId(), "shadowMap");
+			auto ambientLocation = glGetUniformLocation(shader->getId(), "material.ambient");
+			auto diffuseLocation = glGetUniformLocation(shader->getId(), "material.diffuse");
+			auto normalLocation = glGetUniformLocation(shader->getId(), "material.normal");
+			auto specularLocation = glGetUniformLocation(shader->getId(), "material.specular");
+			auto shininessLocation = glGetUniformLocation(shader->getId(), "material.shininess");
+
+			shadowMap.bindDepthMap();
+			glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, ambient->id);
+			glActiveTexture(GL_TEXTURE2); glBindTexture(GL_TEXTURE_2D, diffuse->id);
+			glActiveTexture(GL_TEXTURE3); glBindTexture(GL_TEXTURE_2D, normal->id);
+			glActiveTexture(GL_TEXTURE4); glBindTexture(GL_TEXTURE_2D, specular->id);
+
+			glUniform1i(shadowMapLocation, 0);
+			glUniform1i(ambientLocation, 1);
+			glUniform1i(diffuseLocation, 2);
+			glUniform1i(normalLocation, 3);
+			glUniform1i(specularLocation, 4);
+
+			glUniform1f(shininessLocation, command.material->ns);
+
+			glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(command.projection));
+			glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(command.view));
+			glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(command.modelTransform));
+			glUniformMatrix4fv(glGetUniformLocation(shader->getId(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(getLightSpaceMatrix(command, light)));
+			mesh->draw();
+		}
+		break;
+	case 1:
+		depthShader->use();
+
+		GLint location = glGetUniformLocation(depthShader->getId(), "depthMap");
+		if (location != -1)
 		{
-			std::cerr << "no shader exists on the gpu with name: " << command.shader->name << "\nShader needs to be submitted at the start of the program";
-			exit(1);
+			glUniform1i(location, 0);
 		}
 
-		if (command.shader == nullptr)
-		{
-			throw std::runtime_error("shader is null");
-		}
+		glActiveTexture(GL_TEXTURE0);
+		shadowMap.bindDepthMap();
 
-		GpuMesh* mesh = gpuMeshCache[command.mesh].get();
-		GpuShader* shader = gpuShaderCache[command.shader].get();
-
-		GpuTexture* ambient		= gpuTextureCache[command.material->mapTextures[int(Core::MaterialData::MapType::Ambient)]].get();
-		GpuTexture* diffuse		= gpuTextureCache[command.material->mapTextures[int(Core::MaterialData::MapType::Diffuse)]].get();
-		GpuTexture* specular	= gpuTextureCache[command.material->mapTextures[int(Core::MaterialData::MapType::Specular)]].get();
-		GpuTexture* normal		= gpuTextureCache[command.material->mapTextures[int(Core::MaterialData::MapType::Normal)]].get();
-		
-		if (diffuse == nullptr)
-		{
-			throw std::runtime_error("diffuse is null");
-		}
-
-		if (ambient == nullptr)
-		{
-			throw std::runtime_error("ambient is null: " + command.material->name);
-		}
-
-		glUseProgram(shader->getId());
-
-		auto projectionMatrixLocation	= glGetUniformLocation(shader->getId(), "projection");
-		auto viewMatrixLocation			= glGetUniformLocation(shader->getId(), "view");
-		auto modelMatrixLocation		= glGetUniformLocation(shader->getId(), "model");
-		
-		assert(!(projectionMatrixLocation == -1 || viewMatrixLocation == -1 || modelMatrixLocation == -1) && "error sending mvp to shader");
-
-		auto ambientLocation	= glGetUniformLocation(shader->getId(), "material.ambient");
-		auto diffuseLocation	= glGetUniformLocation(shader->getId(), "material.diffuse");
-		auto normalLocation		= glGetUniformLocation(shader->getId(), "material.normal");
-		auto specularLocation	= glGetUniformLocation(shader->getId(), "material.specular");
-		auto shininessLocation	= glGetUniformLocation(shader->getId(), "material.shininess");
-		
-		glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, ambient->id);
-		glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, diffuse->id);
-		glActiveTexture(GL_TEXTURE2); glBindTexture(GL_TEXTURE_2D, normal->id);
-		glActiveTexture(GL_TEXTURE3); glBindTexture(GL_TEXTURE_2D, specular->id);
-		
-		glUniform1i(ambientLocation, 0);
-		glUniform1i(diffuseLocation, 1);
-		glUniform1i(normalLocation, 2);
-		glUniform1i(specularLocation, 3);
-		glUniform1f(shininessLocation, command.material->ns);
-
-		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(command.projection));
-		glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(command.view));
-		glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(command.modelTransform));
-
-		diffuse->bind();
-
-		mesh->draw();
+		screenQuad.render(depthShader->getId());
+		break;
 	}
 
+	
 	renderQueue.clear();
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

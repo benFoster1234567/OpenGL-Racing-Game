@@ -39,6 +39,8 @@ void Engine::Infra::Application::importAssets()
 {
 	engine.assetPipeline.submit<Core::MaterialData>("assets/materials/testMaterial.mtl", "testMaterial");
 	engine.assetPipeline.submit<Core::MaterialData>("assets/materials/cubeMaterial.mtl", "cubeMaterial");
+	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/depthBufferOut.glsl", "depthBuffer");
+	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/shadows.glsl", "shadowMap");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/bunny.obj", "bunny");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/cube.obj", "cube");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/car.obj", "car");
@@ -202,10 +204,11 @@ void Engine::Infra::Application::run()
 		});
 
 	renderer.setPolygonMode(0);
-
+	
 	setupImportCallbacks();
 	importAssets();
 	engine.publishAssets(); //sends to gpu
+	renderer.createShadowMap();
 	sendTexturesToRenderer();
 	std::vector<Engine::Core::ECS::StaticPointLightRendererData> lightData{};
 
@@ -220,7 +223,7 @@ void Engine::Infra::Application::run()
 		splr.position = light.position;
 		splr.color = light.color;
 		splr.radius = light.radius;
-
+		splr.intensity = light.intensity;
 		pointLights.push_back(splr);
 	}
 
@@ -233,7 +236,7 @@ void Engine::Infra::Application::run()
 		window->pollEvents();
 		window->updateViewport();
 
-		renderer.clear();
+		//renderer.clear();
 
 		float currentWidth = static_cast<float>(window->getWidth());
 		float currentHeight = static_cast<float>(window->getHeight());
@@ -247,7 +250,7 @@ void Engine::Infra::Application::run()
 		engine.updateGame();
 		engine.zeroMouse();
 
-		renderer.flush();
+		renderer.flush(currentWidth, currentHeight);
 		//renderer.renderLights();
 		debugConsoleUi->prepareFrame();
 		debugConsoleUi->render();

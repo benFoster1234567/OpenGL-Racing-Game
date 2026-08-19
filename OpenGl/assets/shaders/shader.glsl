@@ -7,20 +7,23 @@ layout (location = 2) in vec2 aTex;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat4 lightSpaceMatrix;
 
 out vec3 vertexNormal;   
 out vec3 vertexPosition; 
 out vec2 texCoord;
+out vec4 vertexPosLightSpace;
 
 void main()
 {
     vec4 worldPos = model * vec4(aPos, 1.0);
-    gl_Position = projection * view * worldPos;
 
     // Transform vertex normal by model orientation matrix
     vertexNormal = mat3(model) * aNorm; 
     vertexPosition = worldPos.xyz;    
     texCoord = aTex;
+    vertexPosLightSpace = lightSpaceMatrix * vec4(vertexPosition, 1.0);
+    gl_Position = projection * view * worldPos;
 }
 
 #endif
@@ -48,18 +51,32 @@ layout (std140) uniform LightBlock {
 } ub;
 
 uniform mat4 view; 
+uniform sampler2D shadowMap;
 uniform Material material;
  
 in vec3 vertexNormal;
 in vec3 vertexPosition;
 in vec2 texCoord;
+in vec4 vertexPosLightSpace;
 
 out vec4 FragColor;
 
 float attenuate(float d, float r)
 {
-    float a = 1 - pow(d/r, 4);
+    float dOverR = clamp(d / r, 0.0, 1.0);
+    float a = 1 - dOverR*dOverR*dOverR*dOverR;
     return (a*a) / ((d*d)+1);
+}
+
+float shadowCalculation(vec4 fragPosLightSpace, float bias)
+{
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float currentDepth = projCoords.z; 
+
+    float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;  
+    return shadow;
 }
 
 void main()
@@ -77,7 +94,7 @@ void main()
     vec3 cameraPosWorld = invView[3].xyz;
     vec3 viewDir = normalize(cameraPosWorld - vertexPosition);
 
-    vec3 colorOut = ambientColor * 0.1; // Base ambient contribution
+    vec3 colorOut = vec3(0.0); // Base ambient contribution
 
     for (int i = 0; i < ub.activeLightCount; i++)
     {
@@ -85,6 +102,7 @@ void main()
         vec3 lightPos   = light.posRad.xyz;
         float radius    = light.posRad.w;
         vec3 lightColor = light.color.rgb;
+        float intensity = light.color.a; 
 
         vec3 lightDir = lightPos - vertexPosition;
         
@@ -102,8 +120,11 @@ void main()
         vec3 diffuse = Kd * diffuseColor;
         vec3 specular = Ks * specularColor;
 
-        colorOut += (diffuse + specular) * attenuation;
+        colorOut += (diffuse + specular) * attenuation * intensity;
     }
+    float bias = 0.005;
+    float shadow  = shadowCalculation(vertexPosLightSpace, bias);
+    colorOut = ambientColor + (1.0 - shadow) * colorOut;
 
     FragColor.rgb = pow(colorOut, vec3(1.0));
     FragColor.a = 1.0;

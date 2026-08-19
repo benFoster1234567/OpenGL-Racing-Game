@@ -95,6 +95,7 @@ namespace Engine::Core::ECS
 	{
 		glm::vec3 color{};
 		float radius{};
+		float intensity{1.0f};
 	};
 
 	struct MotionPropertiesComponent : ComponentBase
