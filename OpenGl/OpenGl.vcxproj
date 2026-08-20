@@ -158,6 +158,8 @@
     <ClCompile Include="tests\Tester.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\core\assets\AssetIds.h" />
+    <ClInclude Include="include\core\assets\AssetStorage.h" />
     <ClInclude Include="include\core\assets\AssetManager.h" />
     <ClInclude Include="include\core\assets\AssetPipeline.h" />
     <ClInclude Include="include\core\assets\MaterialRenderData.h" />
@@ -193,11 +195,13 @@
     <ClInclude Include="include\core\Patterns.h" />
     <ClInclude Include="include\infra\app\Window.h" />
     <ClInclude Include="include\infra\renderer\Framebuffer.h" />
+    <ClInclude Include="include\infra\renderer\GpuAssetLoader.h" />
     <ClInclude Include="include\infra\renderer\Quad.h" />
     <ClInclude Include="include\infra\renderer\Renderer.h" />
     <ClInclude Include="include\infra\renderer\assets\GpuShader.h" />
     <ClInclude Include="include\infra\renderer\ShadowCubeMap.h" />
     <ClInclude Include="include\infra\renderer\Shadows.h" />
+    <ClInclude Include="include\IsUniquePtr.h" />
     <ClInclude Include="include\SparseSet.h" />
     <ClInclude Include="tests\Tester.h" />
     <ClInclude Include="include\core\assets\TextureData.h" />

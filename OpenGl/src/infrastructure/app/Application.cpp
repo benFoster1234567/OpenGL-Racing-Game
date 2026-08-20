@@ -9,7 +9,7 @@
 #include <core/input/Keys.h>
 #include <infra/app/Window.h>
 #include <infra/engine/DebugConsoleUI.h>
-
+#include <infra/renderer/GpuAssetLoader.h>
 #include <vector>
 #include <iterator>
 #include <stdexcept>
@@ -51,12 +51,6 @@ void Engine::Infra::Application::importAssets()
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0068.gif", "tileSpecular");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0066.gif", "tileDiffuse");
 	engine.createAssetManager();
-	Core::MaterialData* testMaterial = nullptr;
-	engine.assetManager.getMaterial(testMaterial,"testMaterial");
-	if (!testMaterial)
-	{
-		throw std::runtime_error("Failed to load testMaterial");
-	}
 }
 
 void Engine::Infra::Application::sendTexturesToRenderer()
@@ -179,24 +173,7 @@ void Engine::Infra::Application::setupImportCallbacks()
 void Engine::Infra::Application::run()
 {
 	//TODO: ensure that all of the dispatchers are reset when this is destroyed.
-	engine.shaderDispatcher.subscribe([&](std::vector<Engine::Core::ShaderData*> shaderList) 
-		{ 
-			renderer.loadShaders(shaderList); 
-			std::cout << "load shaders invoked!" << "\n";
-		});
-
-	engine.meshDispatcher.subscribe([&](std::vector<Engine::Core::MeshData*> meshList)
-		{
-			renderer.loadMeshes(meshList);
-			std::cout << "load meshes invoked!\n";
-		});
-
-	engine.textureDispatcher.subscribe([&](std::vector<Engine::Core::TextureData*> textureList)
-		{
-			renderer.loadTextures(textureList);
-			std::cout << "load textures invoked!\n";
-		});
-
+	
 	Engine::Core::ECS::RenderDispatcher::sendRenderInfo.subscribe([&](Engine::Core::ECS::RenderOutput output)
 		{
 			RenderCommand rc = { .view = output.view, .projection = output.projection, .modelTransform = output.modelTransform, .shader = output.shader, .mesh = output.mesh,.material = output.material };
@@ -207,9 +184,11 @@ void Engine::Infra::Application::run()
 	
 	setupImportCallbacks();
 	importAssets();
-	engine.publishAssets(); //sends to gpu
+	//engine.publishAssets(); //sends to gpu
+	GpuAssetLoader::fillRenderer(engine.assetManager, renderer);
 	renderer.createShadowMap();
-	sendTexturesToRenderer();
+	
+	//sendTexturesToRenderer();
 	std::vector<Engine::Core::ECS::StaticPointLightRendererData> lightData{};
 
 	//TODO: Tidy this up

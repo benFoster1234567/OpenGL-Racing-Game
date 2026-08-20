@@ -14,8 +14,8 @@ namespace Engine::Core::ECS
 		glm::mat4 view{1.0f};
 		glm::mat4 projection{1.0f};
 		glm::mat4 modelTransform{1.0f};
-		ShaderData* shader{};
-		MeshData* mesh{};
+		ShaderId shader{};
+		MeshId mesh{};
 		MaterialData* material{};
 	};
 

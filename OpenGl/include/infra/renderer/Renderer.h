@@ -19,7 +19,8 @@
 #include "Shadows.h"
 #include "Quad.h"
 #include "ShadowCubeMap.h"
-
+#include "core/assets/AssetIds.h"
+#include "SparseSet.h"
 namespace Engine::Infra 
 {
 	constexpr uint32_t MAX_LIGHTS = 100;
@@ -50,8 +51,9 @@ namespace Engine::Infra
 		glm::mat4 view;
 		glm::mat4 projection;
 		glm::mat4 modelTransform;
-		Core::ShaderData* shader;
-		Core::MeshData* mesh;
+
+		Core::ShaderId shader;
+		Core::MeshId mesh;
 		Core::MaterialData* material;
 	};
 
@@ -65,15 +67,21 @@ namespace Engine::Infra
 	class Renderer
 	{
 	private:
+
+		friend class GpuAssetLoader;
 		std::vector<RenderCommand> renderQueue;
-		std::map<Core::MeshData*, std::unique_ptr<GpuMesh>> gpuMeshCache{};
-		std::map<Core::TextureData*, std::unique_ptr<GpuTexture>> gpuTextureCache{};
-		//std::map<Core::TextureIdx, unsigned int> textureIdxToId{}; // Maps texture index to OpenGL texture ID. We can change this to a span set if we want to avoid the map overhead.
+		
+		SparseSet<std::unique_ptr<GpuTexture>, Core::AssetIdMax, Core::AssetCapacity> gpuTextureCache{};
+		SparseSet<std::unique_ptr<GpuMesh>, Core::AssetIdMax, Core::AssetCapacity> gpuMeshCache{};
+		SparseSet<std::unique_ptr<GpuShader>, Core::AssetIdMax, Core::AssetCapacity> gpuShaderCache{};
+		
 		std::vector<StaticPointLightResource> staticPointLights{};
-		void cacheShader(Core::ShaderData* shaderData);
-		void cacheTexture(Core::TextureData* textureData);
-		void cacheMesh(Core::MeshData* meshData);
-		void drawLights(Core::ShaderData* lightShader, size_t lightCount);
+		
+		void cacheShader(Core::ShaderId shaderId, Core::ShaderData* shaderData);
+		void cacheTexture(Core::TextureId textureId, Core::TextureData* textureData);
+		void cacheMesh(Core::MeshId meshId, Core::MeshData* meshData);
+		
+		void drawLights(Core::ShaderId shaderId, size_t lightCount);
 		
 		unsigned int renderMode = 0;
 
@@ -98,7 +106,6 @@ namespace Engine::Infra
 		ShadowMap shadowMap;
 		ShadowCubeMap shadowCubemap;
 	public:
-		std::map<Core::ShaderData*, std::unique_ptr<GpuShader>> gpuShaderCache{};
 	
 	private:
 
@@ -151,9 +158,6 @@ namespace Engine::Infra
 			shadowCubemap.attachFramebufferToDepthBuffer();
 		}
 
-		void loadMeshes(std::vector<Core::MeshData*>& meshes);
-		void loadShaders(std::vector<Core::ShaderData*>& shaders);
-		void loadTextures(std::vector<Core::TextureData*>& textures);
 		void loadLights(std::vector<StaticPointLightResource>& staticLights);
 		void renderLights();
 		void submit(RenderCommand command);

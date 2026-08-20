@@ -14,15 +14,13 @@
 #include <utility>
 #include <variant>
 #include <algorithm>
+#include "AssetIds.h"
 #include "TextureFileNameRegistry.h"
 #include "AssetStorage.h"
 
 namespace Engine::Core
 {
-	constexpr int AssetCapacity = 512;
-	constexpr int AssetIdMax = 1024;
-
-	using AssetVariant = std::variant<std::monostate, MeshData, TextureData, MaterialData, ShaderData>;
+	using AssetVariant = std::variant<std::monostate, std::unique_ptr<MeshData>, std::unique_ptr<TextureData>, std::unique_ptr<MaterialData>, std::unique_ptr<ShaderData>>;
 
 
 	struct TextureInfo
@@ -30,11 +28,6 @@ namespace Engine::Core
 		std::string filePath{};
 		TextureIdx textureId{};
 	};
-
-	using MeshId = size_t;
-	using MaterialId = size_t;
-	using ShaderId = size_t;
-	using TextureId = size_t;
 	
 	class AssetManager
 	{
@@ -50,7 +43,8 @@ namespace Engine::Core
 		friend class AssetPipeline;
 
 	public:
-	
+		std::unordered_map<std::string, std::string> textureFilePathToNameMap{};
+
 		AssetManager();
 		~AssetManager();
 
@@ -69,8 +63,25 @@ namespace Engine::Core
 		void addAsset(const std::string& name, AssetVariant&& asset);
 
 		std::vector<ShaderData*> shaderList();
+		std::vector<MaterialData*> materialList();
 		std::vector<MeshData*> meshList();
 		std::vector<TextureData*>textureList();
+
+		TextureId getTextureId(const std::string& name)
+		{
+			return textures.getId(name);
+		}
+
+		ShaderId getShaderId(const std::string& name)
+		{
+			return shaders.getId(name);
+		}
+
+		MeshId getMeshId(const std::string& name)
+		{
+			return meshes.getId(name);
+		}
+
 
 	};
 

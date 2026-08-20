@@ -1,4 +1,5 @@
 #pragma once
+
 #include "core/ecs/ECS.h"
 #include "core/assets/assetManager.h"
 #include "core/ecs/Coordinator.h"
@@ -22,11 +23,10 @@ namespace Engine::Core::Game
 		InputBridge& inputHandler;
 
 	public:
-
-		Scene(AssetManager& _assetManager, InputBridge& _inputHandler) : 
-			assetManager(_assetManager), 
+		Scene(AssetManager& _assetManager, InputBridge& _inputHandler) :
+			assetManager(_assetManager),
 			inputHandler(_inputHandler)
-		{ 
+		{
 			static SceneId currentId = 0;
 			id = currentId;
 			currentId++;
@@ -36,25 +36,22 @@ namespace Engine::Core::Game
 
 		SceneId id;
 
-		//import assets, setup entities, components, and systems
+		// import assets, setup entities, components, and systems
 		virtual void setup() = 0;
 
-		//clean assetManager, coordinator, etc.
+		// clean assetManager, coordinator, etc.
 		virtual void shutdown() = 0;
 
-		//called in main loop - updates systems, etc.
+		// called in main loop - updates systems, etc.
 		virtual void update(float aspect, MouseInputResource mouseState, float deltaTime) = 0;
-
 	};
-
 
 	class TestScene : public Scene
 	{
 	private:
-
-		ECS::Entity playerEntity{ };
-		ECS::Entity gridEntity{ };
-		ECS::Entity lightEntity{ };
+		ECS::Entity playerEntity{};
+		ECS::Entity gridEntity{};
+		ECS::Entity lightEntity{};
 
 		void registerSystems()
 		{
@@ -109,29 +106,27 @@ namespace Engine::Core::Game
 			lightSignature.set(coordinator.getComponentType<ECS::StaticPointLightComponent>());
 
 			coordinator.setSystemSignature<ECS::StaticLightRenderSetupSystem>(lightSignature);
-
 		}
 
 		ECS::Entity setupPlayerEntity()
 		{
 			ECS::Entity entity = coordinator.createEntity();
-		
-			ECS::MeshComponent mesh{};
-			assetManager.getMesh(mesh.meshData, "bunny");
-			ECS::ShaderComponent shader{};
-			assetManager.getShader(shader.shaderData, "shader");
+
+			ECS::MeshComponent mesh{ assetManager.getMeshId("bunny") };
+			ECS::ShaderComponent shader{ assetManager.getShaderId("shader") };
+
 			ECS::PlayerController playerController{};
 			playerController.turnSensitivity = 100;
 			playerController.speed = 5;
 
 			ECS::MouseInputSettings mis{};
-			mis.sensitivity = { 20,15 };
+			mis.sensitivity = { 20, 15 };
 
 			ECS::MaterialDataComponent matComp{};
-			assetManager.getMaterial(matComp.material, "testMaterial");
+			assetManager.get(matComp.material, "testMaterial");
 			ECS::TransformComponent transform{};
 
-			transform.scale = { 2,2,2 };
+			transform.scale = { 2, 2, 2 };
 
 			if (matComp.material == nullptr)
 			{
@@ -154,20 +149,18 @@ namespace Engine::Core::Game
 		{
 			ECS::Entity entity = coordinator.createEntity();
 
-			ECS::ShaderComponent shader{};
-			assetManager.getShader(shader.shaderData, "gridShader");
-
-			ECS::MeshComponent gridMesh{};
-			assetManager.getMesh(gridMesh.meshData, "grid");
+			ECS::ShaderComponent shader{ assetManager.getShaderId("gridShader") };
+			ECS::MeshComponent gridMesh{ assetManager.getMeshId("grid") };
 
 			ECS::TransformComponent gridTransform{};
-			gridTransform.position = { 0.0f,-1.0f,0.0f };
+			gridTransform.position = { 0.0f, -1.0f, 0.0f };
 
 			ECS::ExternalCameraComponent extCamComp{};
 			extCamComp.entityWithCamera = cameraEntity;
 
 			ECS::MaterialDataComponent matComp{};
-			assetManager.getMaterial(matComp.material, "testMaterial");
+			assetManager.get(matComp.material, "testMaterial");
+
 			coordinator.addComponent(entity, gridMesh);
 			coordinator.addComponent(entity, shader);
 			coordinator.addComponent(entity, gridTransform);
@@ -180,22 +173,26 @@ namespace Engine::Core::Game
 		ECS::Entity setupCubeEntity(ECS::Entity cameraEntity)
 		{
 			ECS::Entity entity = coordinator.createEntity();
-			ECS::MeshComponent mesh{};
-			assetManager.getMesh(mesh.meshData, "cube");
-			ECS::ShaderComponent shader{};
-			assetManager.getShader(shader.shaderData, "shader");
+
+			ECS::MeshComponent mesh{ assetManager.getMeshId("cube") };
+			ECS::ShaderComponent shader{ assetManager.getShaderId("shader") };
+
 			ECS::TransformComponent transform{};
-			transform.scale = { 5.5f,0.2f,5.5f };
-			transform.position = { 0.0f,-1.0f,0.0f };	
+			transform.scale = { 5.5f, 0.2f, 5.5f };
+			transform.position = { 0.0f, -1.0f, 0.0f };
+
 			ECS::ExternalCameraComponent extCamComp{};
 			extCamComp.entityWithCamera = cameraEntity;
+
 			ECS::MaterialDataComponent matComp{};
-			assetManager.getMaterial(matComp.material, "cubeMaterial");
+			assetManager.get(matComp.material, "cubeMaterial");
+
 			coordinator.addComponent(entity, transform);
 			coordinator.addComponent(entity, mesh);
 			coordinator.addComponent(entity, shader);
 			coordinator.addComponent(entity, extCamComp);
 			coordinator.addComponent(entity, matComp);
+
 			return entity;
 		}
 
@@ -204,9 +201,10 @@ namespace Engine::Core::Game
 			ECS::Entity entity = coordinator.createEntity();
 
 			ECS::StaticPointLightComponent lightComp{};
-			lightComp.color = { 1,1,1 };
+			lightComp.color = { 1, 1, 1 };
 			lightComp.radius = radius;
 			lightComp.intensity = intensity;
+
 			coordinator.addComponent(entity, transform);
 			coordinator.addComponent(entity, lightComp);
 
@@ -216,11 +214,10 @@ namespace Engine::Core::Game
 		ECS::Entity setupLightEntity()
 		{
 			ECS::TransformComponent transform{};
-			transform.position = { 3,4,0 };
+			transform.position = { 3, 4, 0 };
 
 			return setupLightEntity(transform, 20.0f);
 		}
-
 
 	public:
 		using Scene::Scene;
@@ -235,7 +232,7 @@ namespace Engine::Core::Game
 			auto cubeEntity = setupCubeEntity(playerEntity);
 
 			ECS::TransformComponent t{};
-			t.position = { 4,3,-1 };
+			t.position = { 4, 3, -1 };
 
 			auto lightEntity2 = setupLightEntity(t);
 		}
@@ -250,7 +247,6 @@ namespace Engine::Core::Game
 
 		}
 
-		//update systems here
 		void update(float aspect, MouseInputResource mouseState, float deltaTime) override
 		{
 			coordinator.getSystem<ECS::MouseControlSystem>()->update(coordinator, mouseState);
@@ -259,7 +255,4 @@ namespace Engine::Core::Game
 			coordinator.getSystem<ECS::KeyControlSystem>()->update(coordinator, inputHandler, deltaTime);
 		}
 	};
-
 }
-
-

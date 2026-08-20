@@ -2,6 +2,7 @@
 #include "core/assets/TextureData.h"
 #include <string>
 #include "ShaderData.h"
+#include "AssetIds.h"
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/vector_float4.hpp>
 #include <optional>
@@ -36,7 +37,7 @@ namespace Engine::Core
 		int illum{ 2 };
 
 		std::array <std::string, MAX_MAPTYPES> mapFilePaths{};
-		std::array <TextureData*, MAX_MAPTYPES> mapTextures{};
+		std::array <TextureId, MAX_MAPTYPES> mapTextures{};
 
 		static MapType getMapTypeFromString(std::string mapName)
 		{

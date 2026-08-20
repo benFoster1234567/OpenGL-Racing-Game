@@ -2,14 +2,15 @@
 
 #include <cstdint>
 #include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include "core/assets/MeshData.h"
 #include "core/assets/ShaderData.h"
 #include "core/assets/MaterialData.h"
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/gtc/quaternion.hpp>
 #include "core/ECS/ECS.h"
 #include "core/input/Keys.h"
+
 namespace Engine::Core::ECS
 {
 	struct ComponentBase
@@ -19,14 +20,14 @@ namespace Engine::Core::ECS
 
 	struct CameraComponent : public ComponentBase
 	{
-		float fieldOfView{glm::radians(60.0f)};
-		float nearClipPlane{0.01f};
+		float fieldOfView{ glm::radians(60.0f) };
+		float nearClipPlane{ 0.01f };
 		float farClipPlane{ 10.0f };
-		bool isOrtho{false};
+		bool isOrtho{ false };
 		float distance{ 5.0f };
-		glm::vec3 position{0.0f,0.0f,5.0f};
-		glm::mat4 projectionMat{1.0f};
-		glm::mat4 viewMat{1.0f};
+		glm::vec3 position{ 0.0f,0.0f,5.0f };
+		glm::mat4 projectionMat{ 1.0f };
+		glm::mat4 viewMat{ 1.0f };
 	};
 
 	struct OrbitalCameraComponent : public ComponentBase
@@ -41,7 +42,6 @@ namespace Engine::Core::ECS
 		Entity entityWithCamera{};
 	};
 
-	//change this to add more keybindings
 	struct PlayerController : ComponentBase
 	{
 		KeyCode strafeLeft{ KeyCode::A };
@@ -60,29 +60,29 @@ namespace Engine::Core::ECS
 		glm::vec3 scale{ 1.0f, 1.0f, 1.0f };
 	};
 
-
-
 	struct MeshComponent : public ComponentBase
 	{
 		MeshComponent() = default;
-		MeshComponent(Engine::Core::MeshData* mesh) : meshData(mesh) {}
-		Engine::Core::MeshData* meshData{ nullptr };
+		MeshComponent(Engine::Core::MeshId id) : meshId(id) {}
+		Engine::Core::MeshId meshId{};
 	};
 
 	struct ShaderComponent : public ComponentBase
 	{
 		ShaderComponent() = default;
-		ShaderComponent(Engine::Core::ShaderData* shader) : shaderData(shader) {}
-		Engine::Core::ShaderData* shaderData{ nullptr };
+		ShaderComponent(Engine::Core::ShaderId id) : shaderId(id) {}
+		Engine::Core::ShaderId shaderId{};
 	};
 
 	struct MaterialComponent : public ComponentBase
 	{
 		MaterialComponent() = default;
-		MaterialComponent(ShaderData* _shader, MaterialData* _material) : shader{ _shader }, material{ _material } {}
+		MaterialComponent(Engine::Core::ShaderId _shader, MaterialData* _material)
+			: shader{ _shader }, material{ _material } {
+		}
 		~MaterialComponent() = default;
 
-		ShaderData* shader{ nullptr };
+		Engine::Core::ShaderId shader{};
 		MaterialData* material{ nullptr };
 	};
 
@@ -95,7 +95,7 @@ namespace Engine::Core::ECS
 	{
 		glm::vec3 color{};
 		float radius{};
-		float intensity{1.0f};
+		float intensity{ 1.0f };
 	};
 
 	struct MotionPropertiesComponent : ComponentBase

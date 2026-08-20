@@ -57,7 +57,6 @@ namespace Engine::Core
 		EventDispatcher<std::vector<TextureData*>> textureDispatcher{};
 
 		void createAssetManager();
-		void publishAssets();
 		void updateDeltaTime(float dt) { deltaTime = dt; }
 		void updateAspect(float a) { aspect = a; }
 		void updateMouse( double xpos, double ypos);

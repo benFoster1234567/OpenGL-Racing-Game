@@ -90,6 +90,8 @@ Engine::Core::MeshData Engine::Infra::ImportFuncs::importMeshDataTOL(const std::
 	newMesh.attributes.push_back(std::move(vertexPoints));//0
 	newMesh.attributes.push_back(std::move(normals));//1
 	newMesh.attributes.push_back(std::move(texCoords));//2
+
+	newMesh.name = name;
 	return newMesh;
 }
 

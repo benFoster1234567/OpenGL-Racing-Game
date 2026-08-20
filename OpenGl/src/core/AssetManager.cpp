@@ -114,6 +114,11 @@ std::vector<Engine::Core::ShaderData*> Engine::Core::AssetManager::shaderList()
 	return shaders.getRawPointerList();
 }
 
+std::vector<Engine::Core::MaterialData*> Engine::Core::AssetManager::materialList()
+{
+	return materials.getRawPointerList();
+}
+
 std::vector<Engine::Core::MeshData*> Engine::Core::AssetManager::meshList()
 {
 	return meshes.getRawPointerList();

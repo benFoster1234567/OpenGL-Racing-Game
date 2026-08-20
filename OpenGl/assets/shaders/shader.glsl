@@ -127,6 +127,7 @@ void main()
     colorOut = ambientColor + (1.0 - shadow) * colorOut;
 
     FragColor.rgb = pow(colorOut, vec3(1.0));
+    //FragColor = vec4(1.0);
     FragColor.a = 1.0;
 }
 #endif

@@ -7,15 +7,15 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-void Engine::Infra::Renderer::cacheMesh(Core::MeshData* meshData)
+void Engine::Infra::Renderer::cacheMesh(Core::MeshId meshId, Core::MeshData* meshData)
 {
 	auto gpuMesh = std::make_unique<GpuMesh>(meshData);
-	gpuMeshCache.emplace(meshData, std::move(gpuMesh));
+	gpuMeshCache.insert(meshId, std::move(gpuMesh));
 }
 
-void Engine::Infra::Renderer::drawLights(Core::ShaderData* lightShader, size_t lightCount)
+void Engine::Infra::Renderer::drawLights(Core::ShaderId shaderId, size_t lightCount)
 {
-	GpuShader* gpuShader = gpuShaderCache[lightShader].get();
+	GpuShader* gpuShader = gpuShaderCache.get(shaderId).get();
 	
 	glBindVertexArray(emptyVao);
 
@@ -25,69 +25,24 @@ void Engine::Infra::Renderer::drawLights(Core::ShaderData* lightShader, size_t l
 
 }
 
-void Engine::Infra::Renderer::cacheShader(Core::ShaderData* shaderData)
+void Engine::Infra::Renderer::cacheShader(Core::ShaderId shaderId, Core::ShaderData* shaderData)
 {
 	auto gpuShader = std::make_unique<GpuShader>(shaderData);
 
-	gpuShaderCache.emplace(shaderData, std::move(gpuShader));
+	// Ensure newly cached shaders link their LightBlock uniform to UBO binding point 0
+	GLuint blockIndex = glGetUniformBlockIndex(gpuShader->getId(), "LightBlock");
+	if (blockIndex != GL_INVALID_INDEX)
+	{
+		glUniformBlockBinding(gpuShader->getId(), blockIndex, 0);
+	}
+
+	gpuShaderCache.insert(shaderId, std::move(gpuShader));
 }
 
-void Engine::Infra::Renderer::cacheTexture(Core::TextureData* textureData)
+void Engine::Infra::Renderer::cacheTexture(Core::TextureId textureId, Core::TextureData* textureData)
 {
-
 	auto gpuTexture = std::make_unique<GpuTexture>(textureData);
-	gpuTextureCache.emplace(textureData, std::move(gpuTexture));
-}
-
-void Engine::Infra::Renderer::loadMeshes(std::vector<Core::MeshData*>& meshes)
-{
-	int c = 0;
-	for (const auto& mesh : meshes)
-	{
-		c++;
-		mesh->recomputeNormals();
-
-		cacheMesh(mesh);
-		gpuMeshCache[mesh]->genBuffers();
-	}
-
-	screenQuad.create();
-	std::cout << c << " meshes loaded!\n";
-}
-
-void Engine::Infra::Renderer::loadShaders(std::vector<Core::ShaderData*>& shaders)
-{
-	for (const auto& shader : shaders)
-	{
-		//std::cout << "shader name: " << shader->name << "\n";
-		cacheShader(shader);
-		if (shader->name == "lightDebugShader")
-		{
-			DebugLightShader = gpuShaderCache[shader].get();
-		}
-		else if (shader->name == "shadowMap")
-		{
-			shadowShader = gpuShaderCache[shader].get();
-			std::cout << "shadow shader found!\n";
-		}
-		else if (shader->name == "depthBuffer")
-		{
-			depthShader = gpuShaderCache[shader].get();
-			std::cout << "depth shader found!\n";
-		}
-
-		gpuShaderCache[shader]->compileShaders();
-	}
-
-}
-
-void Engine::Infra::Renderer::loadTextures(std::vector<Core::TextureData*>& textures)
-{
-	for (const auto& texture : textures)
-	{
-		cacheTexture(texture);
-		gpuTextureCache[texture]->genTexture();
-	}
+	gpuTextureCache.insert(textureId, std::move(gpuTexture));
 }
 
 void Engine::Infra::Renderer::loadLights(std::vector<StaticPointLightResource>& staticLights)
@@ -128,9 +83,9 @@ void Engine::Infra::Renderer::loadLights(std::vector<StaticPointLightResource>& 
 	glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	for (const auto& [shaderData, shader] : gpuShaderCache)
+	for (const auto& shader : gpuShaderCache)
 	{
-		GLuint blockIndex = glGetUniformBlockIndex(shader->Id, "LightBlock");
+		GLuint blockIndex = glGetUniformBlockIndex(shader->getId(), "LightBlock");
 
 		if (blockIndex != GL_INVALID_INDEX)
 		{
@@ -152,7 +107,7 @@ void Engine::Infra::Renderer::submit(RenderCommand command)
 {
 	if (!gpuMeshCache.contains(command.mesh))
 	{
-		std::cerr << "no mesh exists on the gpu with name: " << command.mesh->name << "\nMesh needs to be submitted at the start of the program";
+		std::cerr << "no mesh exists on the gpu with id: " << command.mesh << "\nMesh needs to be submitted at the start of the program";
 		exit(1);
 	}
 
@@ -177,7 +132,7 @@ void Engine::Infra::Renderer::flush(size_t w , size_t h)
 	for (const auto& command : renderQueue)
 	{
 		configureShadowShadersAndMatrices(command, light);
-		gpuMeshCache[command.mesh]->draw();
+		gpuMeshCache.get(command.mesh)->draw();
 	}
 	shadowMap.unbindFrameBuffer();
 
@@ -202,28 +157,28 @@ void Engine::Infra::Renderer::flush(size_t w , size_t h)
 
 			if (!gpuMeshCache.contains(command.mesh))
 			{
-				std::cerr << "no mesh exists on the gpu with name: " << command.mesh->name << "\nMesh needs to be submitted at the start of the program";
+				std::cerr << "no mesh exists on the gpu with id: " << command.mesh << "\nMesh needs to be submitted at the start of the program";
 				exit(1);
 			}
 
 			if (!gpuShaderCache.contains(command.shader))
 			{
-				std::cerr << "no shader exists on the gpu with name: " << command.shader->name << "\nShader needs to be submitted at the start of the program";
+				std::cerr << "no shader exists on the gpu with id: " << command.shader << "\nShader needs to be submitted at the start of the program";
 				exit(1);
 			}
 
-			if (command.shader == nullptr)
+			GpuMesh* mesh = gpuMeshCache.get(command.mesh).get();
+			GpuShader* shader = gpuShaderCache.get(command.shader).get();
+
+			if (mesh == nullptr)
 			{
-				throw std::runtime_error("shader is null");
+				throw std::runtime_error("mesh is null");
 			}
 
-			GpuMesh* mesh = gpuMeshCache[command.mesh].get();
-			GpuShader* shader = gpuShaderCache[command.shader].get();
-
-			GpuTexture* ambient = gpuTextureCache[command.material->mapTextures[int(Core::MaterialData::MapType::Ambient)]].get();
-			GpuTexture* diffuse = gpuTextureCache[command.material->mapTextures[int(Core::MaterialData::MapType::Diffuse)]].get();
-			GpuTexture* specular = gpuTextureCache[command.material->mapTextures[int(Core::MaterialData::MapType::Specular)]].get();
-			GpuTexture* normal = gpuTextureCache[command.material->mapTextures[int(Core::MaterialData::MapType::Normal)]].get();
+			GpuTexture* ambient = gpuTextureCache.get(command.material->mapTextures[int(Core::MaterialData::MapType::Ambient)]).get();
+			GpuTexture* diffuse = gpuTextureCache.get(command.material->mapTextures[int(Core::MaterialData::MapType::Diffuse)]).get();
+			GpuTexture* specular = gpuTextureCache.get(command.material->mapTextures[int(Core::MaterialData::MapType::Specular)]).get();
+			GpuTexture* normal = gpuTextureCache.get(command.material->mapTextures[int(Core::MaterialData::MapType::Normal)]).get();
 
 			if (diffuse == nullptr)
 			{

@@ -9,7 +9,8 @@ private:
 	std::vector<size_t> denseToSparse;
 	std::vector<size_t> sparse;
 	std::vector<T> dense;
-	size_t size{ 0 };
+	size_t _size{ 0 };
+
 public:
 	SparseSet()
 	{
@@ -37,12 +38,13 @@ public:
 
 		dense.push_back(value);
 		denseToSparse.push_back(index);
-		sparse[index] = size;
+		sparse[index] = _size;
 		size++;
 	}
+
 	void insert(size_t index, T&& value)
 	{
-		if (index >= SparseMax || size >= Capacity)
+		if (index >= SparseMax || _size >= Capacity)
 		{
 			throw std::out_of_range("Index out of bounds or capacity exceeded");
 		}
@@ -54,8 +56,8 @@ public:
 
 		dense.push_back(std::move(value));
 		denseToSparse.push_back(index);
-		sparse[index] = size;
-		size++;
+		sparse[index] = _size;
+		_size++;
 	}
 
 	void remove(size_t index)
@@ -65,7 +67,7 @@ public:
 			throw std::out_of_range("Index out of bounds or element does not exist");
 		}
 		size_t denseIndex = sparse[index];
-		size_t lastSparseIndex = denseToSparse[size - 1];
+		size_t lastSparseIndex = denseToSparse[_size - 1];
 
 		if constexpr (IsUniquePtr<T>)
 		{
@@ -83,7 +85,7 @@ public:
 		sparse[index] = Capacity;
 		dense.pop_back();
 		denseToSparse.pop_back();
-		size--;
+		_size--;
 	}
 
 	T& get(size_t index)
@@ -129,11 +131,14 @@ public:
 		return dense.cbegin(); 
 	}
 	
-	auto cend()   const 
+	auto cend() const 
 	{ 
 		return dense.cend(); 
 	}
 
-
+	size_t size() 
+	{
+		return _size;
+	}
 
 };

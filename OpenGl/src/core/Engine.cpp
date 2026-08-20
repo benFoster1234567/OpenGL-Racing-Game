@@ -3,19 +3,6 @@
 #include <glm/ext/quaternion_float.hpp>
 
 
-void Engine::Core::EngineSystem::publishAssets()
-{
-	std::vector<TextureData*> textureList{};
-	assetManager.textureList(textureList);
-	std::vector<ShaderData*> shaderList{};
-	assetManager.shaderList(shaderList);
-	std::vector<MeshData*> meshList{};
-	assetManager.meshList(meshList);
-	textureDispatcher.invoke(textureList);
-	shaderDispatcher.invoke(shaderList);
-	meshDispatcher.invoke(meshList);
-}
-
 void Engine::Core::EngineSystem::updateMouse(double xpos, double ypos)
 {
 	inputHandler.updateMousePosition({ xpos,ypos });
@@ -34,7 +21,7 @@ void Engine::Core::EngineSystem::updateInputState()
 void Engine::Core::EngineSystem::setTextureUvTiling(std::string textureName, glm::vec2 uvTiling)
 {
 	TextureData* texture = nullptr;
-	assetManager.getTexture(texture, textureName);
+	assetManager.get(texture, textureName);
 	texture->uvTiling = uvTiling;
 }
 
@@ -46,13 +33,13 @@ void Engine::Core::EngineSystem::fillStaticLightVector(std::vector<ECS::StaticPo
 //loads assets from files
 void Engine::Core::EngineSystem::createAssetManager()
 {
-	size_t initialShaders = assetManager.shaderMap.size();
-	size_t initialMeshes = assetManager.meshMap.size();
+	size_t initialShaders = assetManager.shaders.size();
+	size_t initialMeshes = assetManager.meshes.size();
 
 	assetPipeline.populateAssetManager(assetManager);
 
-	size_t addedShaders = assetManager.shaderMap.size() - initialShaders;
-	size_t addedMeshes = assetManager.meshMap.size() - initialMeshes;
+	size_t addedShaders = assetManager.shaders.size() - initialShaders;
+	size_t addedMeshes = assetManager.meshes.size() - initialMeshes;
 
 	if (addedShaders == 0 && addedMeshes == 0)
 	{
