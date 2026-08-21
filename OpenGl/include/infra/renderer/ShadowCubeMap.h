@@ -1,10 +1,12 @@
 #pragma once
+
 #include "DepthCubeMap.h"
 #include "Framebuffer.h"
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/trigonometric.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Engine::Infra
 {
@@ -17,16 +19,16 @@ namespace Engine::Infra
 		Framebuffer framebuffer;
 		DepthCubeMap depthCubemap;
 		
-		glm::mat4 lightSpaceTransform{};
+		//glm::mat4 lightSpaceTransform{};
 		std::vector<glm::mat4> shadowTransforms{};
 
 		glm::vec3 lightPosition{};
 
 		void genShadowTransforms()
 		{
-
+			shadowTransforms.clear();
 			float aspect = float(width) / float(height);
-			float nnear = 1.0f;
+			float nnear = 0.1f;
 			float ffar = 25.0f;
 			glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, nnear, ffar);
 
@@ -50,6 +52,7 @@ namespace Engine::Infra
 		void setLightPosition(glm::vec3 position)
 		{
 			lightPosition = position;
+			genShadowTransforms();
 		}
 
 		void create()
@@ -58,6 +61,7 @@ namespace Engine::Infra
 			depthCubemap.generate();
 			depthCubemap.bind();
 			depthCubemap.prepareCubemapFaces();
+			//genShadowTransforms();
 		}
 		
 		void destroy()
@@ -76,7 +80,19 @@ namespace Engine::Infra
 
 		void setViewport()		{ depthCubemap.setViewport(); }
 		void bindFramebuffer()	{ framebuffer.bind(); }
+		void unbindFramebuffer() { framebuffer.unbind(); }
 		void bindDepthCubemap() { depthCubemap.bind(); }
+		void sendTransformsToShader(GLuint shader)
+		{
+			GLuint loc = glGetUniformLocation(shader, "shadowMatrices");
+			glUniformMatrix4fv(loc,6,  GL_FALSE, glm::value_ptr(shadowTransforms[0]));
+
+			GLuint locLight = glGetUniformLocation(shader, "lightPos");
+			glUniform3fv(locLight, 1, glm::value_ptr(lightPosition));
+
+			GLuint locFar = glGetUniformLocation(shader, "far_plane");
+			glUniform1f(locFar, 25.0f); // Matches 'ffar' from genShadowTransforms
+		}
 
 	};
 

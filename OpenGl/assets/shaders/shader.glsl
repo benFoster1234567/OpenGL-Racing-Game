@@ -12,17 +12,17 @@ uniform mat4 lightSpaceMatrix;
 out vec3 vertexNormal;   
 out vec3 vertexPosition; 
 out vec2 texCoord;
-out vec4 vertexPosLightSpace;
+//out vec4 vertexPosLightSpace;
 
 void main()
 {
     vec4 worldPos = model * vec4(aPos, 1.0);
 
     // Transform vertex normal by model orientation matrix
-    vertexNormal = mat3(model) * aNorm; 
+    vertexNormal = transpose(inverse(mat3(model))) * aNorm; 
     vertexPosition = worldPos.xyz;    
     texCoord = aTex;
-    vertexPosLightSpace = lightSpaceMatrix * vec4(vertexPosition, 1.0);
+   // vertexPosLightSpace = lightSpaceMatrix * vec4(vertexPosition, 1.0);
     gl_Position = projection * view * worldPos;
 }
 
@@ -51,9 +51,11 @@ layout (std140) uniform LightBlock {
 } ub;
 
 uniform mat4 view; 
-uniform sampler2D shadowMap;
+uniform samplerCube depthMap;
 uniform Material material;
- 
+
+uniform float far_plane;
+
 in vec3 vertexNormal;
 in vec3 vertexPosition;
 in vec2 texCoord;
@@ -68,23 +70,27 @@ float attenuate(float d, float r)
     return (a*a) / ((d*d)+1);
 }
 
-float shadowCalculation(vec4 fragPosLightSpace, float bias)
+float shadowCalculation(vec3 fragPos, vec3 lightPos)
 {
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    projCoords = projCoords * 0.5 + 0.5;
-    float closestDepth = texture(shadowMap, projCoords.xy).r;
-    float currentDepth = projCoords.z; 
+    vec3 fragToLight = fragPos - lightPos; 
+    float closestDepth = texture(depthMap, fragToLight).r;
+    // it is currently in linear range between [0,1]. Re-transform back to original value
+    closestDepth *= far_plane;
+    // now get current linear depth as the length between the fragment and light position
+    float currentDepth = length(fragToLight);
+    // now test for shadows
+    float bias = 0.05; 
+    float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;
 
-    float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;  
     return shadow;
-}
+}  
 
 void main()
 {
     vec2 uTiling = vec2(10.0,10.0);
     vec2 tiledUV = texCoord * uTiling;
 
-    vec3 ambientColor  = texture(material.ambient, tiledUV).rgb;
+    vec3 ambientColor  = texture(material.diffuse, tiledUV).rgb* 0.05;
     vec3 diffuseColor  = texture(material.diffuse, tiledUV).rgb;
     vec3 specularColor = texture(material.specular,tiledUV).rgb;
     
@@ -95,7 +101,7 @@ void main()
     vec3 viewDir = normalize(cameraPosWorld - vertexPosition);
 
     vec3 colorOut = vec3(0.0); // Base ambient contribution
-
+   /// vec3 lightPos = ub.lights[0].posRad.xyz;
     for (int i = 0; i < ub.activeLightCount; i++)
     {
         StaticPointLight light = ub.lights[i];
@@ -120,11 +126,12 @@ void main()
         vec3 diffuse = Kd * diffuseColor;
         vec3 specular = Ks * specularColor;
 
-        colorOut += (diffuse + specular) * attenuation * intensity;
+        float shadow  = shadowCalculation(vertexPosition, lightPos);
+        colorOut +=(1.0 - shadow) * (diffuse + specular) * attenuation * intensity;
     }
-    float bias = 0.005;
-    float shadow  = shadowCalculation(vertexPosLightSpace, bias);
-    colorOut = ambientColor + (1.0 - shadow) * colorOut;
+    
+    colorOut = ambientColor +  colorOut;
+    //colorOut = ambientColor + colorOut;
 
     FragColor.rgb = pow(colorOut, vec3(1.0));
     //FragColor = vec4(1.0);

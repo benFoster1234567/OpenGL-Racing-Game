@@ -57,21 +57,24 @@ void GpuShader::compileShaders()
 		std::cerr << "ERROR: Fragment Shader Compilation Failed\n" << infoLog << std::endl;
 	}
 
-	GLuint geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+	GLuint geometryShader = 0;
 	bool geometryIncluded = data->shaderSrc.find("GEOMETRY_SHADER") != std::string::npos;
+
 	if (geometryIncluded)
 	{
+		geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
 		std::string geoSrc = buildShaderString(430, "GEOMETRY_SHADER", data->shaderSrc);
-		const char* geoSrcStr = fragSrc.c_str();
-		glShaderSource(geometryShader, 1, &fragSrcStr, NULL);
+		const char* geoSrcStr = geoSrc.c_str(); // FIXED
+
+		glShaderSource(geometryShader, 1, &geoSrcStr, NULL); // FIXED
 		glCompileShader(geometryShader);
 
 		glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success);
 
 		if (!success)
 		{
-			glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-			std::cerr << "ERROR: Fragment Shader Compilation Failed\n" << infoLog << std::endl;
+			glGetShaderInfoLog(geometryShader, 512, NULL, infoLog);
+			std::cerr << "ERROR: Geometry Shader Compilation Failed\n" << infoLog << std::endl; // FIXED log label
 		}
 	}
 

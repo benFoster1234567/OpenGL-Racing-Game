@@ -93,7 +93,7 @@ namespace Engine::Infra
 				renderer.cacheShader(id, shaderData);
 				renderer.gpuShaderCache.get(id).get()->compileShaders();
 
-				if (shaderName == "shadowMap")
+				/*if (shaderName == "shadowMap")
 				{
 					renderer.shadowShader = renderer.gpuShaderCache.get(id).get();
 					std::cout << "shadow shader found!\n";
@@ -103,8 +103,13 @@ namespace Engine::Infra
 				{
 					renderer.depthShader = renderer.gpuShaderCache.get(id).get();
 					std::cout << "depth shader found!\n";
-				}
+				}*/
 
+				if (shaderName == "depthCubemap")
+				{
+					renderer.shadowCubemapShader = renderer.gpuShaderCache.get(id).get();
+					std::cout << "depth cube map found!\n";
+				}
 			}
 		}
 	};

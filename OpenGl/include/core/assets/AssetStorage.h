@@ -39,8 +39,9 @@ namespace Engine::Core
 			return assets.contains(it->second);
 		}
 
-		size_t getId(const std::string& name)
+		size_t getId(std::string name)
 		{
+
 			auto it = nameToId.find(name);
 			if (it == nameToId.end())
 			{

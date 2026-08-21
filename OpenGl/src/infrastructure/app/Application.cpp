@@ -41,6 +41,7 @@ void Engine::Infra::Application::importAssets()
 	engine.assetPipeline.submit<Core::MaterialData>("assets/materials/cubeMaterial.mtl", "cubeMaterial");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/depthBufferOut.glsl", "depthBuffer");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/shadows.glsl", "shadowMap");
+	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/depthCubeShader.glsl", "depthCubemap");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/bunny.obj", "bunny");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/cube.obj", "cube");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/car.obj", "car");
@@ -51,6 +52,8 @@ void Engine::Infra::Application::importAssets()
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0068.gif", "tileSpecular");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0066.gif", "tileDiffuse");
 	engine.createAssetManager();
+
+	
 }
 
 void Engine::Infra::Application::sendTexturesToRenderer()
@@ -184,11 +187,12 @@ void Engine::Infra::Application::run()
 	
 	setupImportCallbacks();
 	importAssets();
-	//engine.publishAssets(); //sends to gpu
+
 	GpuAssetLoader::fillRenderer(engine.assetManager, renderer);
-	renderer.createShadowMap();
-	
-	//sendTexturesToRenderer();
+
+	//renderer.createShadowMap();
+	//renderer.createShadowCubemap();
+
 	std::vector<Engine::Core::ECS::StaticPointLightRendererData> lightData{};
 
 	//TODO: Tidy this up
@@ -209,7 +213,7 @@ void Engine::Infra::Application::run()
 	renderer.loadLights(pointLights);
 	glfwSwapInterval(0); 
 	window->disableCursor();
-
+	renderer.prepareDepthCubemap();
 	while (!window->shouldClose())
 	{
 		window->pollEvents();

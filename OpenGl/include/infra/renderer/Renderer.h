@@ -100,14 +100,15 @@ namespace Engine::Infra
 		GLuint ubo{ 0 };
 		GpuShader* DebugLightShader = nullptr;
 
-		GpuShader* shadowShader = nullptr;
-		GpuShader* depthShader = nullptr;
+		GpuShader* shadowCubemapShader = nullptr;
+		GLuint depthCubemapId = 0;
+		GLuint depthMapFBO = 0;
 
-		ShadowMap shadowMap;
-		ShadowCubeMap shadowCubemap;
-	public:
-	
-	private:
+		glm::vec3 lightPos{};
+
+		float nnear{};
+		float ffar{};
+		std::vector<glm::mat4> shadowTransforms;
 
 		glm::mat4 getLightSpaceMatrix(const Engine::Infra::RenderCommand& command, const StaticPointLightResource& light)
 		{
@@ -119,32 +120,80 @@ namespace Engine::Infra
 			return lightSpaceMatrix;
 		}
 
-		void configureShadowShadersAndMatrices(const Engine::Infra::RenderCommand& command, const StaticPointLightResource& light)
-		{
-			auto lightProj = getLightProjectionMatrix();
-			glm::mat4 modelMatrix = command.modelTransform;
-			glm::vec3 position = glm::vec3(modelMatrix[3]);
-			glm::mat4 viewMat = glm::lookAt(light.position, -light.position, glm::vec3(0, 1, 0));
-			glm::mat4 lightSpaceMatrix = getLightSpaceMatrix(command, light);
-			if (shadowShader != nullptr) 
-			{
-				shadowShader->use();
-
-				glUniformMatrix4fv(glGetUniformLocation(shadowShader->getId(), "lightSpaceMatrix"), 1, GL_FALSE, (GLfloat*)&lightSpaceMatrix[0]);
-				glUniformMatrix4fv(glGetUniformLocation(shadowShader->getId(), "model"), 1, GL_FALSE, (GLfloat*)&modelMatrix[0]);
-			}
-		}
 
 	public:
 		
-		Renderer() : shadowMap{1024, 1024}, shadowCubemap{1024, 1024}
+		Renderer()
 		{
 			ilInit();
 			iluInit();
 			ilutRenderer(ILUT_OPENGL);
 		}
 
+		void prepareDepthCubemap()
+		{
+			if (staticPointLights.empty()) return;
+
+			lightPos = staticPointLights[0].position;
+
+			if (depthMapFBO == 0)
+			{
+				glGenFramebuffers(1, &depthMapFBO);
+				glGenTextures(1, &depthCubemapId);
+
+				const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+				glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemapId);
+				for (unsigned int i = 0; i < 6; ++i)
+					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT,
+						SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+				glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+				glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+				glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+				glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+				glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemapId, 0);
+				glDrawBuffer(GL_NONE);
+				glReadBuffer(GL_NONE);
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+			}
+
+			// Recalculate shadow matrices
+			shadowTransforms.clear();
+			const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+			float aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
+			nnear = 1.0f;
+			ffar = 25.0f;
+			glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, nnear, ffar);
+
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
+		}
+
 		~Renderer() = default;
+
+		void setShadowCubemapShader(Core::ShaderId shader)
+		{
+			shadowCubemapShader = gpuShaderCache.get(shader).get();
+		}
+		
+		/*void setShadowShader(Core::ShaderId shader)
+		{
+			shadowShader = gpuShaderCache.get(shader).get();
+		}
+
+		void setDepthShader(Core::ShaderId shader)
+		{
+			depthShader = gpuShaderCache.get(shader).get();
+		}
 
 		void createShadowMap()
 		{
@@ -156,7 +205,7 @@ namespace Engine::Infra
 		{
 			shadowCubemap.create();
 			shadowCubemap.attachFramebufferToDepthBuffer();
-		}
+		}*/
 
 		void loadLights(std::vector<StaticPointLightResource>& staticLights);
 		void renderLights();
@@ -172,6 +221,6 @@ namespace Engine::Infra
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
 
-		void flush();
+		
 	};
 }

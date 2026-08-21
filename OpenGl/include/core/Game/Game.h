@@ -196,7 +196,7 @@ namespace Engine::Core::Game
 			return entity;
 		}
 
-		ECS::Entity setupLightEntity(ECS::TransformComponent transform, float radius = 10.0f, float intensity = 10.0f)
+		ECS::Entity setupLightEntity(ECS::TransformComponent transform, float radius = 20.0f, float intensity = 30.0f)
 		{
 			ECS::Entity entity = coordinator.createEntity();
 
@@ -235,6 +235,9 @@ namespace Engine::Core::Game
 			t.position = { 4, 3, -1 };
 
 			auto lightEntity2 = setupLightEntity(t);
+			t.position = { -4, 4, 1 };
+
+			//auto lightEntity3 = setupLightEntity(t);
 		}
 
 		void setupLights(std::vector<ECS::StaticPointLightRendererData>& lightSetupQueueOut)
