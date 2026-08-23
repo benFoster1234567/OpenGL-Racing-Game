@@ -27,3 +27,4 @@ map_Ks textures/pic0068.gif
 
 Also, currently when a map isn't given for a map for a certain reflection color, the renderer creates a new 1x1 texture of the specified color and sends that to the shader in place of the missing map. This way, I don't need extra conditional statements inside my shaders, and I can just trust that the uploaded texture contains the correct color from the material.
 
+![Imported model]({{ "/resources/images/Screenshot 2026-08-03 140816.png" | relative_url }})

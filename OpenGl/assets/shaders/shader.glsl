@@ -74,11 +74,8 @@ float shadowCalculation(vec3 fragPos, vec3 lightPos)
 {
     vec3 fragToLight = fragPos - lightPos; 
     float closestDepth = texture(depthMap, fragToLight).r;
-    // it is currently in linear range between [0,1]. Re-transform back to original value
     closestDepth *= far_plane;
-    // now get current linear depth as the length between the fragment and light position
     float currentDepth = length(fragToLight);
-    // now test for shadows
     float bias = 0.05; 
     float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;
 
