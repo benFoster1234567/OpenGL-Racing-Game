@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Devlog 03: Third Update"
+title: "Devlog 03: Textures, Shadows, and Pointlights"
 date: 2026-08-03
 ---
 
