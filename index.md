@@ -1,11 +1,11 @@
 ---
 layout: default
-title: "My Game Engine Devlog"
+title: "OpenGL Game Engine Devlog"
 ---
 
-# Welcome to my Game Engine Devlog!
+# My First Engineless Game 
 
-Hi, I'm building a C++ motorcycle racing game using OpenGL. Follow my progress, engineering choices, and milestones below.
+Hi, I'm building a C++ motorcycle racing game using OpenGL. Follow my progress and milestones below.
 
 ## Blog Posts
 <ul>
