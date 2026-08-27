@@ -24,6 +24,12 @@ namespace Engine::Core
 	class MeshData
 	{
 	private:
+
+		const size_t VERTEX_ATTRIBUTE	= 0;
+		const size_t NORMAL_ATTRIBUTE	= 1;
+		const size_t TEXCOORD_ATTRIBUTE	= 2;
+		const size_t TANGENT_ATTRIBUTE	= 3;
+
 	public:
 		MeshData() = default;
 		MeshData(std::vector<Attribute> as) : attributes(std::move(as)) {}
@@ -31,9 +37,18 @@ namespace Engine::Core
 		std::string name;
 		MeshType meshType{ MeshType::Fill };
 		std::vector<Attribute> attributes{};
+
 		void printPoints(); //for debugging purposes...
 
 		void recomputeNormals(int vertexIndex = 0, int normalsIndex = 1);
+		void computeTangents();
+		
+		void recomputeNormalsAndTangents()
+		{
+			recomputeNormals();
+			computeTangents();
+		}
+
 	};
 
 	class GridData : public MeshData

@@ -25,6 +25,174 @@ void Engine::Infra::Renderer::drawLights(Core::ShaderId shaderId, size_t lightCo
 
 }
 
+std::vector<glm::mat4> Engine::Infra::Renderer::getTransformCubemapArray(std::vector<glm::vec3> lightPositions)
+{
+	std::vector<glm::mat4> transforms{};
+
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	float aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
+
+	glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, nnear, ffar);
+
+	for (int i{}; i < 16; i++)
+	{
+		glm::vec3 lp{ 0.0f };
+		if (i < staticPointLights.size())
+		{
+			lp = staticPointLights[i].position;
+			transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+			transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+			transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+			transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+			transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+			transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
+		}
+	}
+
+	return transforms;
+}
+
+void Engine::Infra::Renderer::prepareDepthCubemapArray()
+{
+	if (staticPointLights.empty()) return;
+
+	//calculate and cache these values...
+	std::vector<glm::vec3> lightPositions{};
+	lightPositions.assign(16, glm::vec3{ 0 });
+	
+	for (int i{ 0 }; i < staticPointLights.size(); i++)
+	{
+		glm::vec3 currentLightPosition = staticPointLights[i].position;
+		lightPositions[i] = currentLightPosition;
+	}
+
+	staticPointlightData.numLights = staticPointLights.size();
+	staticPointlightData.lightPositions = lightPositions;
+	staticPointlightData.shadowTransforms = getTransformCubemapArray(lightPositions);
+	
+	//setup cubemap array
+	if (depthMapFBO == 0)
+	{
+		glGenFramebuffers(1, &depthMapFBO);
+		glGenTextures(1, &depthCubemapId);
+
+		glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, depthCubemapId);
+		const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+		GLsizei totalLayers = static_cast<GLsizei>(staticPointLights.size() * 6);
+
+		glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY
+			, 0
+			, GL_DEPTH_COMPONENT24
+			, SHADOW_WIDTH
+			, SHADOW_HEIGHT
+			, totalLayers
+			, 0
+			, GL_DEPTH_COMPONENT
+			, GL_FLOAT
+			, NULL
+		);
+
+		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemapId, 0);
+
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+	}
+	
+	nnear = 1.0f;
+	ffar = 25.0f;
+	
+}
+
+void Engine::Infra::Renderer::prepareDepthCubemap()
+{
+	if (staticPointLights.empty()) return;
+
+	lightPos = staticPointLights[0].position;
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+
+	if (depthMapFBO == 0)
+	{
+		glGenFramebuffers(1, &depthMapFBO);
+		glGenTextures(1, &depthCubemapId);
+
+		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemapId);
+
+		GLsizei totalLayers = static_cast<GLsizei>(staticPointLights.size() * 6);
+
+		for (unsigned int i = 0; i < 6; ++i)
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT,
+				SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemapId, 0);
+
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+	}
+
+	// Recalculate shadow matrices
+	shadowTransforms.clear();
+	float aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
+	nnear = 1.0f;
+	ffar = 25.0f;
+	glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, nnear, ffar);
+
+	/*shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));*/
+}
+
+void Engine::Infra::Renderer::renderToShadowCubemapArray(size_t w, size_t h, std::vector<StaticPointLight> shadowCastingLights)
+{
+	shadowCubemapShader->use();
+	glViewport(0, 0, 1024, 1024);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	GLuint shadowShaderId = shadowCubemapShader->getId();
+
+	GLuint numLights = staticPointLights.size();
+
+	glUniformMatrix4fv(
+		glGetUniformLocation(shadowShaderId, "shadowMatrices")
+		, 6 * 16, GL_FALSE, glm::value_ptr(staticPointlightData.shadowTransforms[0]));
+
+	glUniform3fv(glGetUniformLocation(shadowShaderId, "staticPointlightData.lights"), 16, glm::value_ptr(staticPointlightData.lightPositions[0]));
+	glUniform1f(glGetUniformLocation(shadowShaderId, "far_plane"), ffar);
+	glUniform1i(glGetUniformLocation(shadowShaderId, "lightNumber"), numLights);
+
+	for (const auto& command : renderQueue)
+	{
+		GpuMesh* mesh = gpuMeshCache.get(command.mesh).get();
+		glUniformMatrix4fv(glGetUniformLocation(shadowShaderId, "model"), 1, GL_FALSE, glm::value_ptr(command.modelTransform));
+		mesh->draw();
+	}
+}
+
 void Engine::Infra::Renderer::cacheShader(Core::ShaderId shaderId, Core::ShaderData* shaderData)
 {
 	auto gpuShader = std::make_unique<GpuShader>(shaderData);
@@ -43,6 +211,31 @@ void Engine::Infra::Renderer::cacheTexture(Core::TextureId textureId, Core::Text
 {
 	auto gpuTexture = std::make_unique<GpuTexture>(textureData);
 	gpuTextureCache.insert(textureId, std::move(gpuTexture));
+}
+
+void Engine::Infra::Renderer::renderToShadowCubemap(size_t w, size_t h)
+{
+	//glEnable(GL_DEPTH_TEST);
+	shadowCubemapShader->use();
+	//glCullFace(GL_FRONT);
+	glViewport(0, 0, 1024, 1024);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	GLuint shadowShaderId = shadowCubemapShader->getId();
+
+	glUniformMatrix4fv(glGetUniformLocation(shadowShaderId, "shadowMatrices"), 6, GL_FALSE, glm::value_ptr(getTransforms(lightPos)[0]));
+	glUniform3fv(glGetUniformLocation(shadowShaderId, "lightPos"), 1, glm::value_ptr(lightPos));
+	glUniform1f(glGetUniformLocation(shadowShaderId, "far_plane"), ffar);
+
+	for (const auto& command : renderQueue)
+	{
+		GpuMesh* mesh = gpuMeshCache.get(command.mesh).get();
+		glUniformMatrix4fv(glGetUniformLocation(shadowShaderId, "model"), 1, GL_FALSE, glm::value_ptr(command.modelTransform));
+		mesh->draw();
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Engine::Infra::Renderer::loadLights(std::vector<StaticPointLightResource>& staticLights)
@@ -113,29 +306,9 @@ void Engine::Infra::Renderer::submit(RenderCommand command)
 	renderQueue.push_back(command);
 }
 
-
-
 void Engine::Infra::Renderer::flush(size_t w , size_t h)
 {
-	shadowCubemapShader->use();
-	//glCullFace(GL_FRONT);
-	glViewport(0, 0, 1024, 1024);
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	GLuint shadowShaderId = shadowCubemapShader->getId();
-	glUniformMatrix4fv(glGetUniformLocation(shadowShaderId, "shadowMatrices"), 6, GL_FALSE, glm::value_ptr(shadowTransforms[0]));
-	glUniform3fv(glGetUniformLocation(shadowShaderId, "lightPos"), 1, glm::value_ptr(lightPos));
-	glUniform1f(glGetUniformLocation(shadowShaderId, "far_plane"), ffar);
-
-	for (const auto& command : renderQueue)
-	{
-		GpuMesh* mesh = gpuMeshCache.get(command.mesh).get();
-		glUniformMatrix4fv(glGetUniformLocation(shadowShaderId, "model"), 1, GL_FALSE, glm::value_ptr(command.modelTransform));
-		mesh->draw();
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	renderToShadowCubemap(w,h);
 
 	glViewport(0, 0, w, h);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);

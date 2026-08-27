@@ -3,41 +3,29 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNorm;
 layout (location = 2) in vec2 aTex;
-layout (location = 3) in vec4 aTang;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat4 lightSpaceMatrix;
 
+out vec3 vertexNormal;   
 out vec3 vertexPosition; 
 out vec2 texCoord;
-out vec3 vTangent;
-out vec3 vBitangent;
-out vec3 vNormal;
 
 void main()
 {
     vec4 worldPos = model * vec4(aPos, 1.0);
+
+    vertexNormal = transpose(inverse(mat3(model))) * aNorm; 
     vertexPosition = worldPos.xyz;    
     texCoord = aTex;
-
-    mat3 normalMatrix = transpose(inverse(mat3(model)));
-
-    vec3 N = normalize(normalMatrix * aNorm);
-    vec3 T = normalize(normalMatrix * aTang.xyz);
-    
-    T = normalize(T - dot(T, N) * N);
-
-    vec3 B = cross(N, T) * aTang.w;
-
-    vTangent   = T;
-    vBitangent = B;
-    vNormal    = N;
 
     gl_Position = projection * view * worldPos;
 }
 
 #endif
+
 #ifdef FRAGMENT_SHADER
  
 #define MAX_LIGHTS 100
@@ -46,7 +34,7 @@ struct StaticPointLight {
     vec4 color;  
 };
  
-uniform samplerCube depthMap;
+uniform samplerCubeArray depthMap;
 struct Material 
 {
     sampler2D ambient;
@@ -63,55 +51,51 @@ layout (std140) uniform LightBlock {
 
 uniform mat4 view; 
 uniform Material material;
+
 uniform float far_plane;
 
+in vec3 vertexNormal;
 in vec3 vertexPosition;
 in vec2 texCoord;
-in vec3 vTangent;
-in vec3 vBitangent;
-in vec3 vNormal;
 
 out vec4 FragColor;
 
 float attenuate(float d, float r)
 {
     float dOverR = clamp(d / r, 0.0, 1.0);
-    float a = 1.0 - dOverR*dOverR*dOverR*dOverR;
-    return (a*a) / ((d*d)+1.0);
+    float a = 1 - dOverR*dOverR*dOverR*dOverR;
+    return (a*a) / ((d*d)+1);
 }
 
-float shadowCalculation(vec3 fragPos, vec3 lightPos)
+float shadowCalculation(vec3 fragPos, vec3 lightPos, float index)
 {
     vec3 fragToLight = fragPos - lightPos; 
-    float closestDepth = texture(depthMap, fragToLight).r;
+    float closestDepth = texture(depthMap, vec4(fragToLight, index).r;
     closestDepth *= far_plane;
     float currentDepth = length(fragToLight);
     float bias = 0.05; 
-    return currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;
+
+    return shadow;
 }  
 
 void main()
 {
-    vec2 uTiling = vec2(10.0, 10.0);
+    vec2 uTiling = vec2(10.0,10.0);
     vec2 tiledUV = texCoord * uTiling;
 
-    vec3 ambientColor  = texture(material.diffuse, tiledUV).rgb * 0.05;
+    vec3 ambientColor  = texture(material.diffuse, tiledUV).rgb* 0.05;
     vec3 diffuseColor  = texture(material.diffuse, tiledUV).rgb;
-    vec3 specularColor = texture(material.specular, tiledUV).rgb;
-
-    vec3 normal = normalize(texture(material.normal, tiledUV).xyz * 2.0 - 1.0);
-
-    vec3 T = normalize(vTangent);
-    vec3 B = normalize(vBitangent);
-    vec3 N = normalize(vNormal);
-
-    mat3 TBN = transpose(mat3(T, B, N));
+    vec3 specularColor = texture(material.specular,tiledUV).rgb;
     
-    vec3 cameraPosWorld = inverse(view)[3].xyz;
-    vec3 viewDir = normalize(TBN * (cameraPosWorld - vertexPosition));
+    vec3 normal = normalize(vertexNormal);
 
-    vec3 colorOut = vec3(0.0);
+    mat4 invView = inverse(view);
+    vec3 cameraPosWorld = invView[3].xyz;
+    vec3 viewDir = normalize(cameraPosWorld - vertexPosition);
 
+    vec3 colorOut = vec3(0.0); // Base ambient contribution
+   /// vec3 lightPos = ub.lights[0].posRad.xyz;
     for (int i = 0; i < ub.activeLightCount; i++)
     {
         StaticPointLight light = ub.lights[i];
@@ -120,7 +104,8 @@ void main()
         vec3 lightColor = light.color.rgb;
         float intensity = light.color.a; 
 
-        vec3 lightDir = TBN * (lightPos - vertexPosition);
+        vec3 lightDir = lightPos - vertexPosition;
+        
         float distance = length(lightDir);
 
         float attenuation = attenuate(distance, radius);
@@ -132,15 +117,17 @@ void main()
         float Kd = max(dot(normal, L), 0.0);
         float Ks = pow(max(dot(normal, H), 0.0), material.shininess);
 
-        vec3 diffuse  = Kd * diffuseColor * lightColor;
-        vec3 specular = Ks * specularColor * lightColor;
+        vec3 diffuse = Kd * diffuseColor;
+        vec3 specular = Ks * specularColor;
 
-        float shadow  = shadowCalculation(vertexPosition, lightPos);
+        float cubeMapIndex = i;
+        float shadow  = shadowCalculation(vertexPosition, lightPos, cubeMapIndex);
         colorOut += (1.0 - shadow) * (diffuse + specular) * attenuation * intensity;
     }
     
-    colorOut += ambientColor;
+    colorOut = ambientColor +  colorOut;
 
-    FragColor = vec4(colorOut, 1.0);
+    FragColor.rgb = pow(colorOut, vec3(1.0));
+    FragColor.a = 1.0;
 }
 #endif

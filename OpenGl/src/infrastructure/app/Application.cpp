@@ -51,6 +51,7 @@ void Engine::Infra::Application::importAssets()
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/testTextures.jpg", "uvChecker");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0068.gif", "tileSpecular");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0066.gif", "tileDiffuse");
+	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0067.gif", "tileNormal");
 	engine.createAssetManager();
 
 	

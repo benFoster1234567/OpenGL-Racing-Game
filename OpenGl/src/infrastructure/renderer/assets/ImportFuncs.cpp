@@ -90,6 +90,7 @@ Engine::Core::MeshData Engine::Infra::ImportFuncs::importMeshDataTOL(const std::
 	newMesh.attributes.push_back(std::move(vertexPoints));//0
 	newMesh.attributes.push_back(std::move(normals));//1
 	newMesh.attributes.push_back(std::move(texCoords));//2
+	newMesh.attributes.push_back({});
 
 	newMesh.name = name;
 	return newMesh;
@@ -262,34 +263,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			ss >> texturePath;
 			materialData.setMapFilePath(firstWord, texturePath);
 		}
-		/*
-		else if (firstWord == "map_Kd")
-		{
-			std::string texturePath;
-			ss >> texturePath;
-			materialData.mapKdPath = texturePath;
-		}
-	
-		else if (firstWord == "map_Ks")
-		{
-			std::string texturePath;
-			ss >> texturePath;
-			materialData.mapKsPath = texturePath;
-		}
-		
-		else if (firstWord == "map_Ke")
-		{
-			std::string texturePath;
-			ss >> texturePath;
-			materialData.mapKePath = texturePath;
-		}
-		
-		else if (firstWord == "map_Bump" || firstWord == "bump")
-		{
-			std::string texturePath;
-			ss >> texturePath;
-			materialData.mapBumpPath = texturePath;
-		}*/
+
 	}
 
 	materialFile.close();

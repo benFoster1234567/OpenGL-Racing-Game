@@ -95,6 +95,13 @@ namespace Engine::Infra
 			return p;
 		}
 
+		struct
+		{
+			size_t numLights{ 0 }; // <= 16
+			std::vector<glm::vec3> lightPositions{};
+			std::vector<glm::mat4> shadowTransforms{};
+		}staticPointlightData;
+
 		size_t activeLightCount = 0;
 		GLuint emptyVao{ 0 }; // for debug positions and such
 		GLuint ubo{ 0 };
@@ -138,6 +145,8 @@ namespace Engine::Infra
 			return transforms;
 		}
 
+		std::vector<glm::mat4> getTransformCubemapArray(std::vector<glm::vec3> lightPositions);
+
 	public:
 		
 		Renderer()
@@ -147,57 +156,13 @@ namespace Engine::Infra
 			ilutRenderer(ILUT_OPENGL);
 		}
 
-		void prepareDepthCubemap()
-		{
-			if (staticPointLights.empty()) return;
+		void prepareDepthCubemapArray();
 
-			lightPos = staticPointLights[0].position;
+		void prepareDepthCubemap();
 
-			if (depthMapFBO == 0)
-			{
-				glGenFramebuffers(1, &depthMapFBO);
-				glGenTextures(1, &depthCubemapId);
+		void renderToShadowCubemapArray(size_t w, size_t h, std::vector<StaticPointLight> shadowCastingLights);
 
-				const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-				glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, depthCubemapId);
-
-				GLsizei totalLayers = static_cast<GLsizei>(staticPointLights.size() * 6);
-				glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT24, SHADOW_WIDTH, SHADOW_HEIGHT, totalLayers, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-
-				glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-				glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-				glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-				glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-				glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-				glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-
-				glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemapId, 0);
-
-				glDrawBuffer(GL_NONE);
-				glReadBuffer(GL_NONE);
-				glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-			}
-
-			// Recalculate shadow matrices
-			shadowTransforms.clear();
-			const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-			float aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
-			nnear = 1.0f;
-			ffar = 25.0f;
-			glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, nnear, ffar);
-
-			nnear = 1.0f;
-			ffar = 25.0f;
-			/*shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
-			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
-			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));*/
-		}
+		void renderToShadowCubemap(size_t w, size_t h);
 
 		~Renderer() = default;
 
@@ -205,28 +170,6 @@ namespace Engine::Infra
 		{
 			shadowCubemapShader = gpuShaderCache.get(shader).get();
 		}
-		
-		/*void setShadowShader(Core::ShaderId shader)
-		{
-			shadowShader = gpuShaderCache.get(shader).get();
-		}
-
-		void setDepthShader(Core::ShaderId shader)
-		{
-			depthShader = gpuShaderCache.get(shader).get();
-		}
-
-		void createShadowMap()
-		{
-			shadowMap.create();
-			shadowMap.attachFramebufferToDepthBuffer();
-		}
-
-		void createShadowCubemap()
-		{
-			shadowCubemap.create();
-			shadowCubemap.attachFramebufferToDepthBuffer();
-		}*/
 
 		void loadLights(std::vector<StaticPointLightResource>& staticLights);
 		void renderLights();

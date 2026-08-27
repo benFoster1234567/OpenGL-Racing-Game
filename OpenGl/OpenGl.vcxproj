@@ -213,15 +213,18 @@
     <None Include="assets\materials\testMaterial.mtl" />
     <None Include="assets\materials\cubeMaterial.mtl" />
     <None Include="assets\shaders\depthBufferOut.glsl" />
+    <None Include="assets\shaders\depthCubemapArrayShader.glsl" />
     <None Include="assets\shaders\depthCubeShader.glsl" />
     <None Include="assets\shaders\gridShader.glsl" />
     <None Include="assets\shaders\lightDebuggerShader.glsl" />
     <None Include="assets\shaders\pointShadow.glsl" />
     <None Include="assets\shaders\shader.glsl" />
+    <None Include="assets\shaders\shaderBlinnPhongWithPointShadows.glsl" />
     <None Include="assets\shaders\shadows.glsl" />
     <None Include="shaders\shader.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="assets\materials\textures\pic0067.gif" />
     <Image Include="assets\materials\textures\testTextures.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

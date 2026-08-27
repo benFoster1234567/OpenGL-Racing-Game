@@ -239,9 +239,14 @@
     <None Include="assets\shaders\depthBufferOut.glsl" />
     <None Include="assets\shaders\pointShadow.glsl" />
     <None Include="assets\shaders\depthCubeShader.glsl" />
+    <None Include="assets\shaders\depthCubemapArrayShader.glsl" />
+    <None Include="assets\shaders\shaderBlinnPhongWithPointShadows.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\materials\textures\testTextures.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\materials\textures\pic0067.gif">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
