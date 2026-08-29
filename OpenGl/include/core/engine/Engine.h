@@ -52,6 +52,11 @@ namespace Engine::Core
 
 		void fillStaticLightVector(std::vector<ECS::StaticPointLightRendererData>& lights);
 
+		std::vector<ECS::StaticPointLightRendererData> getShadowCastingPointlights()
+		{
+			return game.getShadowCastingPointlights();
+		}
+
 		EventDispatcher<std::vector<ShaderData*>> shaderDispatcher{};
 		EventDispatcher<std::vector<MeshData*>> meshDispatcher{};
 		EventDispatcher<std::vector<TextureData*>> textureDispatcher{};

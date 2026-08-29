@@ -221,7 +221,6 @@
     <None Include="assets\shaders\lightDebuggerShader.glsl" />
     <None Include="assets\shaders\pointShadow.glsl" />
     <None Include="assets\shaders\shader.glsl" />
-    <None Include="assets\shaders\shaderBlinnPhongWithPointShadows.glsl" />
     <None Include="assets\shaders\shadows.glsl" />
     <None Include="shaders\shader.glsl" />
   </ItemGroup>

@@ -27,12 +27,10 @@ void Engine::Core::MeshData::recomputeNormals(int vertexIndex, int normalsIndex)
 	if (normalsIndex >= attributes.size() || vertexIndex >= attributes.size()) return;
 
 	auto verts = attributes[vertexIndex].data;
-
 	std::vector<float> norms{};
 
 	for (int i{}; i < verts.size();)
 	{
-
 		glm::vec3 vert1{ verts[i], verts[i + 1], verts[i + 2] }; i += 3;
 		glm::vec3 vert2{ verts[i], verts[i + 1], verts[i + 2] }; i += 3;
 		glm::vec3 vert3{ verts[i], verts[i + 1], verts[i + 2] }; i += 3;
@@ -45,11 +43,8 @@ void Engine::Core::MeshData::recomputeNormals(int vertexIndex, int normalsIndex)
 			norms.push_back(norm.y);
 			norms.push_back(norm.z);
 		}
-
 	}
-
 	attributes[normalsIndex].data = norms;
-
 }
 
 void Engine::Core::MeshData::computeTangents()

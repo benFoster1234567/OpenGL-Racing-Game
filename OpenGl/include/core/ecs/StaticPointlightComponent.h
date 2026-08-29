@@ -12,4 +12,8 @@ namespace Engine::Core::ECS
 		bool castShadows{ false };
 	};
 
+	struct ShadowCastComponent : ComponentBase
+	{
+	};
+
 }

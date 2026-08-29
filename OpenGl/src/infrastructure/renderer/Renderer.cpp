@@ -34,7 +34,7 @@ std::vector<glm::mat4> Engine::Infra::Renderer::getTransformCubemapArray(std::ve
 
 	glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, nnear, ffar);
 
-	for (int i{}; i < 16; i++)
+	for (int i{}; i < 4; i++)
 	{
 		glm::vec3 lp{ 0.0f };
 		if (i < staticPointLights.size())
@@ -57,21 +57,14 @@ void Engine::Infra::Renderer::prepareDepthCubemapArray()
 {
 	if (staticPointLights.empty()) return;
 
-	//calculate and cache these values...
-	std::vector<glm::vec3> lightPositions{};
-	lightPositions.assign(16, glm::vec3{ 0 });
-	
-	for (int i{ 0 }; i < staticPointLights.size(); i++)
+
+	///pointlightLoader.loadShadowCastedPointlights(staticPointLights, nnear, ffar);
+
+	for (const auto& shader : gpuShaderCache)
 	{
-		glm::vec3 currentLightPosition = staticPointLights[i].position;
-		lightPositions[i] = currentLightPosition;
+		pointlightLoader.bindShadowBlockToShader(shader->getId());
 	}
 
-	staticPointlightData.numLights = staticPointLights.size();
-	staticPointlightData.lightPositions = lightPositions;
-	staticPointlightData.shadowTransforms = getTransformCubemapArray(lightPositions);
-	
-	//setup cubemap array
 	if (depthMapFBO == 0)
 	{
 		glGenFramebuffers(1, &depthMapFBO);
@@ -110,8 +103,7 @@ void Engine::Infra::Renderer::prepareDepthCubemapArray()
 
 	}
 	
-	nnear = 1.0f;
-	ffar = 25.0f;
+
 	
 }
 
@@ -159,15 +151,9 @@ void Engine::Infra::Renderer::prepareDepthCubemap()
 	ffar = 25.0f;
 	glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, nnear, ffar);
 
-	/*shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));*/
 }
 
-void Engine::Infra::Renderer::renderToShadowCubemapArray(size_t w, size_t h, std::vector<StaticPointLight> shadowCastingLights)
+void Engine::Infra::Renderer::renderToShadowCubemapArray(size_t w, size_t h)
 {
 	shadowCubemapShader->use();
 	glViewport(0, 0, 1024, 1024);
@@ -176,15 +162,7 @@ void Engine::Infra::Renderer::renderToShadowCubemapArray(size_t w, size_t h, std
 	glEnable(GL_DEPTH_TEST);
 	GLuint shadowShaderId = shadowCubemapShader->getId();
 
-	GLuint numLights = staticPointLights.size();
-
-	glUniformMatrix4fv(
-		glGetUniformLocation(shadowShaderId, "shadowMatrices")
-		, 6 * 16, GL_FALSE, glm::value_ptr(staticPointlightData.shadowTransforms[0]));
-
-	glUniform3fv(glGetUniformLocation(shadowShaderId, "staticPointlightData.lights"), 16, glm::value_ptr(staticPointlightData.lightPositions[0]));
 	glUniform1f(glGetUniformLocation(shadowShaderId, "far_plane"), ffar);
-	glUniform1i(glGetUniformLocation(shadowShaderId, "lightNumber"), numLights);
 
 	for (const auto& command : renderQueue)
 	{
@@ -192,6 +170,9 @@ void Engine::Infra::Renderer::renderToShadowCubemapArray(size_t w, size_t h, std
 		glUniformMatrix4fv(glGetUniformLocation(shadowShaderId, "model"), 1, GL_FALSE, glm::value_ptr(command.modelTransform));
 		mesh->draw();
 	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 }
 
 void Engine::Infra::Renderer::cacheShader(Core::ShaderId shaderId, Core::ShaderData* shaderData)
@@ -239,56 +220,23 @@ void Engine::Infra::Renderer::renderToShadowCubemap(size_t w, size_t h)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Engine::Infra::Renderer::loadLights(std::vector<StaticPointLightResource>& staticLights)
+void Engine::Infra::Renderer::loadLights(std::vector<StaticPointLightResource> staticLights)
 {
-	//staticPointLights = staticLights;
-	//glEnable(GL_PROGRAM_POINT_SIZE);
-	//StaticPointLight lights[MAX_LIGHTS];
+	staticPointLights = staticLights;
 
 	glGenVertexArrays(1, &emptyVao);
-
-	//size_t lightsToCopy = (std::min)(staticLights.size(), static_cast<size_t>(MAX_LIGHTS));
-	//for (size_t i = 0; i < lightsToCopy; ++i) {
-	//	auto lightCpu = staticLights[i];
-	//	StaticPointLight lightGpu
-	//	{
-	//		.posRad = {lightCpu.position, lightCpu.radius},
-	//		.color = {lightCpu.color, lightCpu.intensity}
-	//	};
-
-	//	lights[i] = lightGpu;
-	//}
-
-	//LightBlock uboData{};
-
-	//std::memcpy(uboData.lights, lights, sizeof(lights));
-	//uboData.activeLightCount = static_cast<int>(lightsToCopy);
-
-	//activeLightCount = uboData.activeLightCount;
-
-	////GLuint ubo;
-	//glGenBuffers(1, &ubo);
-	//glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-
-	//glBufferData(GL_UNIFORM_BUFFER, sizeof(LightBlock), &uboData, GL_STATIC_DRAW);
-
-	//GLuint bindingPoint{ 0 };
-	//glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, ubo);
-	//glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
 	pointlightLoader.loadStaticPointlights(staticLights);
 	activeLightCount = pointlightLoader.getActiveLightCount();
 
 	for (const auto& shader : gpuShaderCache)
 	{
 		pointlightLoader.bindLightBlockToShader(shader->getId());
-		/*GLuint blockIndex = glGetUniformBlockIndex(shader->getId(), "LightBlock");
-
-		if (blockIndex != GL_INVALID_INDEX)
-		{
-			glUniformBlockBinding(shader->Id, blockIndex, bindingPoint);
-		}*/
 	}
+}
+
+void Engine::Infra::Renderer::loadShadowingLights(std::vector<StaticPointLightResource> staticLights)
+{
+	pointlightLoader.loadShadowCastedPointlights(staticLights, nnear, ffar);
 }
 
 void Engine::Infra::Renderer::renderLights()
@@ -314,13 +262,15 @@ void Engine::Infra::Renderer::submit(RenderCommand command)
 
 void Engine::Infra::Renderer::flush(size_t w , size_t h)
 {
-	renderToShadowCubemap(w,h);
+	renderToShadowCubemapArray(w,h);
 
 	glViewport(0, 0, w, h);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	pointlightLoader.bindLightBufferBase();
+
+	bool renderMultiLightShadows = true;
 
 	for (const auto& command : renderQueue)
 	{
@@ -338,7 +288,15 @@ void Engine::Infra::Renderer::flush(size_t w , size_t h)
 		glUniform1f(glGetUniformLocation(shader->getId(), "far_plane"), ffar);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemapId);
+		if (renderMultiLightShadows)
+		{
+			glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, depthCubemapId);
+		}
+
+		else
+		{
+			glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemapId);
+		}
 
 		glUniform2fv(glGetUniformLocation(shader->getId(), "uvScale"), 1, glm::value_ptr(command.uvScale));
 

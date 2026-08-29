@@ -68,6 +68,13 @@ namespace Engine::Core::ECS
 		void fill(Coordinator& coordinator, std::vector<StaticPointLightRendererData>& queue);
 	};
 
+	class ShadowPointSystem : public System
+	{
+	public:
+
+		std::vector<StaticPointLightRendererData> getShadowCastingPointlights(Coordinator& coordinator);
+	};
+
 	class PhysicsSystem : public System
 	{
 	public:

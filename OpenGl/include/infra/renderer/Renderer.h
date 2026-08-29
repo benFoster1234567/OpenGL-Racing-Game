@@ -25,12 +25,6 @@
 
 namespace Engine::Infra 
 {
-
-
-
-
-
-
 	struct RenderCommand
 	{
 		glm::mat4 view;
@@ -48,8 +42,6 @@ namespace Engine::Infra
 	{
 		FILL, LINE
 	};
-
-	
 
 	class Renderer
 	{
@@ -143,13 +135,16 @@ namespace Engine::Infra
 			ilInit();
 			iluInit();
 			ilutRenderer(ILUT_OPENGL);
+
+			nnear = 1.0f;
+			ffar = 25.0f;
 		}
 
 		void prepareDepthCubemapArray();
 
 		void prepareDepthCubemap();
 
-		void renderToShadowCubemapArray(size_t w, size_t h, std::vector<StaticPointLight> shadowCastingLights);
+		void renderToShadowCubemapArray(size_t w, size_t h);
 
 		void renderToShadowCubemap(size_t w, size_t h);
 
@@ -160,8 +155,11 @@ namespace Engine::Infra
 			shadowCubemapShader = gpuShaderCache.get(shader).get();
 		}
 
-		void loadLights(std::vector<StaticPointLightResource>& staticLights);
+		void loadLights(std::vector<StaticPointLightResource> staticLights);
+		void loadShadowingLights(std::vector<StaticPointLightResource> staticLights);
+
 		void renderLights();
+
 		void submit(RenderCommand command);
 
 		void flush(size_t w = 800, size_t h = 600);

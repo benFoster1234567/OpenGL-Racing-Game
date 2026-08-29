@@ -1,3 +1,5 @@
+#define MULTI_LIGHT
+
 #ifdef VERTEX_SHADER
 
 layout (location = 0) in vec3 aPos;
@@ -41,12 +43,20 @@ void main()
 #ifdef FRAGMENT_SHADER
  
 #define MAX_LIGHTS 100
+
 struct StaticPointLight {
     vec4 posRad; 
     vec4 color;  
 };
- 
-uniform samplerCube depthMap;
+
+#ifdef SINGLE_LIGHT
+    uniform samplerCube depthMap;
+#endif
+
+#ifdef MULTI_LIGHT
+    uniform samplerCubeArray depthMap;
+#endif
+
 struct Material 
 {
     sampler2D ambient;
@@ -56,15 +66,34 @@ struct Material
     float shininess;
 };
  
-layout (std140) uniform LightBlock {
+layout (std140, binding = 0) uniform LightBlock {
     StaticPointLight lights[MAX_LIGHTS];
     int activeLightCount;
 } ub;
+
+#ifdef MULTI_LIGHT
+
+    struct ShadowData
+    {
+        mat4 shadowTransforms[6];
+        vec4 lightPosition;
+    };
+
+    layout (std140, binding = 1) uniform ShadowBlock {
+        ShadowData lights[4];
+        int activeLightCount;
+    } ub1;
+
+#endif
 
 uniform mat4 view; 
 uniform Material material;
 uniform float far_plane;
 uniform vec2 uvScale;
+
+#ifdef SINGLE_LIGHT
+    uniform vec3 lightPosition
+#endif
 
 in vec3 vertexPosition;
 in vec2 texCoord;
@@ -81,7 +110,26 @@ float attenuate(float d, float r)
     return (a*a) / ((d*d)+1.0);
 }
 
-float shadowCalculation(vec3 fragPos, vec3 lightPos)
+float getClosestDepth(vec3 fragToLight, vec3 offset, float index)
+{
+    float closestDepth = 0;
+    
+    #ifdef SINGLE_LIGHT
+       
+       closestDepth = texture(depthMap, fragToLight + offset).r;
+
+    #endif
+    #ifdef MULTI_LIGHT
+
+        closestDepth = texture(depthMap, vec4(fragToLight + offset, index)).r; 
+
+    #endif
+
+    return closestDepth;
+}
+
+
+float shadowCalculation(vec3 fragPos, vec3 lightPos, float index)
 {
     vec3 fragToLight = fragPos - lightPos; 
     float currentDepth = length(fragToLight);
@@ -95,15 +143,41 @@ float shadowCalculation(vec3 fragPos, vec3 lightPos)
         {
             for(float z = -offset; z < offset; z += offset / (samples * 0.5))
             {
-                float closestDepth = texture(depthMap, fragToLight + vec3(x, y, z)).r; 
-                closestDepth *= far_plane;   // undo mapping [0;1]
+                
+                float closestDepth = getClosestDepth(fragToLight, vec3(x,y,z), index); 
+                closestDepth *= far_plane; 
                 if(currentDepth - bias > closestDepth)
                     shadow += 1.0;
             }
         }
     }
     return shadow / (samples * samples * samples);
-}  
+}
+
+float getShadow(vec3 fragPos)
+{
+     float shadow = 0;
+    
+    #ifdef SINGLE_LIGHT
+       
+       shadow = shadowCalculation(lightPosition, fragPos, 0);
+
+    #endif
+    #ifdef MULTI_LIGHT
+
+        for (int i = 0; i < ub1.activeLightCount; i++)
+        {
+            vec3 lightPos = ub1.lights[i].lightPosition.xyz;
+            float index = float(i);
+            shadow += shadowCalculation(fragPos, lightPos, index);
+        }
+
+    #endif
+
+    return shadow;
+}
+
+
 
 void main()
 {
@@ -150,12 +224,18 @@ void main()
         vec3 diffuse  = Kd * diffuseColor * lightColor;
         vec3 specular = Ks * specularColor * lightColor;
 
-        float shadow  = shadowCalculation(vertexPosition, lightPos);
+        float index = float(i);
+        float shadow  = shadowCalculation(vertexPosition, lightPos, index);
+
         colorOut += (1.0 - shadow) * (diffuse + specular) * attenuation * intensity;
     }
     
+    vec3 colorFractional = (colorOut - ( ub1.activeLightCount / ub.activeLightCount) * colorOut ) + (colorOut * getShadow(vertexPosition));
+
     colorOut += ambientColor;
 
     FragColor = vec4(colorOut, 1.0);
 }
 #endif
+
+

@@ -1,11 +1,11 @@
 # Blender MTL File: 'None'
 # Material Count: 1
 testMaterial Material
-Ns 20
+Ns 200
 Ka 0.000000 0.00000 0.00000
 Kd 0.600000 0.00000 0.800000
 Ks 1.00000 1.00000 1.00000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.0000
-map_Kd textures/testTextures.jpg
+map_Kd textures/gold.jpg

@@ -60,6 +60,7 @@ namespace Engine::Core::Game
 			coordinator.registerSystem<ECS::KeyControlSystem>();
 			coordinator.registerSystem<ECS::MouseControlSystem>();
 			coordinator.registerSystem<ECS::StaticLightRenderSetupSystem>();
+			coordinator.registerSystem<ECS::ShadowPointSystem>();
 		}
 
 		void registerComponents()
@@ -74,6 +75,7 @@ namespace Engine::Core::Game
 			coordinator.registerComponent<ECS::StaticPointLightComponent>();
 			coordinator.registerComponent<ECS::ExternalCameraComponent>();
 			coordinator.registerComponent<ECS::MaterialDataComponent>();
+			coordinator.registerComponent<ECS::ShadowCastComponent>();
 		}
 
 		void defineSystemSignatures()
@@ -99,6 +101,7 @@ namespace Engine::Core::Game
 			externalCamSig.set(coordinator.getComponentType<ECS::MeshComponent>());
 			externalCamSig.set(coordinator.getComponentType<ECS::ShaderComponent>());
 			externalCamSig.set(coordinator.getComponentType<ECS::ExternalCameraComponent>());
+
 			coordinator.setSystemSignature<ECS::RenderDispatcherExternalCamera>(externalCamSig);
 
 			ECS::Signature lightSignature{};
@@ -106,6 +109,14 @@ namespace Engine::Core::Game
 			lightSignature.set(coordinator.getComponentType<ECS::StaticPointLightComponent>());
 
 			coordinator.setSystemSignature<ECS::StaticLightRenderSetupSystem>(lightSignature);
+
+			ECS::Signature shadowCastingSignature{};
+			
+			shadowCastingSignature.set(coordinator.getComponentType<ECS::ShadowCastComponent>());
+			shadowCastingSignature.set(coordinator.getComponentType<ECS::TransformComponent>());
+			shadowCastingSignature.set(coordinator.getComponentType<ECS::StaticPointLightComponent>());
+
+			coordinator.setSystemSignature<ECS::ShadowPointSystem>(shadowCastingSignature);
 		}
 
 		ECS::Entity setupPlayerEntity()
@@ -167,6 +178,7 @@ namespace Engine::Core::Game
 			coordinator.addComponent(entity, extCamComp);
 			coordinator.addComponent(entity, matComp);
 
+
 			return entity;
 		}
 
@@ -223,7 +235,7 @@ namespace Engine::Core::Game
 			return entity;
 		}
 
-		ECS::Entity setupLightEntity(ECS::TransformComponent transform, float radius = 1000.0f, float intensity = 180.0f)
+		ECS::Entity setupLightEntity(ECS::TransformComponent transform, float radius = 25.0f, float intensity = 180.0f)
 		{
 			ECS::Entity entity = coordinator.createEntity();
 
@@ -234,6 +246,7 @@ namespace Engine::Core::Game
 
 			coordinator.addComponent(entity, transform);
 			coordinator.addComponent(entity, lightComp);
+			coordinator.addComponent(entity, ECS::ShadowCastComponent{});
 
 			return entity;
 		}
@@ -259,26 +272,35 @@ namespace Engine::Core::Game
 			auto cubeEntity = setupCubeEntity(playerEntity);
 
 			ECS::TransformComponent t2{};
+
 			t2.scale = glm::vec3{ 0.5f, 1, 0.5f };
 			t2.position = { 0,0,0 };
-
 			t2.rotation = { 0,0,0,1 };
+			
 			setupCubeEntity(playerEntity, t2, {1,2});
 
 			ECS::TransformComponent t{};
+			ECS::TransformComponent t3{};
+			ECS::TransformComponent t4{};
 
 			t.position = { 18, 7, -1 };
-
+			t3.position = { -18, 7, -1 };
+			t4.position = {1, 7, -2};
+			auto lightEntity1 = setupLightEntity(t3);
 			auto lightEntity2 = setupLightEntity(t);
-			//t.position = { -4, 4, 1 };
 
+			auto lightEntity3 = setupLightEntity(t4);
 
-			//auto lightEntity3 = setupLightEntity(t);
 		}
 
 		void setupLights(std::vector<ECS::StaticPointLightRendererData>& lightSetupQueueOut)
 		{
 			coordinator.getSystem<ECS::StaticLightRenderSetupSystem>()->fill(coordinator, lightSetupQueueOut);
+		}
+
+		std::vector<ECS::StaticPointLightRendererData> getShadowCastingPointlights()
+		{
+			return coordinator.getSystem<ECS::ShadowPointSystem>()->getShadowCastingPointlights(coordinator);
 		}
 
 		void shutdown() override

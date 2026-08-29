@@ -27,7 +27,7 @@ namespace Engine::Infra
 
 	struct ShadowBlock
 	{
-		PointlightShadowmapData lights[16];
+		PointlightShadowmapData lights[4];
 		int activeLightCount{ 0 };
 		int padding[3]{ 0, 0, 0 };
 	};
@@ -48,7 +48,7 @@ namespace Engine::Infra
 	class PointlightLoader
 	{
 	private:
-		static constexpr size_t MAX_SHADOW_SRC = 16;
+		static constexpr size_t MAX_SHADOW_SRC = 4;
 		static constexpr GLuint LIGHT_BINDING_POINT = 0;
 		static constexpr GLuint SHADOW_BINDING_POINT = 1;
 		static constexpr uint32_t MAX_LIGHTS = 100;

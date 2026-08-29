@@ -49,6 +49,7 @@ void Engine::Infra::Application::importAssets()
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/gridShader.glsl", "gridShader");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/lightDebuggerShader.glsl", "lightDebugShader");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/testTextures.jpg", "uvChecker");
+	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/gold.jpg", "gold");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0068.gif", "tileSpecular");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0066.gif", "tileDiffuse");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0067.gif", "tileNormal");
@@ -191,9 +192,6 @@ void Engine::Infra::Application::run()
 
 	GpuAssetLoader::fillRenderer(engine.assetManager, renderer);
 
-	//renderer.createShadowMap();
-	//renderer.createShadowCubemap();
-
 	std::vector<Engine::Core::ECS::StaticPointLightRendererData> lightData{};
 
 	//TODO: Tidy this up
@@ -212,9 +210,26 @@ void Engine::Infra::Application::run()
 	}
 
 	renderer.loadLights(pointLights);
-	glfwSwapInterval(0); 
+
+	auto shadowCastingLightData = engine.getShadowCastingPointlights();
+	std::vector<StaticPointLightResource> shadowCastingPointlights{};
+
+	for (const auto& light : shadowCastingLightData)
+	{
+		StaticPointLightResource splr{};
+		splr.position = light.position;
+		splr.color = light.color;
+		splr.radius = light.radius;
+		splr.intensity = light.intensity;
+		shadowCastingPointlights.push_back(splr);
+	}
+
+	renderer.loadShadowingLights(shadowCastingPointlights);
+
+	glfwSwapInterval(0);
 	window->disableCursor();
-	renderer.prepareDepthCubemap();
+	renderer.prepareDepthCubemapArray();
+
 	while (!window->shouldClose())
 	{
 		window->pollEvents();

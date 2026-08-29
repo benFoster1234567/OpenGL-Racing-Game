@@ -192,3 +192,26 @@ void Engine::Core::ECS::PhysicsSystem::update(Coordinator& coordinator, float de
 		transform.position += deltaPos;
 	}
 }
+
+std::vector<Engine::Core::ECS::StaticPointLightRendererData> Engine::Core::ECS::ShadowPointSystem::getShadowCastingPointlights(Coordinator& coordinator)
+{
+	std::vector<StaticPointLightRendererData> lights{};
+
+	for (Entity entity : entities)
+	{
+
+		auto& shadowProps = coordinator.getComponent<ShadowCastComponent>(entity);
+		const auto& light = coordinator.getComponent<StaticPointLightComponent>(entity);
+		const auto& transform = coordinator.getComponent<TransformComponent>(entity);
+
+		StaticPointLightRendererData rd{};
+		rd.color = light.color;
+		rd.position = transform.position;
+		rd.radius = light.radius;
+		rd.intensity = light.intensity;
+		
+		lights.push_back(rd);
+	}
+
+	return lights;
+}
