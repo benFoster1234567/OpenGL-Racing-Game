@@ -175,11 +175,14 @@ namespace Engine::Core::Game
 			ECS::Entity entity = coordinator.createEntity();
 
 			ECS::MeshComponent mesh{ assetManager.getMeshId("cube") };
+			mesh.uvScale = { 20,20 };
+
 			ECS::ShaderComponent shader{ assetManager.getShaderId("shader") };
 
 			ECS::TransformComponent transform{};
-			transform.scale = { 5.5f, 0.2f, 5.5f };
+			transform.scale = { 15.5f, 0.2f, 15.5f };
 			transform.position = { 0.0f, -1.0f, 0.0f };
+
 
 			ECS::ExternalCameraComponent extCamComp{};
 			extCamComp.entityWithCamera = cameraEntity;
@@ -196,7 +199,31 @@ namespace Engine::Core::Game
 			return entity;
 		}
 
-		ECS::Entity setupLightEntity(ECS::TransformComponent transform, float radius = 20.0f, float intensity = 30.0f)
+		ECS::Entity setupCubeEntity(ECS::Entity cameraEntity, ECS::TransformComponent transform, glm::vec2 uvScale)
+		{
+			ECS::Entity entity = coordinator.createEntity();
+
+			ECS::MeshComponent mesh{ assetManager.getMeshId("cube") };
+			mesh.uvScale = uvScale;
+			ECS::ShaderComponent shader{ assetManager.getShaderId("shader") };
+
+
+			ECS::ExternalCameraComponent extCamComp{};
+			extCamComp.entityWithCamera = cameraEntity;
+
+			ECS::MaterialDataComponent matComp{};
+			assetManager.get(matComp.material, "cubeMaterial");
+
+			coordinator.addComponent(entity, transform);
+			coordinator.addComponent(entity, mesh);
+			coordinator.addComponent(entity, shader);
+			coordinator.addComponent(entity, extCamComp);
+			coordinator.addComponent(entity, matComp);
+
+			return entity;
+		}
+
+		ECS::Entity setupLightEntity(ECS::TransformComponent transform, float radius = 1000.0f, float intensity = 180.0f)
 		{
 			ECS::Entity entity = coordinator.createEntity();
 
@@ -214,7 +241,7 @@ namespace Engine::Core::Game
 		ECS::Entity setupLightEntity()
 		{
 			ECS::TransformComponent transform{};
-			transform.position = { 3, 4, 0 };
+			transform.position = { 15, 10, 0 };
 
 			return setupLightEntity(transform, 20.0f);
 		}
@@ -231,11 +258,20 @@ namespace Engine::Core::Game
 			playerEntity = setupPlayerEntity();
 			auto cubeEntity = setupCubeEntity(playerEntity);
 
+			ECS::TransformComponent t2{};
+			t2.scale = glm::vec3{ 0.5f, 1, 0.5f };
+			t2.position = { 0,0,0 };
+
+			t2.rotation = { 0,0,0,1 };
+			setupCubeEntity(playerEntity, t2, {1,2});
+
 			ECS::TransformComponent t{};
-			t.position = { 4, 3, -1 };
+
+			t.position = { 18, 7, -1 };
 
 			auto lightEntity2 = setupLightEntity(t);
-			t.position = { -4, 4, 1 };
+			//t.position = { -4, 4, 1 };
+
 
 			//auto lightEntity3 = setupLightEntity(t);
 		}

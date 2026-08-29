@@ -172,6 +172,7 @@
     <ClInclude Include="include\core\ecs\ECS.h" />
     <ClInclude Include="include\core\ecs\EntityRegistry.h" />
     <ClInclude Include="include\core\ecs\StaticPointLight.h" />
+    <ClInclude Include="include\core\ecs\StaticPointlightComponent.h" />
     <ClInclude Include="include\core\ecs\System.h" />
     <ClInclude Include="include\core\ecs\SystemRegistry.h" />
     <ClInclude Include="include\core\ecs\Systems.h" />
@@ -196,6 +197,7 @@
     <ClInclude Include="include\infra\app\Window.h" />
     <ClInclude Include="include\infra\renderer\Framebuffer.h" />
     <ClInclude Include="include\infra\renderer\GpuAssetLoader.h" />
+    <ClInclude Include="include\infra\renderer\PointlightLoader.h" />
     <ClInclude Include="include\infra\renderer\Quad.h" />
     <ClInclude Include="include\infra\renderer\Renderer.h" />
     <ClInclude Include="include\infra\renderer\assets\GpuShader.h" />

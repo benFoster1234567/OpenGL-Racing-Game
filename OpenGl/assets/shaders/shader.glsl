@@ -64,6 +64,7 @@ layout (std140) uniform LightBlock {
 uniform mat4 view; 
 uniform Material material;
 uniform float far_plane;
+uniform vec2 uvScale;
 
 in vec3 vertexPosition;
 in vec2 texCoord;
@@ -101,13 +102,12 @@ float shadowCalculation(vec3 fragPos, vec3 lightPos)
             }
         }
     }
-    shadow /= (samples * samples * samples);
-    return shadow;
+    return shadow / (samples * samples * samples);
 }  
 
 void main()
 {
-    vec2 uTiling = vec2(10.0, 10.0);
+    vec2 uTiling = uvScale;
     vec2 tiledUV = texCoord * uTiling;
 
     vec3 ambientColor  = texture(material.diffuse, tiledUV).rgb * 0.05;

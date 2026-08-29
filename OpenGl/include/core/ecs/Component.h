@@ -65,6 +65,7 @@ namespace Engine::Core::ECS
 		MeshComponent() = default;
 		MeshComponent(Engine::Core::MeshId id) : meshId(id) {}
 		Engine::Core::MeshId meshId{};
+		glm::vec2 uvScale{1 , 1};
 	};
 
 	struct ShaderComponent : public ComponentBase
@@ -89,13 +90,6 @@ namespace Engine::Core::ECS
 	struct MouseInputSettings : ComponentBase
 	{
 		glm::vec2 sensitivity{ 0.07f,0.05f };
-	};
-
-	struct StaticPointLightComponent : ComponentBase
-	{
-		glm::vec3 color{};
-		float radius{};
-		float intensity{ 1.0f };
 	};
 
 	struct MotionPropertiesComponent : ComponentBase

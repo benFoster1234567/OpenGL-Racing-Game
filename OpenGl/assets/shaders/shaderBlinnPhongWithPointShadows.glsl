@@ -29,6 +29,7 @@ void main()
 #ifdef FRAGMENT_SHADER
  
 #define MAX_LIGHTS 100
+
 struct StaticPointLight {
     vec4 posRad; 
     vec4 color;  
@@ -43,7 +44,7 @@ struct Material
     sampler2D normal;
     float shininess;
 };
- 
+
 layout (std140) uniform LightBlock {
     StaticPointLight lights[MAX_LIGHTS];
     int activeLightCount;

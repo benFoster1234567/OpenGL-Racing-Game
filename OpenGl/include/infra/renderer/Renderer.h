@@ -21,36 +21,23 @@
 #include "ShadowCubeMap.h"
 #include "core/assets/AssetIds.h"
 #include "SparseSet.h"
+#include "PointlightLoader.h"
+
 namespace Engine::Infra 
 {
-	constexpr uint32_t MAX_LIGHTS = 100;
 
-	struct StaticPointLightResource
-	{
-		glm::vec3 position{ 0.0f };
-		glm::vec3 color{ 0.0f };
-		float radius{ 0.0f };
-		float intensity{ 1.0f };
-	};
 
-	struct StaticPointLight
-	{
-		glm::vec4 posRad = { 0.0f,0.0f,0.0f, 10.0f };
-		glm::vec4 color = { 1.0f,1.0f,1.0f, 1.0f };
-	};
 
-	struct UboStaticPointLightData
-	{
-		StaticPointLight lights[100];
-		int activeLightCount;
-		int padding[3];
-	};
+
+
 
 	struct RenderCommand
 	{
 		glm::mat4 view;
 		glm::mat4 projection;
 		glm::mat4 modelTransform;
+
+		glm::vec2 uvScale;
 
 		Core::ShaderId shader;
 		Core::MeshId mesh;
@@ -84,6 +71,8 @@ namespace Engine::Infra
 		void drawLights(Core::ShaderId shaderId, size_t lightCount);
 		
 		unsigned int renderMode = 0;
+
+		PointlightLoader pointlightLoader{};
 
 		int polygonMode = LINE;
 

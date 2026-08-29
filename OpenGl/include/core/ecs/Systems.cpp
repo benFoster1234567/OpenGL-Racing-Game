@@ -28,6 +28,7 @@ void Engine::Core::ECS::RenderDispatcherOrbitalCamera::update(Coordinator& coord
 		sendRenderInfo.invoke({ .view = viewMat
 			, .projection = projectionMat
 			, .modelTransform = transformMat
+			, .uvScale = meshData.uvScale
 			, .shader = shaderData.shaderId
 			, .mesh = meshData.meshId
 			, .material = material.material });
@@ -86,6 +87,7 @@ void Engine::Core::ECS::RenderDispatcherExternalCamera::update(Coordinator& coor
 		sendRenderInfo.invoke({ .view = viewMat
 			, .projection = projectionMat
 			, .modelTransform = transformMat
+			, .uvScale = meshData.uvScale
 			, .shader = shaderData.shaderId
 			, .mesh = meshData.meshId
 			, .material = material.material });

@@ -19,7 +19,7 @@ void Engine::Infra::Renderer::drawLights(Core::ShaderId shaderId, size_t lightCo
 	
 	glBindVertexArray(emptyVao);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
+	pointlightLoader.bindLightBufferBase();
 
 	glDrawArrays(GL_POINTS, 0, lightCount);
 
@@ -40,13 +40,14 @@ std::vector<glm::mat4> Engine::Infra::Renderer::getTransformCubemapArray(std::ve
 		if (i < staticPointLights.size())
 		{
 			lp = staticPointLights[i].position;
-			transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-			transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-			transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-			transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
-			transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
-			transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 		}
+
+		transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+		transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+		transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+		transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+		transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+		transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 	}
 
 	return transforms;
@@ -240,49 +241,53 @@ void Engine::Infra::Renderer::renderToShadowCubemap(size_t w, size_t h)
 
 void Engine::Infra::Renderer::loadLights(std::vector<StaticPointLightResource>& staticLights)
 {
-	staticPointLights = staticLights;
-	glEnable(GL_PROGRAM_POINT_SIZE);
-	StaticPointLight lights[MAX_LIGHTS];
+	//staticPointLights = staticLights;
+	//glEnable(GL_PROGRAM_POINT_SIZE);
+	//StaticPointLight lights[MAX_LIGHTS];
 
 	glGenVertexArrays(1, &emptyVao);
 
-	size_t lightsToCopy = (std::min)(staticLights.size(), static_cast<size_t>(MAX_LIGHTS));
-	for (size_t i = 0; i < lightsToCopy; ++i) {
-		auto lightCpu = staticLights[i];
-		StaticPointLight lightGpu
-		{
-			.posRad = {lightCpu.position, lightCpu.radius},
-			.color = {lightCpu.color, lightCpu.intensity}
-		};
+	//size_t lightsToCopy = (std::min)(staticLights.size(), static_cast<size_t>(MAX_LIGHTS));
+	//for (size_t i = 0; i < lightsToCopy; ++i) {
+	//	auto lightCpu = staticLights[i];
+	//	StaticPointLight lightGpu
+	//	{
+	//		.posRad = {lightCpu.position, lightCpu.radius},
+	//		.color = {lightCpu.color, lightCpu.intensity}
+	//	};
 
-		lights[i] = lightGpu;
-	}
+	//	lights[i] = lightGpu;
+	//}
 
-	UboStaticPointLightData uboData{};
+	//LightBlock uboData{};
 
-	std::memcpy(uboData.lights, lights, sizeof(lights));
-	uboData.activeLightCount = static_cast<int>(lightsToCopy);
+	//std::memcpy(uboData.lights, lights, sizeof(lights));
+	//uboData.activeLightCount = static_cast<int>(lightsToCopy);
 
-	activeLightCount = uboData.activeLightCount;
+	//activeLightCount = uboData.activeLightCount;
 
-	//GLuint ubo;
-	glGenBuffers(1, &ubo);
-	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+	////GLuint ubo;
+	//glGenBuffers(1, &ubo);
+	//glBindBuffer(GL_UNIFORM_BUFFER, ubo);
 
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(UboStaticPointLightData), &uboData, GL_STATIC_DRAW);
+	//glBufferData(GL_UNIFORM_BUFFER, sizeof(LightBlock), &uboData, GL_STATIC_DRAW);
 
-	GLuint bindingPoint{ 0 };
-	glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, ubo);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	//GLuint bindingPoint{ 0 };
+	//glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, ubo);
+	//glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	pointlightLoader.loadStaticPointlights(staticLights);
+	activeLightCount = pointlightLoader.getActiveLightCount();
 
 	for (const auto& shader : gpuShaderCache)
 	{
-		GLuint blockIndex = glGetUniformBlockIndex(shader->getId(), "LightBlock");
+		pointlightLoader.bindLightBlockToShader(shader->getId());
+		/*GLuint blockIndex = glGetUniformBlockIndex(shader->getId(), "LightBlock");
 
 		if (blockIndex != GL_INVALID_INDEX)
 		{
 			glUniformBlockBinding(shader->Id, blockIndex, bindingPoint);
-		}
+		}*/
 	}
 }
 
@@ -290,7 +295,8 @@ void Engine::Infra::Renderer::renderLights()
 {
 	glUseProgram(DebugLightShader->getId());
 	glBindVertexArray(emptyVao);
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
+	pointlightLoader.bindLightBufferBase();
+
 	glDrawArrays(GL_POINTS, 0 , activeLightCount);
 
 }
@@ -314,7 +320,7 @@ void Engine::Infra::Renderer::flush(size_t w , size_t h)
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
+	pointlightLoader.bindLightBufferBase();
 
 	for (const auto& command : renderQueue)
 	{
@@ -333,6 +339,8 @@ void Engine::Infra::Renderer::flush(size_t w , size_t h)
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemapId);
+
+		glUniform2fv(glGetUniformLocation(shader->getId(), "uvScale"), 1, glm::value_ptr(command.uvScale));
 
 		glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, ambient->id);
 		glActiveTexture(GL_TEXTURE2); glBindTexture(GL_TEXTURE_2D, diffuse->id);

@@ -1,8 +1,8 @@
 # Blender MTL File: 'None'
 # Material Count: 1
 testMaterial Material
-Ns 100
-Ka 0.010000 0.010000 0.010000
+Ns 20
+Ka 0.000000 0.00000 0.00000
 Kd 0.600000 0.00000 0.800000
 Ks 1.00000 1.00000 1.00000
 Ke 0.000000 0.000000 0.000000

@@ -180,7 +180,7 @@ void Engine::Infra::Application::run()
 	
 	Engine::Core::ECS::RenderDispatcher::sendRenderInfo.subscribe([&](Engine::Core::ECS::RenderOutput output)
 		{
-			RenderCommand rc = { .view = output.view, .projection = output.projection, .modelTransform = output.modelTransform, .shader = output.shader, .mesh = output.mesh,.material = output.material };
+			RenderCommand rc = { .view = output.view, .projection = output.projection, .modelTransform = output.modelTransform, .uvScale = output.uvScale, .shader = output.shader, .mesh = output.mesh,.material = output.material };
 			renderer.submit(rc);
 		});
 

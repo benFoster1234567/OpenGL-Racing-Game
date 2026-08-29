@@ -27,7 +27,7 @@ Engine::Infra::Window::Window(
 		throw std::runtime_error("Failed to initialize GLFW");
 	}
 
-
+	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -63,7 +63,7 @@ Engine::Infra::Window::Window(
 	int initialWidth, initialHeight;
 	glfwGetFramebufferSize(glfwWindow, &initialWidth, &initialHeight);
 	glViewport(0, 0, initialWidth, initialHeight);
-
+	glEnable(GL_MULTISAMPLE);
 	glewExperimental = GL_TRUE;
 
 	GLenum err = glewInit();

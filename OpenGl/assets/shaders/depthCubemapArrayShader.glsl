@@ -22,7 +22,7 @@ struct StaticPointlightData
     vec4 lightPosition;
 }
 
-layout (std140) uniform LightBlock {
+layout (std140) uniform ShadowBlock {
     StaticPointlightData lights[MAX_LIGHTS];
     int activeLightCount;
 } ub;
