@@ -41,6 +41,8 @@ namespace Engine::Core
 		void printPoints(); //for debugging purposes...
 
 		void recomputeNormals(int vertexIndex = 0, int normalsIndex = 1);
+		void recomputeNormalsSmooth(int vertexIndex = 0, int normalsIndex = 1);
+
 		void computeTangents();
 		
 		void recomputeNormalsAndTangents()

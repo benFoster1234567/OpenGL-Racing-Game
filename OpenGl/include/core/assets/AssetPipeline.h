@@ -15,7 +15,6 @@
 
 namespace Engine::Core {
 
-	class AssetManager;
 	
 	struct ImportCommand
 	{

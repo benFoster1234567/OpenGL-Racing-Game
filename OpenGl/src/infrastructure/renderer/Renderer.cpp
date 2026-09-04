@@ -25,34 +25,6 @@ void Engine::Infra::Renderer::drawLights(Core::ShaderId shaderId, size_t lightCo
 
 }
 
-std::vector<glm::mat4> Engine::Infra::Renderer::getTransformCubemapArray(std::vector<glm::vec3> lightPositions)
-{
-	std::vector<glm::mat4> transforms{};
-
-	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-	float aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
-
-	glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, nnear, ffar);
-
-	for (int i{}; i < 4; i++)
-	{
-		glm::vec3 lp{ 0.0f };
-		if (i < staticPointLights.size())
-		{
-			lp = staticPointLights[i].position;
-		}
-
-		transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-		transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-		transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-		transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
-		transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
-		transforms.push_back(shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
-	}
-
-	return transforms;
-}
-
 void Engine::Infra::Renderer::prepareDepthCubemapArray()
 {
 	if (staticPointLights.empty()) return;
@@ -195,31 +167,6 @@ void Engine::Infra::Renderer::cacheTexture(Core::TextureId textureId, Core::Text
 	gpuTextureCache.insert(textureId, std::move(gpuTexture));
 }
 
-void Engine::Infra::Renderer::renderToShadowCubemap(size_t w, size_t h)
-{
-	//glEnable(GL_DEPTH_TEST);
-	shadowCubemapShader->use();
-	//glCullFace(GL_FRONT);
-	glViewport(0, 0, 1024, 1024);
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	GLuint shadowShaderId = shadowCubemapShader->getId();
-
-	glUniformMatrix4fv(glGetUniformLocation(shadowShaderId, "shadowMatrices"), 6, GL_FALSE, glm::value_ptr(getTransforms(lightPos)[0]));
-	glUniform3fv(glGetUniformLocation(shadowShaderId, "lightPos"), 1, glm::value_ptr(lightPos));
-	glUniform1f(glGetUniformLocation(shadowShaderId, "far_plane"), ffar);
-
-	for (const auto& command : renderQueue)
-	{
-		GpuMesh* mesh = gpuMeshCache.get(command.mesh).get();
-		glUniformMatrix4fv(glGetUniformLocation(shadowShaderId, "model"), 1, GL_FALSE, glm::value_ptr(command.modelTransform));
-		mesh->draw();
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
 void Engine::Infra::Renderer::loadLights(std::vector<StaticPointLightResource> staticLights)
 {
 	staticPointLights = staticLights;
@@ -234,7 +181,7 @@ void Engine::Infra::Renderer::loadLights(std::vector<StaticPointLightResource> s
 	}
 }
 
-void Engine::Infra::Renderer::loadShadowingLights(std::vector<StaticPointLightResource> staticLights)
+void Engine::Infra::Renderer::loadShadowingLights(const std::vector<StaticPointLightResource>& staticLights)
 {
 	pointlightLoader.loadShadowCastedPointlights(staticLights, nnear, ffar);
 }

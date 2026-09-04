@@ -126,7 +126,7 @@ namespace Engine::Infra
 			return transforms;
 		}
 
-		std::vector<glm::mat4> getTransformCubemapArray(std::vector<glm::vec3> lightPositions);
+		std::vector<glm::mat4> getTransformCubemapArray(const std::vector<glm::vec3>& lightPositions);
 
 	public:
 		
@@ -146,8 +146,6 @@ namespace Engine::Infra
 
 		void renderToShadowCubemapArray(size_t w, size_t h);
 
-		void renderToShadowCubemap(size_t w, size_t h);
-
 		~Renderer() = default;
 
 		void setShadowCubemapShader(Core::ShaderId shader)
@@ -156,7 +154,7 @@ namespace Engine::Infra
 		}
 
 		void loadLights(std::vector<StaticPointLightResource> staticLights);
-		void loadShadowingLights(std::vector<StaticPointLightResource> staticLights);
+		void loadShadowingLights(const std::vector<StaticPointLightResource>& staticLights);
 
 		void renderLights();
 

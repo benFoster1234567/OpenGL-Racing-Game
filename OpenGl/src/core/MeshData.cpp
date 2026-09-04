@@ -47,6 +47,12 @@ void Engine::Core::MeshData::recomputeNormals(int vertexIndex, int normalsIndex)
 	attributes[normalsIndex].data = norms;
 }
 
+void Engine::Core::MeshData::recomputeNormalsSmooth(int vertexIndex, int normalsIndex)
+{
+	//TODO: Implement this
+	throw std::logic_error("Method not implemented");
+}
+
 void Engine::Core::MeshData::computeTangents()
 {
 	Attribute tangentAttribute{};

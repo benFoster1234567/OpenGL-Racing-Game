@@ -10,6 +10,122 @@
 #include <core/assets/ShaderData.h>
 #include <IL/il.h>
 
+//struct VertexGL
+//{
+//	glm::vec3 pos;
+//	glm::vec3 norm;
+//	glm::vec2 tex;
+//
+//	bool operator==(const VertexGL& other) const {
+//		return memcmp(this, &other, sizeof(VertexGL)) == 0;
+//	}
+//};
+//
+//Engine::Core::MeshData Engine::Infra::ImportFuncs::importMeshDataWithIndicesTOL(const std::string& path, const std::string& name)
+//{
+//	tinyobj::attrib_t attrib;
+//	std::vector<tinyobj::shape_t> shapes;
+//	std::vector<tinyobj::material_t> materials;
+//	std::string warn, err;
+//
+//	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, path.c_str())) {
+//		throw std::runtime_error(warn + err);
+//	}
+//
+//	Engine::Core::Attribute vertexPoints{}, normals{}, texCoords{};
+//
+//	std::vector<float> verts{}, norms{}, tex{};
+//	std::vector<unsigned int> indices{};
+//	std::unordered_map<VertexGL, unsigned int> uniqueVertexMap{};
+//
+//	bool hasNormals = !attrib.normals.empty();
+//	bool hasTexcoords = !attrib.texcoords.empty();
+//
+//	unsigned int vertexCount = 0;
+//
+//	auto unpackAndAddVertex = [&](const VertexGL& v)
+//		{
+//			verts.push_back(v.pos.x);
+//			verts.push_back(v.pos.y);
+//			verts.push_back(v.pos.z);
+//
+//			norms.push_back(v.norm.x);
+//			norms.push_back(v.norm.y);
+//			norms.push_back(v.norm.z);
+//
+//			tex.push_back(v.tex.x);
+//			tex.push_back(v.tex.y);
+//		};
+//
+//	for (const auto& shape : shapes) {
+//		for (const auto& index : shape.mesh.indices) {
+//			
+//			VertexGL vertex;
+//
+//			vertex.pos.x = (attrib.vertices[3 * index.vertex_index + 0]);
+//			vertex.pos.y = (attrib.vertices[3 * index.vertex_index + 1]);
+//			vertex.pos.z = (attrib.vertices[3 * index.vertex_index + 2]);
+//
+//			if (hasNormals && index.normal_index >= 0)
+//			{
+//				vertex.norm.x = (attrib.normals[3 * index.normal_index + 0]);
+//				vertex.norm.y = (attrib.normals[3 * index.normal_index + 1]);
+//				vertex.norm.z = (attrib.normals[3 * index.normal_index + 2]);
+//			}
+//			else
+//			{
+//				vertex.norm.x = (0.0f);
+//				vertex.norm.y = (1.0f);
+//				vertex.norm.z = (0.0f);
+//			}
+//
+//			if (hasTexcoords && index.texcoord_index >= 0)
+//			{
+//				vertex.tex.x = (attrib.texcoords[2 * index.texcoord_index + 0]);
+//				vertex.tex.y = (1.0f - attrib.texcoords[2 * index.texcoord_index + 1]);
+//			}
+//			else
+//			{
+//				vertex.tex.x = (0.0f);
+//				vertex.tex.y = (0.0f);
+//			}
+//
+//			if (uniqueVertexMap.count(vertex) == 0)
+//			{
+//				uniqueVertexMap[vertex] = vertexCount;
+//				unpackAndAddVertex(vertex);
+//				vertexCount++;
+//			}
+//
+//			indices.push_back(uniqueVertexMap[vertex]);
+//
+//		}
+//	}
+//
+//	vertexPoints.data = verts;
+//	vertexPoints.index = 0;
+//	vertexPoints.size = 3;
+//
+//	normals.data = norms;
+//	normals.index = 1;
+//	normals.size = 3;
+//
+//	texCoords.data = tex;
+//	texCoords.index = 2;
+//	texCoords.size = 2;
+//
+//	Engine::Core::MeshData newMesh{};
+//
+//	newMesh.attributes.push_back(std::move(vertexPoints));//0
+//	newMesh.attributes.push_back(std::move(normals));//1
+//	newMesh.attributes.push_back(std::move(texCoords));//2
+//	newMesh.attributes.push_back({}); // for tangent space. This is computed later after normals are recomputed
+//
+//	newMesh.indices = indices;
+//
+//	newMesh.name = name;
+//	return newMesh;
+//}
 
 Engine::Core::MeshData Engine::Infra::ImportFuncs::importMeshDataTOL(const std::string& path, const std::string& name)
 {

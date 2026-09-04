@@ -92,7 +92,7 @@ uniform float far_plane;
 uniform vec2 uvScale;
 
 #ifdef SINGLE_LIGHT
-    uniform vec3 lightPosition
+    uniform vec3 lightPosition;
 #endif
 
 in vec3 vertexPosition;
@@ -131,27 +131,31 @@ float getClosestDepth(vec3 fragToLight, vec3 offset, float index)
 
 float shadowCalculation(vec3 fragPos, vec3 lightPos, float index)
 {
+    vec3 sampleOffsetDirections[20] = vec3[]
+    (
+       vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+       vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+       vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+       vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+       vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+    );   
+
     vec3 fragToLight = fragPos - lightPos; 
     float currentDepth = length(fragToLight);
     float shadow  = 0.0;
     float bias    = 0.05; 
-    float samples = 4.0;
-    float offset  = 0.1;
-    for(float x = -offset; x < offset; x += offset / (samples * 0.5))
+    int samples = 20;
+    
+    float diskRadius = 0.05;
+    for(int i = 0; i < samples; i++)
     {
-        for(float y = -offset; y < offset; y += offset / (samples * 0.5))
-        {
-            for(float z = -offset; z < offset; z += offset / (samples * 0.5))
-            {
-                
-                float closestDepth = getClosestDepth(fragToLight, vec3(x,y,z), index); 
-                closestDepth *= far_plane; 
-                if(currentDepth - bias > closestDepth)
-                    shadow += 1.0;
-            }
-        }
+        float closestDepth = getClosestDepth(fragToLight, sampleOffsetDirections[i] * diskRadius, index);
+        closestDepth *= far_plane; 
+        if(currentDepth - bias > closestDepth)
+            shadow += 1.0;
     }
-    return shadow / (samples * samples * samples);
+
+    return shadow / float(samples);
 }
 
 float getShadow(vec3 fragPos)
