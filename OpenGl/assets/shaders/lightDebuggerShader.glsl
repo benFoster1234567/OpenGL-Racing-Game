@@ -1,1 +1,0 @@
-#ifdef VERTEX_SHADER
