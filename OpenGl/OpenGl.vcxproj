@@ -140,7 +140,6 @@
     <ClCompile Include="include\core\ecs\components\ShaderComponent.h" />
     <ClCompile Include="include\core\ecs\components\MaterialDataComponent.h" />
     <ClCompile Include="include\core\ecs\components\PlayerControllerComponent.h" />
-    <ClCompile Include="include\core\ecs\components\CarControllerComponent.h" />
     <ClCompile Include="include\core\ecs\components\MotionPropertiesComponent.h" />
     <ClCompile Include="include\core\ecs\components\MouseInputSettingsComponent.h" />
     <ClCompile Include="include\core\ecs\systems\RenderDispatcherSystems.h" />
@@ -181,9 +180,10 @@
     <ClInclude Include="include\core\assets\AssetPipeline.h" />
     <ClInclude Include="include\core\assets\MaterialRenderData.h" />
     <ClInclude Include="include\core\assets\ShaderData.h" />
-    <ClInclude Include="include\core\assets\TextureFileNameRegistry.h" />
+    <ClInclude Include="include\core\ecs\components\Colliders.h" />
     <ClInclude Include="include\core\ecs\components\PhysicsComponent.h" />
     <ClInclude Include="include\core\ecs\components\PointlightComponents.h" />
+    <ClInclude Include="include\core\ecs\components\RigidBodyComponent.h" />
     <ClInclude Include="include\core\ecs\coordinator\ComponentArray.h" />
     <ClInclude Include="include\core\ecs\coordinator\ComponentRegistry.h" />
     <ClInclude Include="include\core\ecs\coordinator\Coordinator.h" />
@@ -198,7 +198,6 @@
     <ClInclude Include="include\core\Physics.h" />
     <ClInclude Include="include\infra\app\Application.h" />
     <ClInclude Include="include\infra\bullet\BtPhysicsEngine.h" />
-    <ClInclude Include="include\infra\bullet\Bullet.h" />
     <ClInclude Include="include\infra\engine\AssetImporter.h" />
     <ClInclude Include="include\infra\engine\DebugConsoleUI.h" />
     <ClInclude Include="include\infra\engine\ImportFuncs.h" />
@@ -219,8 +218,6 @@
     <ClInclude Include="include\infra\renderer\Quad.h" />
     <ClInclude Include="include\infra\renderer\Renderer.h" />
     <ClInclude Include="include\infra\renderer\assets\GpuShader.h" />
-    <ClInclude Include="include\infra\renderer\ShadowCubeMap.h" />
-    <ClInclude Include="include\infra\renderer\Shadows.h" />
     <ClInclude Include="include\IsUniquePtr.h" />
     <ClInclude Include="include\SparseSet.h" />
     <ClInclude Include="tests\Tester.h" />
@@ -233,10 +230,8 @@
     <None Include="assets\shaders\depthCubemapArrayShader.glsl" />
     <None Include="assets\shaders\depthCubeShader.glsl" />
     <None Include="assets\shaders\gridShader.glsl" />
-    <None Include="assets\shaders\lightDebuggerShader.glsl" />
     <None Include="assets\shaders\pointShadow.glsl" />
     <None Include="assets\shaders\shader.glsl" />
-    <None Include="assets\shaders\shadows.glsl" />
     <None Include="shaders\shader.glsl" />
   </ItemGroup>
   <ItemGroup>

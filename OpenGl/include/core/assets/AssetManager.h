@@ -9,13 +9,11 @@
 #include "MaterialData.h"
 #include "ShaderData.h"
 
-
 #include "core/Patterns.h"
 #include <utility>
 #include <variant>
 #include <algorithm>
 #include "AssetIds.h"
-#include "TextureFileNameRegistry.h"
 #include "AssetStorage.h"
 
 namespace Engine::Core
@@ -23,12 +21,6 @@ namespace Engine::Core
 	using AssetVariant = std::variant<std::monostate, std::unique_ptr<MeshData>, std::unique_ptr<TextureData>, std::unique_ptr<MaterialData>, std::unique_ptr<ShaderData>>;
 
 
-	struct TextureInfo
-	{
-		std::string filePath{};
-		TextureIdx textureId{};
-	};
-	
 	class AssetManager
 	{
 	private:

@@ -40,7 +40,7 @@ void Engine::Core::AssetManager::get(ShaderData*& shaderOut, const std::string& 
 	}
 	else 
 	{
-		std::cout << "No shader found when trying to return : " << name << "\n";
+		std::cout << "No shader found : " << name << "\n";
 		shaderOut = nullptr;
 	}
 }
@@ -49,7 +49,7 @@ void Engine::Core::AssetManager::get(TextureData*& texOut, const std::string& na
 {
 	if (!textures.contains(name))
 	{
-		std::cout << "No texture found when trying to return : " << name << "\n";
+		std::cout << "No texture found : " << name << "\n";
 		texOut = nullptr;
 		return;
 	}

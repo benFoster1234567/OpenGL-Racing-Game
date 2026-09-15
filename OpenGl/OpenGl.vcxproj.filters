@@ -96,9 +96,6 @@
     <ClCompile Include="include\core\ecs\components\PlayerControllerComponent.h">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\core\ecs\components\CarControllerComponent.h">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="include\core\ecs\components\MotionPropertiesComponent.h">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -224,9 +221,6 @@
     <ClInclude Include="include\infra\engine\AssetImporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\assets\TextureFileNameRegistry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\core\assets\AssetPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -242,16 +236,10 @@
     <ClInclude Include="include\infra\renderer\DepthMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\infra\renderer\Shadows.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\infra\renderer\Quad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\infra\renderer\DepthCubeMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\infra\renderer\ShadowCubeMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\IsUniquePtr.h">
@@ -281,6 +269,12 @@
     <ClInclude Include="include\core\ecs\components\PhysicsComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\core\ecs\components\RigidBodyComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\ecs\components\Colliders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.glsl" />
@@ -288,8 +282,6 @@
     <None Include="assets\shaders\gridShader.glsl" />
     <None Include="assets\materials\testMaterial.mtl" />
     <None Include="assets\materials\cubeMaterial.mtl" />
-    <None Include="assets\shaders\lightDebuggerShader.glsl" />
-    <None Include="assets\shaders\shadows.glsl" />
     <None Include="assets\shaders\depthBufferOut.glsl" />
     <None Include="assets\shaders\pointShadow.glsl" />
     <None Include="assets\shaders\depthCubeShader.glsl" />

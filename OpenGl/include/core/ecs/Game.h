@@ -5,7 +5,6 @@
 #include "coordinator/Coordinator.h"
 
 #include "components/CameraComponents.h"
-#include "components/CarControllerComponent.h"
 #include "components/MaterialDataComponent.h"
 #include "components/MeshComponent.h"
 #include "components/MotionPropertiesComponent.h"
@@ -15,6 +14,8 @@
 #include "components/ShaderComponent.h"
 #include "components/TransformComponent.h"
 #include "components/PhysicsComponent.h"
+#include "components/RigidBodyComponent.h"
+#include "components/Colliders.h"
 
 #include "systems/PhysicsSystem.h"
 #include "systems/ControlSystems.h"
@@ -97,6 +98,8 @@ namespace Engine::Core::Game
 			coordinator.registerComponent<ECS::MaterialDataComponent>();
 			coordinator.registerComponent<ECS::ShadowCastComponent>();
 			coordinator.registerComponent<ECS::PhysicsComponent>();
+			coordinator.registerComponent<ECS::BoxColliderComponent>();
+			coordinator.registerComponent<ECS::RigidBodyComponent>();
 		}
 
 		void defineSystemSignatures()
@@ -142,6 +145,10 @@ namespace Engine::Core::Game
 			ECS::Signature physicsSystemSig{};
 
 			physicsSystemSig.set(coordinator.getComponentType<ECS::PhysicsComponent>());
+			physicsSystemSig.set(coordinator.getComponentType<ECS::BoxColliderComponent>());
+			physicsSystemSig.set(coordinator.getComponentType<ECS::RigidBodyComponent>());
+			physicsSystemSig.set(coordinator.getComponentType<ECS::TransformComponent>());
+			physicsSystemSig.set(coordinator.getComponentType<ECS::MeshComponent>());
 
 			coordinator.setSystemSignature<ECS::PhysicsSystem>(physicsSystemSig);
 		}
@@ -175,7 +182,7 @@ namespace Engine::Core::Game
 			coordinator.addComponent(entity, mesh);
 			coordinator.addComponent(entity, transform);
 			coordinator.addComponent(entity, ECS::CameraComponent{});
-			coordinator.addComponent(entity, ECS::PhysicsComponent{});
+
 			coordinator.addComponent(entity, shader);
 			coordinator.addComponent(entity, ECS::OrbitalCameraComponent{});
 			coordinator.addComponent(entity, mis);
@@ -211,18 +218,14 @@ namespace Engine::Core::Game
 			return entity;
 		}
 
-		ECS::Entity setupCubeEntity(ECS::Entity cameraEntity)
+
+		ECS::Entity setupRbCubeEntity(ECS::Entity cameraEntity, ECS::TransformComponent transform, glm::vec2 uvScale)
 		{
 			ECS::Entity entity = coordinator.createEntity();
 
 			ECS::MeshComponent mesh{ assetManager.getMeshId("cube") };
-			mesh.uvScale = { 20,20 };
-
+			mesh.uvScale = uvScale;
 			ECS::ShaderComponent shader{ assetManager.getShaderId("shader") };
-
-			ECS::TransformComponent transform{};
-			transform.scale = { 15.5f, 0.2f, 15.5f };
-			transform.position = { 0.0f, -1.0f, 0.0f };
 
 
 			ECS::ExternalCameraComponent extCamComp{};
@@ -236,6 +239,73 @@ namespace Engine::Core::Game
 			coordinator.addComponent(entity, shader);
 			coordinator.addComponent(entity, extCamComp);
 			coordinator.addComponent(entity, matComp);
+
+
+			auto minsMaxes = assetManager.getMesh(mesh.meshId)->getMinMaxes();
+
+			float xSize = (minsMaxes.maxX - minsMaxes.minX) / 2 * transform.scale.x;
+			float ySize = (minsMaxes.maxY - minsMaxes.minY) / 2 * transform.scale.y;
+			float zSize = (minsMaxes.maxZ - minsMaxes.minZ) / 2 * transform.scale.z;
+
+			ECS::BoxColliderComponent collider{};
+			collider.halfBounds = { xSize,ySize,zSize };
+			ECS::RigidBodyComponent rbComp{};
+			rbComp.isKinematic = false;
+			rbComp.isStatic = false;
+			rbComp.mass = 1.0f;
+			rbComp.momentOfInertia = { 1,1,1 };
+
+			coordinator.addComponent(entity, collider);
+			coordinator.addComponent(entity, rbComp);
+			coordinator.addComponent(entity, ECS::PhysicsComponent{});
+			
+
+			return entity;
+		}
+
+
+		ECS::Entity setupGroundEntity(ECS::Entity cameraEntity)
+		{
+			ECS::Entity entity = coordinator.createEntity();
+
+			ECS::MeshComponent mesh{ assetManager.getMeshId("cube") };
+			mesh.uvScale = { 20,20 };
+
+			ECS::ShaderComponent shader{ assetManager.getShaderId("shader") };
+
+			ECS::TransformComponent transform{};
+			transform.scale = { 15.5f, 0.2f, 15.5f };
+			transform.position = { 0.0f, -1.0f, 0.0f };
+
+			ECS::ExternalCameraComponent extCamComp{};
+			extCamComp.entityWithCamera = cameraEntity;
+
+			ECS::MaterialDataComponent matComp{};
+			assetManager.get(matComp.material, "cubeMaterial");
+
+			coordinator.addComponent(entity, transform);
+			coordinator.addComponent(entity, mesh);
+			coordinator.addComponent(entity, shader);
+			coordinator.addComponent(entity, extCamComp);
+			coordinator.addComponent(entity, matComp);
+
+			auto minsMaxes = assetManager.getMesh(mesh.meshId)->getMinMaxes();
+
+			float xSize = (minsMaxes.maxX - minsMaxes.minX) / 2 * transform.scale.x;
+			float ySize = (minsMaxes.maxY - minsMaxes.minY) / 2 * transform.scale.y;
+			float zSize = (minsMaxes.maxZ - minsMaxes.minZ) / 2 * transform.scale.z;
+
+			ECS::BoxColliderComponent collider{};
+			collider.halfBounds = { xSize,ySize,zSize };
+			ECS::RigidBodyComponent rbComp{};
+			rbComp.isKinematic = true;
+			rbComp.isStatic = false;
+			rbComp.mass = 1.0f;
+			rbComp.momentOfInertia = { 1,1,1 };
+
+			coordinator.addComponent(entity, collider);
+			coordinator.addComponent(entity, rbComp);
+			coordinator.addComponent(entity, ECS::PhysicsComponent{});
 
 			return entity;
 		}
@@ -298,7 +368,7 @@ namespace Engine::Core::Game
 			defineSystemSignatures();
 
 			playerEntity = setupPlayerEntity();
-			auto cubeEntity = setupCubeEntity(playerEntity);
+			auto cubeEntity = setupGroundEntity(playerEntity);
 
 			ECS::TransformComponent t2{};
 
@@ -306,11 +376,18 @@ namespace Engine::Core::Game
 			t2.position = { 0,0,0 };
 			t2.rotation = { 0,0,0,1 };
 
-			setupCubeEntity(playerEntity, t2, { 1,2 });
+			setupRbCubeEntity(playerEntity, t2, { 1,2 });
 
 			ECS::TransformComponent t{};
 			ECS::TransformComponent t3{};
 			ECS::TransformComponent t4{};
+			ECS::TransformComponent t5{};
+			ECS::TransformComponent t6{};
+
+			t5.position = { 0,10,0 };
+			auto fallingCubeEntity = setupRbCubeEntity(playerEntity, t5, {1,1});
+			t6.position = { 1,14,0 };
+			auto fallingCubeEntity2 = setupRbCubeEntity(playerEntity, t6, {1,1});
 
 			t.position = { 18, 7, -1 };
 			t3.position = { -18, 7, -1 };
@@ -320,6 +397,8 @@ namespace Engine::Core::Game
 
 			auto lightEntity3 = setupLightEntity(t4);
 
+			coordinator.getSystem<ECS::PhysicsSystem>()->fillInitialCommandBuffer(coordinator);
+
 		}
 
 		void pollPhysicsEvents(const std::vector<ECS::PhysicsEvent>& eventQueue)
@@ -327,10 +406,11 @@ namespace Engine::Core::Game
 			coordinator.getSystem<ECS::PhysicsSystem>()->pollPhysicsEngine(eventQueue);
 		}
 
-		std::vector<ECS::PhysicsEngineCommand> getPhysicsEngineCommands()
+		ECS::PhysicsEngineCommandBuffer& getPhysicsEngineCommands()
 		{
-			return coordinator.getSystem<ECS::PhysicsSystem>()->getCommands();
+			return coordinator.getSystem<ECS::PhysicsSystem>()->getCommandBuffer();
 		}
+
 
 		void setupLights(std::vector<ECS::StaticPointLightRendererData>& lightSetupQueueOut)
 		{

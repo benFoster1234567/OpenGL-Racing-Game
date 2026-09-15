@@ -5,6 +5,7 @@
 #include <glm/mat4x4.hpp>
 #include <vector>
 #include <utility>
+#include <limits> 
 
 namespace Engine::Core
 {
@@ -13,6 +14,13 @@ namespace Engine::Core
 		std::vector<float> data;
 		unsigned int size;
 		unsigned int index;
+	};
+
+	struct ExtremeMeasurements
+	{
+		float minX{	std::numeric_limits<float>::max() }, maxX{ std::numeric_limits<float>::min() };
+		float minY{ std::numeric_limits<float>::max() }, maxY{ std::numeric_limits<float>::min() };
+		float minZ{ std::numeric_limits<float>::max() }, maxZ{ std::numeric_limits<float>::min() };
 	};
 
 	enum class MeshType
@@ -45,6 +53,34 @@ namespace Engine::Core
 
 		void computeTangents();
 		
+		ExtremeMeasurements getMinMaxes()
+		{
+			ExtremeMeasurements minMax;
+
+			minMax.minX = minMax.minY = minMax.minZ = std::numeric_limits<float>::max();
+			minMax.maxX = minMax.maxY = minMax.maxZ = std::numeric_limits<float>::lowest();
+
+			const auto& vertices = attributes[VERTEX_ATTRIBUTE].data;
+
+			for (size_t i = 0; i < vertices.size(); i += 3)
+			{
+				float x = vertices[i];
+				float y = vertices[i + 1];
+				float z = vertices[i + 2];
+
+				minMax.minX = std::min(minMax.minX, x);
+				minMax.maxX = std::max(minMax.maxX, x);
+
+				minMax.minY = std::min(minMax.minY, y);
+				minMax.maxY = std::max(minMax.maxY, y);
+
+				minMax.minZ = std::min(minMax.minZ, z);
+				minMax.maxZ = std::max(minMax.maxZ, z);
+			}
+
+			return minMax;
+		}
+
 		void recomputeNormalsAndTangents()
 		{
 			recomputeNormals();

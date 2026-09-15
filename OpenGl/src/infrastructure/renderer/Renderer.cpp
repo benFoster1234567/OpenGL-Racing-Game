@@ -186,15 +186,7 @@ void Engine::Infra::Renderer::loadShadowingLights(const std::vector<StaticPointL
 	pointlightLoader.loadShadowCastedPointlights(staticLights, nnear, ffar);
 }
 
-void Engine::Infra::Renderer::renderLights()
-{
-	glUseProgram(DebugLightShader->getId());
-	glBindVertexArray(emptyVao);
-	pointlightLoader.bindLightBufferBase();
 
-	glDrawArrays(GL_POINTS, 0 , activeLightCount);
-
-}
 
 void Engine::Infra::Renderer::submit(RenderCommand command)
 {

@@ -74,7 +74,7 @@ namespace Engine::Core
 		void updateGame() { game.update(aspect, inputHandler.mouseState, deltaTime); }
 		void updatePhysics() { game.updatePhysics(deltaTime); }
 
-		std::vector<ECS::PhysicsEngineCommand> getPhysicsCommandQueue()
+		ECS::PhysicsEngineCommandBuffer& getPhysicsCommandQueue()
 		{
 			return game.getPhysicsEngineCommands();
 		}

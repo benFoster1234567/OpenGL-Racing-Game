@@ -12,21 +12,21 @@ namespace Engine::Core::ECS
 {
 	class Coordinator;
 
-	
-
 	class PhysicsSystem : public System
 	{
 	private:
-		std::vector<PhysicsEngineCommand> commandQueue{};
+		PhysicsEngineCommandBuffer commandBuffer{};
 		std::vector<PhysicsEvent> eventQueue{};
+
 	public:
 		void update(Coordinator& coordinator, float deltaTime);
 
-		std::vector<PhysicsEngineCommand> getCommands();
-		
+		void fillInitialCommandBuffer(Coordinator& coordinator);
+
+		PhysicsEngineCommandBuffer& getCommandBuffer() { return commandBuffer; }
+		const PhysicsEngineCommandBuffer& getCommandBuffer() const { return commandBuffer; } 
+
 		void pollPhysicsEngine(const std::vector<PhysicsEvent>& eventList);
-
-
 
 	};
 }

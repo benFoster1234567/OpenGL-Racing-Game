@@ -40,35 +40,24 @@ void Engine::Infra::Application::importAssets()
 	engine.assetPipeline.submit<Core::MaterialData>("assets/materials/testMaterial.mtl", "testMaterial");
 	engine.assetPipeline.submit<Core::MaterialData>("assets/materials/cubeMaterial.mtl", "cubeMaterial");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/depthBufferOut.glsl", "depthBuffer");
-	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/shadows.glsl", "shadowMap");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/depthCubeShader.glsl", "depthCubemap");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/bunny.obj", "bunny");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/cube.obj", "cube");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/car.obj", "car");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/shader.glsl", "shader");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/gridShader.glsl", "gridShader");
-	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/lightDebuggerShader.glsl", "lightDebugShader");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/testTextures.jpg", "uvChecker");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/gold.jpg", "gold");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0068.gif", "tileSpecular");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0066.gif", "tileDiffuse");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0067.gif", "tileNormal");
 	engine.createAssetManager();
-
-	
 }
 
-void Engine::Infra::Application::sendTexturesToRenderer()
-{
-	std::vector<Core::TextureInfo> textureList;
-	//engine.assetManager.textureList(textureList);
-	//renderer.loadTextures(textureList);
-}
 
 //all debug command lambdas are setup here
 void Engine::Infra::Application::setupDebugCommands()
 {
-	//TODO: check for memory leaks with these lambda captures. Ensure they are not called after the window is destroyed.
     std::function <std::string()> exitFunc = [&]()
     {
         window->closeApplication = true;
@@ -231,8 +220,11 @@ void Engine::Infra::Application::run()
 	window->disableCursor();
 	renderer.prepareDepthCubemapArray();
 
-	float physicsUpdateSeconds = 1.0f;
-	float physicsUpdateAccum = 0.0f;
+	float physicsUpdateSeconds = 0.02f;
+	float physicsUpdateDuration = 0.0f;
+
+	btPhysicsEngine.loadPhysicsCommands(engine.getPhysicsCommandQueue());
+	btPhysicsEngine.evaluateCommands();
 
 	while (!window->shouldClose())
 	{
@@ -241,7 +233,7 @@ void Engine::Infra::Application::run()
 		window->updateDeltaTime();
 		float deltaTime = window->deltaTime();
 
-		physicsUpdateAccum = physicsUpdateAccum < physicsUpdateSeconds ? physicsUpdateAccum + deltaTime : 0.0f;
+		physicsUpdateDuration = physicsUpdateDuration < physicsUpdateSeconds ? physicsUpdateDuration + deltaTime : 0.0f;
 		
 		float currentWidth = static_cast<float>(window->getWidth());
 		float currentHeight = static_cast<float>(window->getHeight());
@@ -254,11 +246,9 @@ void Engine::Infra::Application::run()
 		engine.updateMouse(x, y);
 		engine.updateGame();
 
-		if (physicsUpdateAccum == 0.0f)
+		if (physicsUpdateDuration == 0.0f)
 		{
-			engine.updatePhysics();
-			btPhysicsEngine.loadPhysicsCommands(engine.getPhysicsCommandQueue());
-			btPhysicsEngine.runSimulation();
+			btPhysicsEngine.runSimulation(physicsUpdateSeconds);
 		}
 
 		engine.pollPhysicsEvents(btPhysicsEngine.pollEvents());

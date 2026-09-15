@@ -16,9 +16,7 @@
 #include <IL/il.h>
 #include <IL/ilu.h>
 #include <IL/ilut.h>
-#include "Shadows.h"
 #include "Quad.h"
-#include "ShadowCubeMap.h"
 #include "core/assets/AssetIds.h"
 #include "SparseSet.h"
 #include "PointlightLoader.h"
@@ -30,9 +28,7 @@ namespace Engine::Infra
 		glm::mat4 view;
 		glm::mat4 projection;
 		glm::mat4 modelTransform;
-
 		glm::vec2 uvScale;
-
 		Core::ShaderId shader;
 		Core::MeshId mesh;
 		Core::MaterialData* material;

@@ -25,7 +25,7 @@ namespace Engine::Core::ECS
 
 	class RenderDispatcher : public System
 	{
-	public:
+	public: //Get rid of this
 		inline static EventDispatcher<RenderOutput> sendRenderInfo;
 	};
 
