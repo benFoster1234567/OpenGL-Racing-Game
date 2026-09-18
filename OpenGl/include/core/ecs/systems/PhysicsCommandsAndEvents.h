@@ -33,6 +33,13 @@ namespace Engine::Core::ECS
 		glm::vec3 momentOfInertia{};
 	};
 
+	struct CreateVehicleSimulationCommand
+	{
+		Entity entity;
+		float mass{};
+
+	};
+
 	struct DeleteRigidbodyCommand
 	{
 		Entity entity{};
@@ -48,7 +55,6 @@ namespace Engine::Core::ECS
 
 	struct PhysicsEngineCommandBuffer
 	{
-
 		std::vector<CreateBoxColliderCommand> createBoxes{};
 		std::vector<CreateRigidbodyCommand> createBodies{};
 		std::vector<DeleteRigidbodyCommand> deleteBodies{};

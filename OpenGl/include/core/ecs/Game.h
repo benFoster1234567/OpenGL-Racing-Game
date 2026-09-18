@@ -16,10 +16,12 @@
 #include "components/PhysicsComponent.h"
 #include "components/RigidBodyComponent.h"
 #include "components/Colliders.h"
+#include "components/VehicleComponent.h"
 
 #include "systems/PhysicsSystem.h"
 #include "systems/ControlSystems.h"
 #include "systems/LightSystems.h"
+#include "systems/VehicleSystem.h"
 #include "systems/RenderDispatcherSystems.h"
 
 #include "core/input/KeyboardInput.h"
@@ -35,7 +37,7 @@ namespace Engine::Core::Game
 
 	class Scene
 	{
-	protected:
+	public:
 		ECS::Coordinator coordinator{};
 		AssetManager& assetManager;
 		InputBridge& inputHandler;
@@ -82,6 +84,7 @@ namespace Engine::Core::Game
 			coordinator.registerSystem<ECS::StaticLightRenderSetupSystem>();
 			coordinator.registerSystem<ECS::ShadowPointSystem>();
 			coordinator.registerSystem<ECS::PhysicsSystem>();
+			coordinator.registerSystem<ECS::VehicleSystem>();
 		}
 
 		void registerComponents()
@@ -100,6 +103,7 @@ namespace Engine::Core::Game
 			coordinator.registerComponent<ECS::PhysicsComponent>();
 			coordinator.registerComponent<ECS::BoxColliderComponent>();
 			coordinator.registerComponent<ECS::RigidBodyComponent>();
+			coordinator.registerComponent<ECS::VehicleComponent>();
 		}
 
 		void defineSystemSignatures()
@@ -151,6 +155,13 @@ namespace Engine::Core::Game
 			physicsSystemSig.set(coordinator.getComponentType<ECS::MeshComponent>());
 
 			coordinator.setSystemSignature<ECS::PhysicsSystem>(physicsSystemSig);
+
+			ECS::Signature vehicleSystemSig{};
+
+			vehicleSystemSig.set(coordinator.getComponentType<ECS::VehicleComponent>());
+			vehicleSystemSig.set(coordinator.getComponentType<ECS::TransformComponent>());
+
+			coordinator.setSystemSignature<ECS::VehicleSystem>(vehicleSystemSig);
 		}
 
 		ECS::Entity setupPlayerEntity()
@@ -188,6 +199,55 @@ namespace Engine::Core::Game
 			coordinator.addComponent(entity, mis);
 			coordinator.addComponent(entity, playerController);
 			coordinator.addComponent(entity, matComp);
+
+			return entity;
+		}
+
+		ECS::Entity setupPlayerVehicleEntity()
+		{
+			ECS::Entity entity = setupPlayerEntity();
+
+			auto& transformComponent = coordinator.getComponent<ECS::TransformComponent>(entity);
+			auto& meshComponent = coordinator.getComponent<ECS::MeshComponent>(entity);
+
+			auto meshMinsMaxes = assetManager.getMesh(meshComponent.meshId)->getMinMaxes();
+			
+			transformComponent.position = { -3,2,-3 };
+
+			glm::vec3 bounds
+			{
+				transformComponent.scale.x * (meshMinsMaxes.maxX - meshMinsMaxes.minX) / 2,
+				transformComponent.scale.y * (meshMinsMaxes.maxY - meshMinsMaxes.minY) / 2,
+				transformComponent.scale.z * (meshMinsMaxes.maxZ - meshMinsMaxes.minZ) / 2
+			};
+
+			float connectionHeight = -bounds.y + 0.1;
+
+			ECS::WheelInfo wheel1{};
+			wheel1.connectionPoint = { -bounds.x, connectionHeight, bounds.z };
+			wheel1.isFrontWheel = true;
+			wheel1.radius = 0.2f;
+			wheel1.suspensionRestLength = 0.2f;
+	
+			ECS::WheelInfo wheel2 = wheel1;
+			wheel2.connectionPoint = { bounds.x, connectionHeight, bounds.z };
+			wheel2.isFrontWheel = true;
+
+			ECS::WheelInfo wheel3 = wheel1;
+			wheel3.connectionPoint = { -bounds.x, connectionHeight, -bounds.z };
+			wheel3.isFrontWheel = false;
+
+			ECS::WheelInfo wheel4 = wheel1;
+			wheel4.connectionPoint = { bounds.x, connectionHeight, -bounds.z };
+			wheel4.isFrontWheel = false;
+
+			std::vector<ECS::WheelInfo> wheels{ wheel1, wheel2, wheel3, wheel4 };
+
+			ECS::VehicleComponent vehicleComponent{};
+			vehicleComponent.wheels = wheels;
+			vehicleComponent.collisionBounds = bounds;
+			vehicleComponent.mass = 1000.f;
+			coordinator.addComponent(entity, vehicleComponent);
 
 			return entity;
 		}
@@ -318,7 +378,6 @@ namespace Engine::Core::Game
 			mesh.uvScale = uvScale;
 			ECS::ShaderComponent shader{ assetManager.getShaderId("shader") };
 
-
 			ECS::ExternalCameraComponent extCamComp{};
 			extCamComp.entityWithCamera = cameraEntity;
 
@@ -367,7 +426,7 @@ namespace Engine::Core::Game
 			registerComponents();
 			defineSystemSignatures();
 
-			playerEntity = setupPlayerEntity();
+			playerEntity = setupPlayerVehicleEntity();
 			auto cubeEntity = setupGroundEntity(playerEntity);
 
 			ECS::TransformComponent t2{};
@@ -438,7 +497,8 @@ namespace Engine::Core::Game
 			coordinator.getSystem<ECS::MouseControlSystem>()->update(coordinator, mouseState);
 			coordinator.getSystem<ECS::RenderDispatcherExternalCamera>()->update(coordinator, aspect);
 			coordinator.getSystem<ECS::RenderDispatcherOrbitalCamera>()->update(coordinator, aspect);
-			coordinator.getSystem<ECS::KeyControlSystem>()->update(coordinator, inputHandler, deltaTime);
+			coordinator.getSystem<ECS::VehicleSystem>()->update(coordinator, inputHandler, deltaTime);
+			//coordinator.getSystem<ECS::KeyControlSystem>()->update(coordinator, inputHandler, deltaTime);
 		}
 	};
 }

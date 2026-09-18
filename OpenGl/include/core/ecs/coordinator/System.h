@@ -11,6 +11,7 @@ namespace Engine::Core::ECS
 	public:
 		virtual ~System() = default;
 		std::set<Entity> entities{};
+		
 	};
 
 

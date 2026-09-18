@@ -9,9 +9,10 @@
 #include "../../core/ecs/systems/PhysicsCommandsAndEvents.h"
 #include "../../core/ecs/components/TransformComponent.h"
 #include "../../SparseSet.h"
-
+#include "../../core/ecs/coordinator/Coordinator.h"
 
 //TODO: Implement Bullet3 into infrastructure -- detect collisions, vehicle physics
+
 
 namespace Engine::Infra
 {
@@ -23,7 +24,7 @@ namespace Engine::Infra
 
 	static btQuaternion glmToBt(const glm::quat& q)
 	{
-		return btQuaternion{ q.w, q.x, q.y, q.z };
+		return btQuaternion{ q.x, q.y, q.z, q.w };
 	}
 
 	static glm::vec3 btToGlm(const btVector3& v)
@@ -56,6 +57,32 @@ namespace Engine::Infra
 			transform->rotation = btToGlm(worldTrans.getRotation());
 		}
 	};
+	
+	class MotionStateForECSNew : public btMotionState
+	{
+	public:
+		Core::ECS::Coordinator& coordinator;
+		Core::ECS::Entity entity{};
+
+		MotionStateForECSNew(Core::ECS::Coordinator& coordinator, Core::ECS::Entity entity) : coordinator{ coordinator }, entity{ entity } {}
+
+		void getWorldTransform(btTransform& worldTrans) const override
+		{
+			auto& transform = coordinator.getComponent<Core::ECS::TransformComponent>(entity);
+			worldTrans.setOrigin(glmToBt(transform.position));
+			worldTrans.setRotation(glmToBt(transform.rotation));
+		}
+
+		void setWorldTransform(const btTransform& worldTrans)
+		{
+			auto& transform = coordinator.getComponent<Core::ECS::TransformComponent>(entity);
+			transform.position = btToGlm(worldTrans.getOrigin());
+			transform.rotation = btToGlm(worldTrans.getRotation());
+		}
+
+	};
+
+
 
 	class BtPhysicsEngine
 	{
@@ -65,7 +92,8 @@ namespace Engine::Infra
 		btCollisionDispatcher* dispatcher{nullptr};
 		btDbvtBroadphase* broadPhase{nullptr};
 		btSequentialImpulseConstraintSolver* solver{nullptr};
-		btDiscreteDynamicsWorld* dynamicsWorld{nullptr};
+		btDiscreteDynamicsWorld* dynamicsWorld{ nullptr };
+		btVehicleRaycaster* vehicleRaycaster{ nullptr };
 
 		Core::ECS::PhysicsEngineCommandBuffer commandQueue{};
 		std::vector<Core::ECS::PhysicsEvent> eventCache{};
@@ -75,12 +103,14 @@ namespace Engine::Infra
 		void evaluateCreateRigidbodyCommand(const Core::ECS::CreateRigidbodyCommand& command);
 		void evaluateDeleteRigidbodyCommand(const Core::ECS::DeleteRigidbodyCommand& command);
 		void evaluateCreateBoxColliderCommand(const Core::ECS::CreateBoxColliderCommand& command);
-		
+
 		static constexpr size_t MAX_COMPONENTS = 128;
 		static constexpr size_t MAX_ENTITIES = 1000;
 		SparseSet<btCollisionShape*, MAX_ENTITIES, MAX_ENTITIES> collisionShapes{};
 
 		SparseSet<btRigidBody*, MAX_ENTITIES, MAX_ENTITIES> rigidbodies{};
+		SparseSet<btRaycastVehicle*, MAX_ENTITIES, MAX_ENTITIES> vehicles{};
+
 
 	public:
 
@@ -99,6 +129,8 @@ namespace Engine::Infra
 			destroy();
 		}
 
+		void createVehicles(Core::ECS::Coordinator& coordinator);
+		void updateVehicles(Core::ECS::Coordinator& coordinator);
 
 		BtPhysicsEngine(const BtPhysicsEngine&) = delete;
 		BtPhysicsEngine& operator=(const BtPhysicsEngine&) = delete;

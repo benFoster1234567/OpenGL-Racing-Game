@@ -275,6 +275,12 @@
     <ClInclude Include="include\core\ecs\components\Colliders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\core\ecs\components\VehicleComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\ecs\systems\VehicleSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.glsl" />

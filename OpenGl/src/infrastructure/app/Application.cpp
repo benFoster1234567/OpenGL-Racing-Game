@@ -225,6 +225,7 @@ void Engine::Infra::Application::run()
 
 	btPhysicsEngine.loadPhysicsCommands(engine.getPhysicsCommandQueue());
 	btPhysicsEngine.evaluateCommands();
+	btPhysicsEngine.createVehicles(engine.getCoordinator());
 
 	while (!window->shouldClose())
 	{
@@ -233,8 +234,6 @@ void Engine::Infra::Application::run()
 		window->updateDeltaTime();
 		float deltaTime = window->deltaTime();
 
-		physicsUpdateDuration = physicsUpdateDuration < physicsUpdateSeconds ? physicsUpdateDuration + deltaTime : 0.0f;
-		
 		float currentWidth = static_cast<float>(window->getWidth());
 		float currentHeight = static_cast<float>(window->getHeight());
 		double x{}, y{};
@@ -246,10 +245,8 @@ void Engine::Infra::Application::run()
 		engine.updateMouse(x, y);
 		engine.updateGame();
 
-		if (physicsUpdateDuration == 0.0f)
-		{
-			btPhysicsEngine.runSimulation(physicsUpdateSeconds);
-		}
+		btPhysicsEngine.updateVehicles(engine.getCoordinator());
+		btPhysicsEngine.runSimulation(deltaTime);
 
 		engine.pollPhysicsEvents(btPhysicsEngine.pollEvents());
 		engine.zeroMouse();

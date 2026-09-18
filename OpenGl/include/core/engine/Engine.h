@@ -66,6 +66,7 @@ namespace Engine::Core
 		EventDispatcher<std::vector<MeshData*>> meshDispatcher{};
 		EventDispatcher<std::vector<TextureData*>> textureDispatcher{};
 
+		ECS::Coordinator& getCoordinator() { return game.coordinator; }
 		void createAssetManager();
 		void updateDeltaTime(float dt) { deltaTime = dt; }
 		void updateAspect(float a) { aspect = a; }
