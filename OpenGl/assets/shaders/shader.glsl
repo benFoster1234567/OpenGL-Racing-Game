@@ -1,5 +1,3 @@
-#define MULTI_LIGHT
-
 #ifdef VERTEX_SHADER
 
 layout (location = 0) in vec3 aPos;
@@ -44,18 +42,9 @@ void main()
  
 #define MAX_LIGHTS 100
 
-struct StaticPointLight {
-    vec4 posRad; 
-    vec4 color;  
-};
 
-#ifdef SINGLE_LIGHT
-    uniform samplerCube depthMap;
-#endif
+uniform samplerCubeArray depthMap;
 
-#ifdef MULTI_LIGHT
-    uniform samplerCubeArray depthMap;
-#endif
 
 struct Material 
 {
@@ -66,34 +55,32 @@ struct Material
     float shininess;
 };
  
+struct StaticPointLight {
+    vec4 posRad; 
+    vec4 color;  
+};
+
 layout (std140, binding = 0) uniform LightBlock {
     StaticPointLight lights[MAX_LIGHTS];
     int activeLightCount;
-} ub;
+} ubLight;
 
-#ifdef MULTI_LIGHT
+struct PointlightShadowmapData
+{
+    mat4 shadowTransforms[6];
+    int lightIndex;
+};
 
-    struct ShadowData
-    {
-        mat4 shadowTransforms[6];
-        vec4 lightPosition;
-    };
-
-    layout (std140, binding = 1) uniform ShadowBlock {
-        ShadowData lights[4];
-        int activeLightCount;
-    } ub1;
-
-#endif
+layout (std140, binding = 1) uniform ShadowBlock {
+    PointlightShadowmapData shadowSource[4];
+    int activeLightCount;
+} ubShadow;
 
 uniform mat4 view; 
 uniform Material material;
 uniform float far_plane;
 uniform vec2 uvScale;
 
-#ifdef SINGLE_LIGHT
-    uniform vec3 lightPosition;
-#endif
 
 in vec3 vertexPosition;
 in vec2 texCoord;
@@ -113,24 +100,33 @@ float attenuate(float d, float r)
 float getClosestDepth(vec3 fragToLight, vec3 offset, float index)
 {
     float closestDepth = 0;
-    
-    #ifdef SINGLE_LIGHT
-       
-       closestDepth = texture(depthMap, fragToLight + offset).r;
-
-    #endif
-    #ifdef MULTI_LIGHT
-
-        closestDepth = texture(depthMap, vec4(fragToLight + offset, index)).r; 
-
-    #endif
-
+    closestDepth = texture(depthMap, vec4(fragToLight + offset, index)).r; 
     return closestDepth;
 }
 
-
-float shadowCalculation(vec3 fragPos, vec3 lightPos, float index)
+int getShadowDataIndex(int pointLightIndex) // returns where the shadow data is located in the shadow block
 {
+    for (int i = 0; i  < 4; i++)
+    {
+        if (ubShadow.shadowSource[i].lightIndex == pointLightIndex)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+float shadowCalculation(vec3 fragPos, vec3 lightPos, float index, vec3 worldNormal)
+{
+    int idxInt = int(index);
+
+    float shadowIndex = float(getShadowDataIndex(idxInt));
+
+    if (shadowIndex < 0)
+    {
+        return 0;
+    }
+
     vec3 sampleOffsetDirections[20] = vec3[]
     (
        vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
@@ -140,48 +136,29 @@ float shadowCalculation(vec3 fragPos, vec3 lightPos, float index)
        vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
     );   
 
-    vec3 fragToLight = fragPos - lightPos; 
+    float normalBiasAmount = 0.1; // TUNE THIS: Increase if acne persists, decrease if Peter Panning occurs
+    vec3 biasedFragPos = fragPos + (worldNormal * normalBiasAmount);
+
+    vec3 fragToLight = biasedFragPos - lightPos; 
     float currentDepth = length(fragToLight);
+   
+    float depthBias = 0.05; 
+
     float shadow  = 0.0;
-    float bias    = 0.05; 
     int samples = 20;
-    
     float diskRadius = 0.05;
+    
     for(int i = 0; i < samples; i++)
     {
-        float closestDepth = getClosestDepth(fragToLight, sampleOffsetDirections[i] * diskRadius, index);
+        float closestDepth = getClosestDepth(fragToLight, sampleOffsetDirections[i] * diskRadius, shadowIndex);
         closestDepth *= far_plane; 
-        if(currentDepth - bias > closestDepth)
+        
+        if(currentDepth - depthBias > closestDepth)
             shadow += 1.0;
     }
 
     return shadow / float(samples);
 }
-
-float getShadow(vec3 fragPos)
-{
-     float shadow = 0;
-    
-    #ifdef SINGLE_LIGHT
-       
-       shadow = shadowCalculation(lightPosition, fragPos, 0);
-
-    #endif
-    #ifdef MULTI_LIGHT
-
-        for (int i = 0; i < ub1.activeLightCount; i++)
-        {
-            vec3 lightPos = ub1.lights[i].lightPosition.xyz;
-            float index = float(i);
-            shadow += shadowCalculation(fragPos, lightPos, index);
-        }
-
-    #endif
-
-    return shadow;
-}
-
-
 
 void main()
 {
@@ -198,6 +175,9 @@ void main()
     vec3 B = normalize(vBitangent);
     vec3 N = normalize(vNormal);
 
+    mat3 TBN_World = mat3(T, B, N);
+    vec3 worldNormal = normalize(TBN_World * normal);
+
     mat3 TBN = transpose(mat3(T, B, N));
     
     vec3 cameraPosWorld = inverse(view)[3].xyz;
@@ -205,9 +185,9 @@ void main()
 
     vec3 colorOut = vec3(0.0);
 
-    for (int i = 0; i < ub.activeLightCount; i++)
+    for (int i = 0; i < ubLight.activeLightCount; i++)
     {
-        StaticPointLight light = ub.lights[i];
+        StaticPointLight light = ubLight.lights[i];
         vec3 lightPos   = light.posRad.xyz;
         float radius    = light.posRad.w;
         vec3 lightColor = light.color.rgb;
@@ -228,13 +208,15 @@ void main()
         vec3 diffuse  = Kd * diffuseColor * lightColor;
         vec3 specular = Ks * specularColor * lightColor;
 
+        int shadowMatIndex = getShadowDataIndex(i);
+        
         float index = float(i);
-        float shadow  = shadowCalculation(vertexPosition, lightPos, index);
+        float shadow  = shadowCalculation(vertexPosition, lightPos, index, worldNormal);
 
         colorOut += (1.0 - shadow) * (diffuse + specular) * attenuation * intensity;
     }
     
-    vec3 colorFractional = (colorOut - ( ub1.activeLightCount / ub.activeLightCount) * colorOut ) + (colorOut * getShadow(vertexPosition));
+
 
     colorOut += ambientColor;
 

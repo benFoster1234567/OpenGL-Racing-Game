@@ -14,9 +14,10 @@ namespace Engine::Core::ECS
 		glm::vec3 connectionPoint{0,0,0};
 		bool isFrontWheel{};
 
-		float suspensionStiffness{ 20.f };
-		float wheelsDampingRelaxation{ 2.3f };
-		float wheelsDampingCompression{ 4.4f };
+		float suspensionStiffness{ 50.f };
+		float wheelsDampingRelaxation{ 6.3f };
+		float wheelsDampingCompression{ 8.4f };
+		float currentSuspensionLength{ 0 };
 		float frictionSlip{ 1000.f };
 		float rollInfluence{ .1f };
 	};
@@ -24,8 +25,15 @@ namespace Engine::Core::ECS
 	struct VehicleComponent : public ComponentBase
 	{
 		float mass{};
+
 		glm::vec3 collisionBounds{};
+
 		std::vector<WheelInfo> wheels{};
+		std::vector<Entity> wheelEntities{};
+
+		float engineStrength{ 100.f };
+		float brakeStrength{ 50.f };
+
 		float engineForce{ 0 };
 		float breakingForce{ 0 };
 		float steeringValue{ 0 };

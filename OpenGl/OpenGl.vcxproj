@@ -168,7 +168,7 @@
     <ClCompile Include="src\core\KeyboardInput.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\infrastructure\app\Window.cpp" />
-    <ClCompile Include="src\infrastructure\renderer\Renderer.cpp" />
+    <ClCompile Include="include\infra\renderer\Renderer.cpp" />
     <ClCompile Include="tests\RunTests.cpp" />
     <ClCompile Include="src\infrastructure\renderer\assets\GpuShader.cpp" />
     <ClCompile Include="tests\Tester.cpp" />
@@ -228,8 +228,6 @@
   <ItemGroup>
     <None Include="assets\materials\testMaterial.mtl" />
     <None Include="assets\materials\cubeMaterial.mtl" />
-    <None Include="assets\shaders\depthBufferOut.glsl" />
-    <None Include="assets\shaders\depthCubemapArrayShader.glsl" />
     <None Include="assets\shaders\depthCubeShader.glsl" />
     <None Include="assets\shaders\gridShader.glsl" />
     <None Include="assets\shaders\pointShadow.glsl" />

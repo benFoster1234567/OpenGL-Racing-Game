@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "SparseSet.h"
+#include <glm/gtx/norm.hpp>
 
 namespace Engine::Infra
 {
@@ -21,13 +22,14 @@ namespace Engine::Infra
 
 	struct PointlightShadowmapData
 	{
-		glm::mat4 shadowTransforms[6];
-		glm::vec4 lightPosition;
+		glm::mat4 shadowTransforms[6]{};
+		int lightIndex{0};
+		int padding[3]{0,0,0};
 	};
 
 	struct ShadowBlock
 	{
-		PointlightShadowmapData lights[4];
+		PointlightShadowmapData shadowSource[4]{};
 		int activeLightCount{ 0 };
 		int padding[3]{ 0, 0, 0 };
 	};
@@ -40,7 +42,7 @@ namespace Engine::Infra
 
 	struct LightBlock
 	{
-		StaticPointLight lights[100];
+		StaticPointLight lights[100]{};
 		int activeLightCount{ 0 };
 		int padding[3]{ 0, 0, 0 };
 	};
@@ -57,34 +59,92 @@ namespace Engine::Infra
 		GLuint pointlightUBO{ 0 };
 		GLuint pointShadowmapUBO{ 0 };
 
-		std::vector<StaticPointLightResource> shadowCastingPointlights{};
 		std::vector<StaticPointLightResource> pointlights{};
+		std::array<size_t, MAX_SHADOW_SRC> shadowSourceIndices{ 0 };
 
+		size_t shadowSourceCount{ 0 };
 		int activeLightCount{};
+		
+		ShadowBlock shadowBlock{};
+		float shadowRenderDistance{35.0f};
 
-		ShadowBlock buildShadowBlock(const std::vector<StaticPointLightResource>& shadowCastedLights, float nnear, float ffar)
+		bool selectShadowSourceIndices(const glm::vec3& cameraOrigin)
 		{
-			ShadowBlock shadowBlock{};
-			shadowCastingPointlights = shadowCastedLights;
+			std::array<size_t, MAX_SHADOW_SRC> previousIndices = shadowSourceIndices;
 
+			struct LightCandidate
+			{
+				size_t index;
+				float distSq;
+			};
+
+			std::vector<LightCandidate> candidates;
+			candidates.reserve(pointlights.size());
+
+			const float maxDistSq = shadowRenderDistance * shadowRenderDistance;
+
+			for (size_t i = 0; i < pointlights.size(); ++i)
+			{
+				float distSq = glm::distance2(pointlights[i].position, cameraOrigin);
+				if (distSq <= maxDistSq)
+				{
+					candidates.push_back({ i, distSq });
+				}
+			}
+
+			size_t count = (std::min)(candidates.size(), MAX_SHADOW_SRC);
+
+			if (count > 0)
+			{
+				std::partial_sort(
+					candidates.begin(),
+					candidates.begin() + count,
+					candidates.end(),
+					[](const LightCandidate& a, const LightCandidate& b) {
+						return a.distSq < b.distSq;
+					}
+				);
+			}
+		
+			shadowSourceIndices.fill(std::numeric_limits<size_t>::max());
+
+			for (size_t i = 0; i < count; ++i)
+			{
+				shadowSourceIndices[i] = candidates[i].index;
+			}
+
+			shadowSourceCount = count;
+
+			return previousIndices != shadowSourceIndices;
+		}
+
+		ShadowBlock updateShadowBlock(float nnear, float ffar)
+		{
 			constexpr float aspect = 1.0f; // 1024 / 1024
 			const glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, nnear, ffar);
 
-			size_t activeCount = (std::min)(shadowCastedLights.size(), MAX_SHADOW_SRC);
+			size_t activeCount = (std::min)(shadowSourceCount, MAX_SHADOW_SRC);
 
 			for (size_t i = 0; i < activeCount; ++i)
 			{
-				const glm::vec3& lp = shadowCastedLights[i].position;
-				PointlightShadowmapData& data = shadowBlock.lights[i];
+				//if (i < 0)
+				//{
+				//	continue;  // incase this fixes a bug I'm leaving it here.
+				//}
 
-				data.shadowTransforms[0] = shadowProj * glm::lookAt(lp, lp + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-				data.shadowTransforms[1] = shadowProj * glm::lookAt(lp, lp + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-				data.shadowTransforms[2] = shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
-				data.shadowTransforms[3] = shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
-				data.shadowTransforms[4] = shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
-				data.shadowTransforms[5] = shadowProj * glm::lookAt(lp, lp + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+				PointlightShadowmapData& data = shadowBlock.shadowSource[i];
 
-				data.lightPosition = glm::vec4(lp, 1.0f);
+				int lightIndex = shadowSourceIndices[i];
+				const glm::vec3& sourcePosition = pointlights[lightIndex].position;
+
+				data.shadowTransforms[0] = shadowProj * glm::lookAt(sourcePosition, sourcePosition + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+				data.shadowTransforms[1] = shadowProj * glm::lookAt(sourcePosition, sourcePosition + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+				data.shadowTransforms[2] = shadowProj * glm::lookAt(sourcePosition, sourcePosition + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+				data.shadowTransforms[3] = shadowProj * glm::lookAt(sourcePosition, sourcePosition + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+				data.shadowTransforms[4] = shadowProj * glm::lookAt(sourcePosition, sourcePosition + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+				data.shadowTransforms[5] = shadowProj * glm::lookAt(sourcePosition, sourcePosition + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+
+				data.lightIndex = lightIndex;
 			}
 
 			shadowBlock.activeLightCount = static_cast<int>(activeCount);
@@ -123,7 +183,11 @@ namespace Engine::Infra
 		void bindLightBufferBase()
 		{
 			glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_BINDING_POINT, pointlightUBO);
+		}
 
+		void bindShadowBufferBase()
+		{
+			glBindBufferBase(GL_UNIFORM_BUFFER, SHADOW_BINDING_POINT, pointShadowmapUBO);
 		}
 
 		void genEmptyVao()
@@ -161,9 +225,10 @@ namespace Engine::Infra
 			glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		}
 
-		void loadShadowCastedPointlights(const std::vector<StaticPointLightResource>& shadowCastedLights, float nnear, float ffar)
+		void loadPointShadowSources(glm::vec3 cameraOrigin, float nnear, float ffar)
 		{
-			ShadowBlock shadowBlock = buildShadowBlock(shadowCastedLights, nnear, ffar);
+			selectShadowSourceIndices(cameraOrigin);
+			ShadowBlock shadowBlock = updateShadowBlock(nnear, ffar);
 
 			if (pointShadowmapUBO == 0)
 			{
@@ -176,9 +241,12 @@ namespace Engine::Infra
 			glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		}
 
-		void updateShadowPoints(const std::vector<StaticPointLightResource>& shadowCastedLights, float nnear, float ffar)
+		void updatePointShadowSources(const glm::vec3& cameraOrigin, float nnear, float ffar)
 		{
-			ShadowBlock shadowBlock = buildShadowBlock(shadowCastedLights, nnear, ffar);
+			selectShadowSourceIndices(cameraOrigin);
+	
+
+			ShadowBlock shadowBlock = updateShadowBlock(nnear, ffar);
 
 			glBindBuffer(GL_UNIFORM_BUFFER, pointShadowmapUBO);
 			glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ShadowBlock), &shadowBlock);

@@ -41,6 +41,10 @@ namespace Engine::Infra
 
 	class Renderer
 	{
+
+	public:
+		PointlightLoader pointlightLoader{};
+
 	private:
 
 		friend class GpuAssetLoader;
@@ -60,7 +64,6 @@ namespace Engine::Infra
 		
 		unsigned int renderMode = 0;
 
-		PointlightLoader pointlightLoader{};
 
 		int polygonMode = LINE;
 
@@ -150,9 +153,11 @@ namespace Engine::Infra
 		}
 
 		void loadLights(std::vector<StaticPointLightResource> staticLights);
-		void loadShadowingLights(const std::vector<StaticPointLightResource>& staticLights);
-
-		void renderLights();
+		void loadShadowingLights(glm::vec3 cameraOrigin);
+		void updatePointlightSources(glm::vec3 cameraOrigin)
+		{
+			pointlightLoader.updatePointShadowSources(cameraOrigin, nnear, ffar);
+		}
 
 		void submit(RenderCommand command);
 

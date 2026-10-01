@@ -27,7 +27,7 @@
     <ClCompile Include="tests\RunTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\infrastructure\renderer\Renderer.cpp">
+    <ClCompile Include="include\infra\renderer\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\infrastructure\renderer\assets\GpuShader.cpp">
@@ -288,10 +288,8 @@
     <None Include="assets\shaders\gridShader.glsl" />
     <None Include="assets\materials\testMaterial.mtl" />
     <None Include="assets\materials\cubeMaterial.mtl" />
-    <None Include="assets\shaders\depthBufferOut.glsl" />
     <None Include="assets\shaders\pointShadow.glsl" />
     <None Include="assets\shaders\depthCubeShader.glsl" />
-    <None Include="assets\shaders\depthCubemapArrayShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\materials\textures\testTextures.jpg">

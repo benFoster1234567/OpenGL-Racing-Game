@@ -127,6 +127,7 @@ void Engine::Infra::Renderer::prepareDepthCubemap()
 
 void Engine::Infra::Renderer::renderToShadowCubemapArray(size_t w, size_t h)
 {
+	glCullFace(GL_FRONT);
 	shadowCubemapShader->use();
 	glViewport(0, 0, 1024, 1024);
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -181,9 +182,13 @@ void Engine::Infra::Renderer::loadLights(std::vector<StaticPointLightResource> s
 	}
 }
 
-void Engine::Infra::Renderer::loadShadowingLights(const std::vector<StaticPointLightResource>& staticLights)
+void Engine::Infra::Renderer::loadShadowingLights(glm::vec3 cameraOrigin)
 {
-	pointlightLoader.loadShadowCastedPointlights(staticLights, nnear, ffar);
+	pointlightLoader.loadPointShadowSources(cameraOrigin, nnear, ffar);
+	for (const auto& shader : gpuShaderCache)
+	{
+		pointlightLoader.bindShadowBlockToShader(shader->getId());
+	}
 }
 
 
@@ -208,7 +213,7 @@ void Engine::Infra::Renderer::flush(size_t w , size_t h)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	pointlightLoader.bindLightBufferBase();
-
+	pointlightLoader.bindShadowBufferBase();
 	bool renderMultiLightShadows = true;
 
 	for (const auto& command : renderQueue)

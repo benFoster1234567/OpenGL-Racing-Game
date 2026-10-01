@@ -217,15 +217,16 @@ namespace Engine::Infra
 
             for (int i{ 0 }; i < vehicle->getNumWheels(); i++)
             {
-
-                std::cout << "vehicle transform: x: " << transformComponent.position.x << " y: " << transformComponent.position.y << " z: " << transformComponent.position.z << "\n";
-                std::cout << "applying the engine force: " << vehicleComponent.engineForce << "\n";
                 vehicle->applyEngineForce(vehicleComponent.engineForce, i);
                 vehicle->setBrake(vehicleComponent.breakingForce, i);
                 if (vehicle->getWheelInfo(i).m_bIsFrontWheel)
                 {
                     vehicle->setSteeringValue(vehicleComponent.steeringValue, i);
                 }
+
+                //vehicleComponent.wheels[i].currentSuspensionLength = vehicle->getWheelInfo(i).m_suspensionRestLength1 - vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
+                vehicleComponent.wheels[i].currentSuspensionLength =  vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
+
             }
 
         }

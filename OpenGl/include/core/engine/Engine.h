@@ -41,9 +41,9 @@ namespace Engine::Core
 		float deltaTime{};
 		float aspect{};
 		
-		Game::TestScene game;
 	
 	public:
+		Game::TestScene game;
 
 		AssetManager assetManager;
 		AssetPipeline assetPipeline;

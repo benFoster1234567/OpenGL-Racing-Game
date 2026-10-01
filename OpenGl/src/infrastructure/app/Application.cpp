@@ -39,13 +39,11 @@ void Engine::Infra::Application::importAssets()
 {
 	engine.assetPipeline.submit<Core::MaterialData>("assets/materials/testMaterial.mtl", "testMaterial");
 	engine.assetPipeline.submit<Core::MaterialData>("assets/materials/cubeMaterial.mtl", "cubeMaterial");
-	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/depthBufferOut.glsl", "depthBuffer");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/depthCubeShader.glsl", "depthCubemap");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/bunny.obj", "bunny");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/cube.obj", "cube");
 	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/car.obj", "car");
 	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/shader.glsl", "shader");
-	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/gridShader.glsl", "gridShader");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/testTextures.jpg", "uvChecker");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/gold.jpg", "gold");
 	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0068.gif", "tileSpecular");
@@ -201,20 +199,12 @@ void Engine::Infra::Application::run()
 		renderer.loadLights(pointLights);
 	}
 
-	auto shadowCastingLightData = engine.getShadowCastingPointlights();
-	std::vector<StaticPointLightResource> shadowCastingPointlights{};
-
-	for (const auto& light : shadowCastingLightData)
-	{
-		StaticPointLightResource splr{};
-		splr.position = light.position;
-		splr.color = light.color;
-		splr.radius = light.radius;
-		splr.intensity = light.intensity;
-		shadowCastingPointlights.push_back(splr);
-	}
-
-	renderer.loadShadowingLights(shadowCastingPointlights);
+	auto getCameraOrigin = [this]() -> glm::vec3
+		{
+			return engine.game.coordinator.getComponent<Core::ECS::TransformComponent>(engine.game.playerEntity).position;
+		};
+	
+	renderer.loadShadowingLights(getCameraOrigin());
 
 	glfwSwapInterval(0);
 	window->disableCursor();
@@ -244,6 +234,7 @@ void Engine::Infra::Application::run()
 		engine.updateDeltaTime(deltaTime);
 		engine.updateMouse(x, y);
 		engine.updateGame();
+		renderer.updatePointlightSources(getCameraOrigin());
 
 		btPhysicsEngine.updateVehicles(engine.getCoordinator());
 		btPhysicsEngine.runSimulation(deltaTime);
