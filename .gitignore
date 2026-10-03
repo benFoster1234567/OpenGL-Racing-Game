@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /OpenGl/Notes.txt
 *.json
 /vcpkg_installed
+OpenGl/.editorconfig
