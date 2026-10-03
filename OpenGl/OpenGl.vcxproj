@@ -110,7 +110,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);GLM_ENABLE_EXPERIMENTAL</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\flami\source\repos\benFoster1234567\OpenGL-Racing-Game\OpenGl\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\flami\Documents\Coding stuff\github\OpenGL-Racing-Game\OpenGl\include;C:\Users\flami\source\repos\benFoster1234567\OpenGL-Racing-Game\OpenGl\include;C:\Users\flami\Documents\Coding stuff\github\OpenGL-Racing-Game\OpenGl\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,7 +126,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);GLM_ENABLE_EXPERIMENTAL</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\flami\source\repos\benFoster1234567\OpenGL-Racing-Game\OpenGl\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;C:\Users\flami\Documents\Coding stuff\github\OpenGL-Racing-Game\OpenGl\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -197,10 +197,8 @@
     <ClInclude Include="include\core\engine\Engine.h" />
     <ClInclude Include="include\core\events\EventDispatcher.h" />
     <ClInclude Include="include\core\ecs\Game.h" />
-    <ClInclude Include="include\core\Physics.h" />
     <ClInclude Include="include\infra\app\Application.h" />
     <ClInclude Include="include\infra\bullet\BtPhysicsEngine.h" />
-    <ClInclude Include="include\infra\engine\AssetImporter.h" />
     <ClInclude Include="include\infra\engine\DebugConsoleUI.h" />
     <ClInclude Include="include\infra\engine\ImportFuncs.h" />
     <ClInclude Include="include\infra\app\GlfwKeyHandler.h" />
@@ -226,6 +224,7 @@
     <ClInclude Include="include\core\assets\TextureData.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.editorconfig" />
     <None Include="assets\materials\testMaterial.mtl" />
     <None Include="assets\materials\cubeMaterial.mtl" />
     <None Include="assets\shaders\depthCubeShader.glsl" />

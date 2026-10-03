@@ -38,53 +38,54 @@ namespace Engine::Core
 	class EngineSystem
 	{
 	private:
-		float deltaTime{};
-		float aspect{};
-		
-	
+		float m_deltaTime{};
+		float m_aspect{};
+
+
 	public:
-		Game::TestScene game;
+		Game::TestScene m_game;
 
-		AssetManager assetManager;
-		AssetPipeline assetPipeline;
-		InputBridge inputHandler;
-	
-		EngineSystem() 
-			: assetManager{}, assetPipeline{}, inputHandler{}, game(assetManager, inputHandler) 
-		{} 
+		AssetManager m_assetManager;
+		AssetPipeline m_assetPipeline;
+		InputBridge m_inputHandler;
 
-		void setUpGame() { game.setup(); }
+		EngineSystem()
+			: m_assetManager{}, m_assetPipeline{}, m_inputHandler{}, m_game(m_assetManager, m_inputHandler)
+		{
+		}
+
+		void setUpGame() { m_game.setup(); }
 
 		void fillStaticLightVector(std::vector<ECS::StaticPointLightRendererData>& lights);
 
 		std::vector<ECS::StaticPointLightRendererData> getShadowCastingPointlights()
 		{
-			return game.getShadowCastingPointlights();
+			return m_game.getShadowCastingPointlights();
 		}
 
-		EventDispatcher<std::vector<ShaderData*>> shaderDispatcher{};
-		EventDispatcher<std::vector<MeshData*>> meshDispatcher{};
-		EventDispatcher<std::vector<TextureData*>> textureDispatcher{};
+		EventDispatcher<std::vector<ShaderData*>> m_shaderDispatcher{};
+		EventDispatcher<std::vector<MeshData*>> m_meshDispatcher{};
+		EventDispatcher<std::vector<TextureData*>> m_textureDispatcher{};
 
-		ECS::Coordinator& getCoordinator() { return game.coordinator; }
+		ECS::Coordinator& getCoordinator() { return m_game.m_coordinator; }
 		void createAssetManager();
-		void updateDeltaTime(float dt) { deltaTime = dt; }
-		void updateAspect(float a) { aspect = a; }
-		void updateMouse( double xpos, double ypos);
+		void updateDeltaTime(float dt) { m_deltaTime = dt; }
+		void updateAspect(float a) { m_aspect = a; }
+		void updateMouse(double xpos, double ypos);
 		void zeroMouse();
-		void updateGame() { game.update(aspect, inputHandler.mouseState, deltaTime); }
-		void updatePhysics() { game.updatePhysics(deltaTime); }
+		void updateGame() { m_game.update(m_aspect, m_inputHandler.m_mouseState, m_deltaTime); }
+		void updatePhysics() { m_game.updatePhysics(m_deltaTime); }
 
 		ECS::PhysicsEngineCommandBuffer& getPhysicsCommandQueue()
 		{
-			return game.getPhysicsEngineCommands();
+			return m_game.getPhysicsEngineCommands();
 		}
 
 		void pollPhysicsEvents(const std::vector<ECS::PhysicsEvent>& eventQueue);
-		
+
 		void updateInputState();
 		void setTextureUvTiling(std::string textureName, glm::vec2 uvTiling);
-		
+
 
 	};
 }

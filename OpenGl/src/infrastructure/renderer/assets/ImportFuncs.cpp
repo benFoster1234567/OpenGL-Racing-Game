@@ -153,7 +153,7 @@ Engine::Core::MeshData Engine::Infra::ImportFuncs::importMeshDataTOL(const std::
 
 	bool hasNormals = !attrib.normals.empty();
 	bool hasTexcoords = !attrib.texcoords.empty();
-	
+
 	for (const auto& shape : shapes) {
 		for (const auto& index : shape.mesh.indices) {
 
@@ -180,7 +180,7 @@ Engine::Core::MeshData Engine::Infra::ImportFuncs::importMeshDataTOL(const std::
 				tex.push_back(attrib.texcoords[2 * index.texcoord_index + 0]);
 				tex.push_back(1.0f - attrib.texcoords[2 * index.texcoord_index + 1]);
 			}
-			else 
+			else
 			{
 				tex.push_back(0.0f);
 				tex.push_back(0.0f);
@@ -203,12 +203,12 @@ Engine::Core::MeshData Engine::Infra::ImportFuncs::importMeshDataTOL(const std::
 
 	Engine::Core::MeshData newMesh{};
 
-	newMesh.attributes.push_back(std::move(vertexPoints));//0
-	newMesh.attributes.push_back(std::move(normals));//1
-	newMesh.attributes.push_back(std::move(texCoords));//2
-	newMesh.attributes.push_back({});
+	newMesh.m_attributes.push_back(std::move(vertexPoints));//0
+	newMesh.m_attributes.push_back(std::move(normals));//1
+	newMesh.m_attributes.push_back(std::move(texCoords));//2
+	newMesh.m_attributes.push_back({});
 
-	newMesh.name = name;
+	newMesh.m_name = name;
 	return newMesh;
 }
 
@@ -216,7 +216,7 @@ Engine::Core::ShaderData Engine::Infra::ImportFuncs::importShaderData(const std:
 {
 	std::ifstream shaderFile(path);
 
-	if (!shaderFile.is_open()) 
+	if (!shaderFile.is_open())
 	{
 		std::cerr << "Failed to open shader file: " << path << std::endl;
 		return Core::ShaderData{};
@@ -224,7 +224,7 @@ Engine::Core::ShaderData Engine::Infra::ImportFuncs::importShaderData(const std:
 
 	std::stringstream shaderStream{};
 	shaderStream << shaderFile.rdbuf();
-	
+
 	Core::ShaderData sd(name, path, shaderStream.str());
 	return sd;
 }
@@ -247,13 +247,13 @@ Engine::Core::TextureData Engine::Infra::ImportFuncs::importTextureDataDevIL(con
 
 	ilBindImage(imageID);
 
-	if (!ilLoadImage(reinterpret_cast<const ILchar*>(path.c_str()))) 
+	if (!ilLoadImage(reinterpret_cast<const ILchar*>(path.c_str())))
 	{
 		std::cerr << "Failed to open material file: " << path << std::endl;
 		return Engine::Core::TextureData{};
 	}
 
-	if (!ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE)) 
+	if (!ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE))
 	{
 		std::cerr << "Failed to convert image: " << path << std::endl;
 		return Engine::Core::TextureData{};
@@ -266,14 +266,14 @@ Engine::Core::TextureData Engine::Infra::ImportFuncs::importTextureDataDevIL(con
 	textureData.name = name;
 
 	ILubyte* data = ilGetData();
-	
+
 	if (data)
 	{
 		size_t numPixels = static_cast<size_t>(textureData.width) * textureData.height;
 		size_t dataSize = numPixels * textureData.channels;
 		textureData.pixels.assign(data, data + dataSize);
 	}
-	
+
 	ilDeleteImages(1, &imageID);
 
 	return textureData;
@@ -316,7 +316,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			ss >> ns;
 			materialData.ns = ns;
 		}
-		
+
 		else if (firstWord == "Ni")
 		{
 			ss >> std::skipws;
@@ -324,7 +324,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			ss >> ni;
 			materialData.ni = ni;
 		}
-		
+
 		else if (firstWord == "d")
 		{
 			ss >> std::skipws;
@@ -332,7 +332,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			ss >> d;
 			materialData.d = d;
 		}
-		
+
 		else if (firstWord == "illum")
 		{
 			ss >> std::skipws;
@@ -340,7 +340,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			ss >> illum;
 			materialData.illum = illum;
 		}
-		
+
 		else if (firstWord == "Ka")
 		{
 			std::string vecStr;
@@ -348,7 +348,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			glm::vec3 ka = stringToVec3(vecStr);
 			materialData.ka = ka;
 		}
-		
+
 		else if (firstWord == "Kd")
 		{
 			std::string vecStr;
@@ -356,7 +356,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			glm::vec3 kd = stringToVec3(vecStr);
 			materialData.kd = kd;
 		}
-		
+
 		else if (firstWord == "Ks")
 		{
 			std::string vecStr;
@@ -364,7 +364,7 @@ Engine::Core::MaterialData Engine::Infra::ImportFuncs::importMaterialData(const 
 			glm::vec3 ks = stringToVec3(vecStr);
 			materialData.ks = ks;
 		}
-		
+
 		else if (firstWord == "Ke")
 		{
 			std::string vecStr;

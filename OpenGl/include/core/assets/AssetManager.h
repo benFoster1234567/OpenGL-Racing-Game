@@ -2,17 +2,13 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
-#include <optional>
 
 #include "MeshData.h"
 #include "TextureData.h"
 #include "MaterialData.h"
 #include "ShaderData.h"
 
-#include "core/Patterns.h"
-#include <utility>
 #include <variant>
-#include <algorithm>
 #include "AssetIds.h"
 #include "AssetStorage.h"
 
@@ -26,16 +22,16 @@ namespace Engine::Core
 	private:
 
 		// do not remove assets from the sparse sets until its memory is no longer in use
-		AssetStorage<MeshData, AssetIdMax, AssetCapacity> meshes{};
-		AssetStorage<MaterialData, AssetIdMax, AssetCapacity> materials{};
-		AssetStorage<ShaderData, AssetIdMax, AssetCapacity> shaders{};
-		AssetStorage<TextureData, AssetIdMax, AssetCapacity> textures{};
+		AssetStorage<MeshData, AssetIdMax, AssetCapacity> m_meshes{};
+		AssetStorage<MaterialData, AssetIdMax, AssetCapacity> m_materials{};
+		AssetStorage<ShaderData, AssetIdMax, AssetCapacity> m_shaders{};
+		AssetStorage<TextureData, AssetIdMax, AssetCapacity> m_textures{};
 
 		friend class EngineSystem;
 		friend class AssetPipeline;
 
 	public:
-		std::unordered_map<std::string, std::string> textureFilePathToNameMap{};
+		std::unordered_map<std::string, std::string> m_textureFilePathToNameMap{};
 
 		AssetManager();
 		~AssetManager();
@@ -51,7 +47,7 @@ namespace Engine::Core
 		MaterialData* getMaterial(MaterialId materialId);
 		ShaderData* getShader(ShaderId shaderId);
 		TextureData* getTexture(TextureId textureId);
-		
+
 		void addAsset(const std::string& name, AssetVariant&& asset);
 
 		std::vector<ShaderData*> shaderList();
@@ -61,17 +57,17 @@ namespace Engine::Core
 
 		TextureId getTextureId(const std::string& name)
 		{
-			return textures.getId(name);
+			return m_textures.getId(name);
 		}
 
 		ShaderId getShaderId(const std::string& name)
 		{
-			return shaders.getId(name);
+			return m_shaders.getId(name);
 		}
 
 		MeshId getMeshId(const std::string& name)
 		{
-			return meshes.getId(name);
+			return m_meshes.getId(name);
 		}
 
 

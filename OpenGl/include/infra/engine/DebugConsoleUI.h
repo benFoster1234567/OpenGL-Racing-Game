@@ -17,7 +17,7 @@
 namespace Engine::Infra
 {
 
-	class CommandBase 
+	class CommandBase
 	{
 	public:
 		virtual std::string execute(const std::vector<std::string>& args) = 0;
@@ -28,9 +28,9 @@ namespace Engine::Infra
 	class Command : public CommandBase
 	{
 	private:
-		std::string name;
-		std::function<std::string(Args...)> commandFunction;
-		std::vector<std::string> argumentNames;
+		std::string m_name;
+		std::function<std::string(Args...)> m_commandFunction;
+		std::vector<std::string> m_argumentNames;
 
 
 		std::string getStringAt(const std::vector<std::string>& argStrs, std::size_t I) {
@@ -42,7 +42,7 @@ namespace Engine::Infra
 		{
 			std::stringstream ss(argStr);
 			T value;
-			
+
 			if (!(ss >> value)) {
 				throw std::runtime_error("Failed to parse argument: " + argStr);
 			}
@@ -53,13 +53,13 @@ namespace Engine::Infra
 		template<std::size_t... Is>
 		std::string executeImpl(const std::vector<std::string>& argStrs, std::index_sequence<Is...>)
 		{
-			return commandFunction(parseArgument<Args>(getStringAt(argStrs, Is))...);
+			return m_commandFunction(parseArgument<Args>(getStringAt(argStrs, Is))...);
 		}
 
 
 	public:
 		Command(const std::string& name, std::function<std::string(Args...)> func)
-			: name{ name }, commandFunction{ func }
+			: m_name{ name }, m_commandFunction{ func }
 		{
 		}
 
@@ -71,9 +71,9 @@ namespace Engine::Infra
 
 		std::string execute(const std::vector<std::string>& inputArgs) override
 		{
-			if (inputArgs.size() != sizeof...(Args)) 
+			if (inputArgs.size() != sizeof...(Args))
 			{
-				throw std::runtime_error("Incorrect number of arguments provided to command: " + name);
+				throw std::runtime_error("Incorrect number of arguments provided to command: " + m_name);
 			}
 
 			return executeImpl(inputArgs, std::index_sequence_for<Args...>{});
@@ -104,17 +104,17 @@ namespace Engine::Infra
 				func
 			);
 		}
-	
+
 	};
 
 	class DebugConsoleUi
 	{
 	private:
 		void queueUiDraw();
-		DebugConsole debugConsole;
-		const int resultListMaxSize = 20;
-		std::deque<std::string> consoleResults;
-		char commandBuffer[256]{};
+		DebugConsole m_debugConsole;
+		const int m_resultListMaxSize = 20;
+		std::deque<std::string> m_consoleResults;
+		char m_commandBuffer[256]{};
 
 	public:
 		DebugConsoleUi(Window& window, const std::string& gl_version = "#version 430");
@@ -129,15 +129,15 @@ namespace Engine::Infra
 		void appendResults(std::string r);
 		void prepareFrame();
 		void render();
-		void executeCommand() 
+		void executeCommand()
 		{
-			debugConsole.executeCommand(commandBuffer); 
+			m_debugConsole.executeCommand(m_commandBuffer);
 		}
-		
+
 		template <typename... Args>
 		void registerCommand(const std::string& name, std::function<std::string(Args...)> func)
 		{
-			debugConsole.registerCommand<Args...>(name, func);
+			m_debugConsole.registerCommand<Args...>(name, func);
 		}
 	};
 }

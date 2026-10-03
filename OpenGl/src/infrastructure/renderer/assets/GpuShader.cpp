@@ -5,7 +5,7 @@
 #include <core/assets/ShaderData.h>
 
 GpuShader::GpuShader(Engine::Core::ShaderData* _data)
-	: data(_data), Id{ 0 }
+	: m_data(_data), m_id{ 0 }
 {
 }
 
@@ -18,7 +18,7 @@ static std::string buildShaderString(int version, const std::string& defineAs, s
 
 void GpuShader::compileShaders()
 {
-	if (!data)
+	if (!m_data)
 	{
 		std::cerr << "CRITICAL ERROR: Cannot compile shader because 'data' pointer is NULL!\n";
 		exit(1);
@@ -29,7 +29,7 @@ void GpuShader::compileShaders()
 
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
-	std::string vertSrc = buildShaderString(430, "VERTEX_SHADER", data->shaderSrc);
+	std::string vertSrc = buildShaderString(430, "VERTEX_SHADER", m_data->shaderSrc);
 	//std::cout << vertSrc << "\n";
 	const char* vertSrcStr = vertSrc.c_str();
 	glShaderSource(vertexShader, 1, &vertSrcStr, NULL);
@@ -44,7 +44,7 @@ void GpuShader::compileShaders()
 	}
 
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	std::string fragSrc = buildShaderString(430, "FRAGMENT_SHADER", data->shaderSrc);
+	std::string fragSrc = buildShaderString(430, "FRAGMENT_SHADER", m_data->shaderSrc);
 	const char* fragSrcStr = fragSrc.c_str();
 	glShaderSource(fragmentShader, 1, &fragSrcStr, NULL);
 	glCompileShader(fragmentShader);
@@ -58,12 +58,12 @@ void GpuShader::compileShaders()
 	}
 
 	GLuint geometryShader = 0;
-	bool geometryIncluded = data->shaderSrc.find("GEOMETRY_SHADER") != std::string::npos;
+	bool geometryIncluded = m_data->shaderSrc.find("GEOMETRY_SHADER") != std::string::npos;
 
 	if (geometryIncluded)
 	{
 		geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-		std::string geoSrc = buildShaderString(430, "GEOMETRY_SHADER", data->shaderSrc);
+		std::string geoSrc = buildShaderString(430, "GEOMETRY_SHADER", m_data->shaderSrc);
 		const char* geoSrcStr = geoSrc.c_str(); // FIXED
 
 		glShaderSource(geometryShader, 1, &geoSrcStr, NULL); // FIXED
@@ -95,5 +95,5 @@ void GpuShader::compileShaders()
 	glDeleteShader(fragmentShader);
 	glDeleteShader(geometryShader);
 
-	this->Id = shaderProgram;
+	this->m_id = shaderProgram;
 }

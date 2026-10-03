@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "core/ecs/coordinator/Coordinator.h"
+#include "../coordinator/Coordinator.h"
 #include "../components/CameraComponents.h"
 #include "../components/TransformComponent.h"
 #include "../components/MeshComponent.h"
@@ -15,7 +15,7 @@ namespace Engine::Core::ECS
 {
 	void RenderDispatcherOrbitalCamera::update(Coordinator& coordinator, float aspect)
 	{
-		for (auto entity : entities)
+		for (auto entity : m_entities)
 		{
 			auto& cameraComp = coordinator.getComponent<CameraComponent>(entity);
 			const auto& transform = coordinator.getComponent<TransformComponent>(entity);
@@ -45,11 +45,11 @@ namespace Engine::Core::ECS
 				, .mesh = meshData.meshId
 				, .material = material.material });
 		}
-	} 
+	}
 
 	void RenderDispatcherExternalCamera::update(Coordinator& coordinator, float aspect)
 	{
-		for (auto entity : entities)
+		for (auto entity : m_entities)
 		{
 			const auto& extCameraComp = coordinator.getComponent<ExternalCameraComponent>(entity);
 			const auto& cameraComp = coordinator.getComponent<CameraComponent>(extCameraComp.entityWithCamera);
@@ -78,5 +78,5 @@ namespace Engine::Core::ECS
 				, .mesh = meshData.meshId
 				, .material = material.material });
 		}
-	} 
+	}
 }

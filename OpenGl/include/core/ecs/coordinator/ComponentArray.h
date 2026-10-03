@@ -18,52 +18,52 @@ namespace Engine::Core::ECS
 	class ComponentArray : public IComponentArray
 	{
 	private:
-		size_t size{ 0 };
-		std::array<T, MAX_COMPONENTS> componentArray{};
-		std::unordered_map<Entity, size_t> entityToIndexMap{};
-		std::unordered_map<size_t, Entity> indexToEntityMap{};
+		size_t m_size{ 0 };
+		std::array<T, MAX_COMPONENTS> m_componentArray{};
+		std::unordered_map<Entity, size_t> m_entityToIndexMap{};
+		std::unordered_map<size_t, Entity> m_indexToEntityMap{};
 
 	public:
 		void addData(Entity entity, T component)
 		{
-			if (size >= MAX_COMPONENTS)
+			if (m_size >= MAX_COMPONENTS)
 			{
 				throw std::runtime_error("Maximum number of components reached.");
 			}
 
-			size_t newIndex = size;
-			entityToIndexMap[entity] = newIndex;
-			indexToEntityMap[newIndex] = entity;
-			componentArray[newIndex] = component;
-			++size;
+			size_t newIndex = m_size;
+			m_entityToIndexMap[entity] = newIndex;
+			m_indexToEntityMap[newIndex] = entity;
+			m_componentArray[newIndex] = component;
+			++m_size;
 		}
 
 		void removeData(Entity entity)
 		{
-			assert(entityToIndexMap.find(entity) != entityToIndexMap.end() && "Removing non-existent component.");
+			assert(m_entityToIndexMap.find(entity) != m_entityToIndexMap.end() && "Removing non-existent component.");
 
-			size_t indexOfRemovedEntity = entityToIndexMap[entity];
-			size_t indexOfLastElement = size - 1;
-			componentArray[indexOfRemovedEntity] = componentArray[indexOfLastElement];
+			size_t indexOfRemovedEntity = m_entityToIndexMap[entity];
+			size_t indexOfLastElement = m_size - 1;
+			m_componentArray[indexOfRemovedEntity] = m_componentArray[indexOfLastElement];
 
-			Entity entityOfLastElement = indexToEntityMap[indexOfLastElement];
-			entityToIndexMap[entityOfLastElement] = indexOfRemovedEntity;
-			indexToEntityMap[indexOfRemovedEntity] = entityOfLastElement;
+			Entity entityOfLastElement = m_indexToEntityMap[indexOfLastElement];
+			m_entityToIndexMap[entityOfLastElement] = indexOfRemovedEntity;
+			m_indexToEntityMap[indexOfRemovedEntity] = entityOfLastElement;
 
-			entityToIndexMap.erase(entity);
-			indexToEntityMap.erase(indexOfLastElement);
-			--size;
+			m_entityToIndexMap.erase(entity);
+			m_indexToEntityMap.erase(indexOfLastElement);
+			--m_size;
 		}
 
 		T& getData(Entity entity)
 		{
-			assert(entityToIndexMap.find(entity) != entityToIndexMap.end() && "Retrieving non-existent component.");
-			return componentArray[entityToIndexMap[entity]];
+			assert(m_entityToIndexMap.find(entity) != m_entityToIndexMap.end() && "Retrieving non-existent component.");
+			return m_componentArray[m_entityToIndexMap[entity]];
 		}
 
 		void entityDestroyed(Entity entity) override
 		{
-			if (entityToIndexMap.find(entity) != entityToIndexMap.end())
+			if (m_entityToIndexMap.find(entity) != m_entityToIndexMap.end())
 			{
 				removeData(entity);
 			}

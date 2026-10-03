@@ -7,15 +7,15 @@ namespace Engine::Core::ECS
 	class Coordinator
 	{
 	private:
-		std::unique_ptr<ComponentRegistry> componentRegistry{};
-		std::unique_ptr<EntityRegistry> entityRegistry{};
-		std::unique_ptr<SystemRegistry> systemRegistry{};
+		std::unique_ptr<ComponentRegistry> m_componentRegistry{};
+		std::unique_ptr<EntityRegistry> m_entityRegistry{};
+		std::unique_ptr<SystemRegistry> m_systemRegistry{};
 
 	public:
 		Coordinator() :
-			componentRegistry{ std::make_unique<ComponentRegistry>() },
-			entityRegistry{ std::make_unique<EntityRegistry>() },
-			systemRegistry{ std::make_unique<SystemRegistry>() }
+			m_componentRegistry{ std::make_unique<ComponentRegistry>() },
+			m_entityRegistry{ std::make_unique<EntityRegistry>() },
+			m_systemRegistry{ std::make_unique<SystemRegistry>() }
 		{
 		}
 
@@ -27,76 +27,76 @@ namespace Engine::Core::ECS
 
 		Entity createEntity()
 		{
-			return entityRegistry->createEntity();
+			return m_entityRegistry->createEntity();
 		}
 
 		void destroyEntity(Entity entity)
 		{
-			entityRegistry->destroyEntity(entity);
-			componentRegistry->entityDestroyed(entity);
-			systemRegistry->entityDestroyed(entity);
+			m_entityRegistry->destroyEntity(entity);
+			m_componentRegistry->entityDestroyed(entity);
+			m_systemRegistry->entityDestroyed(entity);
 		}
 
 		// Component methods
 		template<class T>
 		void registerComponent()
 		{
-			componentRegistry->registerComponent<T>();
+			m_componentRegistry->registerComponent<T>();
 		}
 
 		template<class T>
 		void addComponent(Entity entity, T component)
 		{
-			componentRegistry->addComponent<T>(entity, component); 
+			m_componentRegistry->addComponent<T>(entity, component);
 
-			auto signature = entityRegistry->getSignature(entity); 
-			signature.set(componentRegistry->getComponentType<T>(), true);
-			entityRegistry->setSignature(entity, signature);
+			auto signature = m_entityRegistry->getSignature(entity);
+			signature.set(m_componentRegistry->getComponentType<T>(), true);
+			m_entityRegistry->setSignature(entity, signature);
 
-			systemRegistry->entitySignatureChanged(entity, signature); 
+			m_systemRegistry->entitySignatureChanged(entity, signature);
 		}
 
 		template<class T>
 		void removeComponent(Entity entity)
 		{
-			componentRegistry->removeComponent<T>(entity);
+			m_componentRegistry->removeComponent<T>(entity);
 
-			auto signature = entityRegistry->getSignature(entity);
-			signature.set(componentRegistry->getComponentType<T>(), false);
-			entityRegistry->setSignature(entity, signature);
+			auto signature = m_entityRegistry->getSignature(entity);
+			signature.set(m_componentRegistry->getComponentType<T>(), false);
+			m_entityRegistry->setSignature(entity, signature);
 
-			systemRegistry->entitySignatureChanged(entity, signature); 
+			m_systemRegistry->entitySignatureChanged(entity, signature);
 		}
 
 		template<class T>
 		T& getComponent(Entity entity)
 		{
-			return componentRegistry->getComponent<T>(entity); 
+			return m_componentRegistry->getComponent<T>(entity);
 		}
 
 		template<class T>
 		ComponentType getComponentType()
 		{
-			return componentRegistry->getComponentType<T>();
+			return m_componentRegistry->getComponentType<T>();
 		}
 
 		// System methods
 		template<typename T>
-		T* registerSystem() 
+		T* registerSystem()
 		{
-			return systemRegistry->registerSystem<T>(); 
+			return m_systemRegistry->registerSystem<T>();
 		}
 
 		template<typename T>
 		T* getSystem()
 		{
-			return systemRegistry->getSystem<T>();
+			return m_systemRegistry->getSystem<T>();
 		}
 
 		template<typename T>
 		void setSystemSignature(Signature signature)
 		{
-			systemRegistry->template setSignature<T>(signature); 
+			m_systemRegistry->template setSignature<T>(signature);
 		}
 	};
 }

@@ -5,18 +5,18 @@ using namespace Engine::Core;
 
 void Engine::Core::InputBridge::setKey(KeyCode key, bool pressed)
 {
-	inputState.currentFrameInputData.set(int(key), pressed);
+	m_inputState.currentFrameInputData.set(int(key), pressed);
 }
 
 void Engine::Core::InputBridge::updateKeyboard()
 {
-	inputState.previousFrameInputData = inputState.currentFrameInputData;
+	m_inputState.previousFrameInputData = m_inputState.currentFrameInputData;
 }
 
 void Engine::Core::InputBridge::printDebugInfo()
 {
-	std::cout << "previous frame: " << inputState.previousFrameInputData << "\n";
-	std::cout << "current frame: " << inputState.currentFrameInputData << "\n";
+	std::cout << "previous frame: " << m_inputState.previousFrameInputData << "\n";
+	std::cout << "current frame: " << m_inputState.currentFrameInputData << "\n";
 }
 
 void Engine::Core::MouseInputResource::zeroMouseDelta()
@@ -29,5 +29,5 @@ void Engine::Core::MouseInputResource::updateMouseState(glm::vec2 currentMouse)
 {
 	mouseDelta = currentMouse - mousePos;
 	lastMousePos = mousePos;
-	mousePos   = currentMouse;
+	mousePos = currentMouse;
 }

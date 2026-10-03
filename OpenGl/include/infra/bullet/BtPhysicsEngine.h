@@ -29,7 +29,7 @@ namespace Engine::Infra
 
 	static glm::vec3 btToGlm(const btVector3& v)
 	{
-		return glm::vec3{ v.x(), v.y(), v.z()};
+		return glm::vec3{ v.x(), v.y(), v.z() };
 	}
 
 	static glm::quat btToGlm(const btQuaternion& q)
@@ -41,41 +41,41 @@ namespace Engine::Infra
 	class MotionStateForECS : public btMotionState
 	{
 	public:
-		Core::ECS::TransformComponent* transform{nullptr};
+		Core::ECS::TransformComponent* m_transform{ nullptr };
 
 		void getWorldTransform(btTransform& worldTrans) const override
 		{
-			if (transform == nullptr) return;
-			worldTrans.setOrigin(glmToBt(transform->position));
-			worldTrans.setRotation(glmToBt(transform->rotation));
+			if (m_transform == nullptr) return;
+			worldTrans.setOrigin(glmToBt(m_transform->position));
+			worldTrans.setRotation(glmToBt(m_transform->rotation));
 		}
 
 		void setWorldTransform(const btTransform& worldTrans)
 		{
-			if (transform == nullptr) return;
-			transform->position = btToGlm(worldTrans.getOrigin());
-			transform->rotation = btToGlm(worldTrans.getRotation());
+			if (m_transform == nullptr) return;
+			m_transform->position = btToGlm(worldTrans.getOrigin());
+			m_transform->rotation = btToGlm(worldTrans.getRotation());
 		}
 	};
-	
+
 	class MotionStateForECSNew : public btMotionState
 	{
 	public:
-		Core::ECS::Coordinator& coordinator;
-		Core::ECS::Entity entity{};
+		Core::ECS::Coordinator& m_coordinator;
+		Core::ECS::Entity m_entity{};
 
-		MotionStateForECSNew(Core::ECS::Coordinator& coordinator, Core::ECS::Entity entity) : coordinator{ coordinator }, entity{ entity } {}
+		MotionStateForECSNew(Core::ECS::Coordinator& coordinator, Core::ECS::Entity entity) : m_coordinator{ coordinator }, m_entity{ entity } {}
 
 		void getWorldTransform(btTransform& worldTrans) const override
 		{
-			auto& transform = coordinator.getComponent<Core::ECS::TransformComponent>(entity);
+			auto& transform = m_coordinator.getComponent<Core::ECS::TransformComponent>(m_entity);
 			worldTrans.setOrigin(glmToBt(transform.position));
 			worldTrans.setRotation(glmToBt(transform.rotation));
 		}
 
 		void setWorldTransform(const btTransform& worldTrans)
 		{
-			auto& transform = coordinator.getComponent<Core::ECS::TransformComponent>(entity);
+			auto& transform = m_coordinator.getComponent<Core::ECS::TransformComponent>(m_entity);
 			transform.position = btToGlm(worldTrans.getOrigin());
 			transform.rotation = btToGlm(worldTrans.getRotation());
 		}
@@ -88,17 +88,17 @@ namespace Engine::Infra
 	{
 	private:
 
-		btDefaultCollisionConfiguration* collisionConfiguration{nullptr};
-		btCollisionDispatcher* dispatcher{nullptr};
-		btDbvtBroadphase* broadPhase{nullptr};
-		btSequentialImpulseConstraintSolver* solver{nullptr};
-		btDiscreteDynamicsWorld* dynamicsWorld{ nullptr };
-		btVehicleRaycaster* vehicleRaycaster{ nullptr };
+		btDefaultCollisionConfiguration* m_collisionConfiguration{ nullptr };
+		btCollisionDispatcher* m_dispatcher{ nullptr };
+		btDbvtBroadphase* m_broadPhase{ nullptr };
+		btSequentialImpulseConstraintSolver* m_solver{ nullptr };
+		btDiscreteDynamicsWorld* m_dynamicsWorld{ nullptr };
+		btVehicleRaycaster* m_vehicleRaycaster{ nullptr };
 
-		Core::ECS::PhysicsEngineCommandBuffer commandQueue{};
-		std::vector<Core::ECS::PhysicsEvent> eventCache{};
+		Core::ECS::PhysicsEngineCommandBuffer m_commandQueue{};
+		std::vector<Core::ECS::PhysicsEvent> m_eventCache{};
 
-		
+
 		void evaluateMotionCommand(const Core::ECS::MotionCommand& motionCommand);
 		void evaluateCreateRigidbodyCommand(const Core::ECS::CreateRigidbodyCommand& command);
 		void evaluateDeleteRigidbodyCommand(const Core::ECS::DeleteRigidbodyCommand& command);
@@ -106,22 +106,22 @@ namespace Engine::Infra
 
 		static constexpr size_t MAX_COMPONENTS = 128;
 		static constexpr size_t MAX_ENTITIES = 1000;
-		SparseSet<btCollisionShape*, MAX_ENTITIES, MAX_ENTITIES> collisionShapes{};
+		SparseSet<btCollisionShape*, MAX_ENTITIES, MAX_ENTITIES> m_collisionShapes{};
 
-		SparseSet<btRigidBody*, MAX_ENTITIES, MAX_ENTITIES> rigidbodies{};
-		SparseSet<btRaycastVehicle*, MAX_ENTITIES, MAX_ENTITIES> vehicles{};
+		SparseSet<btRigidBody*, MAX_ENTITIES, MAX_ENTITIES> m_rigidbodies{};
+		SparseSet<btRaycastVehicle*, MAX_ENTITIES, MAX_ENTITIES> m_vehicles{};
 
 
 	public:
 
 		BtPhysicsEngine()
 		{
-			broadPhase = new btDbvtBroadphase();
-			collisionConfiguration = new btDefaultCollisionConfiguration();
-			dispatcher = new btCollisionDispatcher(collisionConfiguration);
-			solver = new btSequentialImpulseConstraintSolver();
-			dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadPhase, solver, collisionConfiguration); 
-			dynamicsWorld->setGravity(btVector3(0.0f, -9.81f, 0.0f));
+			m_broadPhase = new btDbvtBroadphase();
+			m_collisionConfiguration = new btDefaultCollisionConfiguration();
+			m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
+			m_solver = new btSequentialImpulseConstraintSolver();
+			m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadPhase, m_solver, m_collisionConfiguration);
+			m_dynamicsWorld->setGravity(btVector3(0.0f, -9.81f, 0.0f));
 		}
 
 		~BtPhysicsEngine()
@@ -136,17 +136,17 @@ namespace Engine::Infra
 		BtPhysicsEngine& operator=(const BtPhysicsEngine&) = delete;
 
 		BtPhysicsEngine(BtPhysicsEngine&& other) noexcept
-			: collisionConfiguration(std::exchange(other.collisionConfiguration, nullptr)),
-			dispatcher(std::exchange(other.dispatcher, nullptr)),
-			broadPhase(std::exchange(other.broadPhase, nullptr)),
-			solver(std::exchange(other.solver, nullptr)),
-			dynamicsWorld(std::exchange(other.dynamicsWorld, nullptr)),
-			collisionShapes(std::move(other.collisionShapes)),
-		//	commandQueue(std::exchange(other.commandQueue, nullptr)),
-			eventCache(std::move(other.eventCache))
+			: m_collisionConfiguration(std::exchange(other.m_collisionConfiguration, nullptr)),
+			m_dispatcher(std::exchange(other.m_dispatcher, nullptr)),
+			m_broadPhase(std::exchange(other.m_broadPhase, nullptr)),
+			m_solver(std::exchange(other.m_solver, nullptr)),
+			m_dynamicsWorld(std::exchange(other.m_dynamicsWorld, nullptr)),
+			m_collisionShapes(std::move(other.m_collisionShapes)),
+			//	commandQueue(std::exchange(other.commandQueue, nullptr)),
+			m_eventCache(std::move(other.m_eventCache))
 		{
 		}
-		
+
 
 		void destroy();
 

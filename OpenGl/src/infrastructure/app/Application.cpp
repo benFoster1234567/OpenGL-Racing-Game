@@ -27,9 +27,9 @@
 
 Engine::Infra::Application::Application()
 {
-	window = std::make_unique<Window>("window", false);
+	m_window = std::make_unique<Window>("window", false);
 	setupWindowCallbacks();
-	debugConsoleUi = std::make_unique<DebugConsoleUi>(*window);
+	m_debugConsoleUi = std::make_unique<DebugConsoleUi>(*m_window);
 	setupDebugCommands();
 }
 
@@ -37,60 +37,60 @@ Engine::Infra::Application::Application()
 //all asset import calls go here
 void Engine::Infra::Application::importAssets()
 {
-	engine.assetPipeline.submit<Core::MaterialData>("assets/materials/testMaterial.mtl", "testMaterial");
-	engine.assetPipeline.submit<Core::MaterialData>("assets/materials/cubeMaterial.mtl", "cubeMaterial");
-	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/depthCubeShader.glsl", "depthCubemap");
-	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/bunny.obj", "bunny");
-	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/cube.obj", "cube");
-	engine.assetPipeline.submit<Core::MeshData>("assets/meshes/car.obj", "car");
-	engine.assetPipeline.submit<Core::ShaderData>("assets/shaders/shader.glsl", "shader");
-	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/testTextures.jpg", "uvChecker");
-	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/gold.jpg", "gold");
-	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0068.gif", "tileSpecular");
-	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0066.gif", "tileDiffuse");
-	engine.assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0067.gif", "tileNormal");
-	engine.createAssetManager();
+	m_engine.m_assetPipeline.submit<Core::MaterialData>("assets/materials/testMaterial.mtl", "testMaterial");
+	m_engine.m_assetPipeline.submit<Core::MaterialData>("assets/materials/cubeMaterial.mtl", "cubeMaterial");
+	m_engine.m_assetPipeline.submit<Core::ShaderData>("assets/shaders/depthCubeShader.glsl", "depthCubemap");
+	m_engine.m_assetPipeline.submit<Core::MeshData>("assets/meshes/bunny.obj", "bunny");
+	m_engine.m_assetPipeline.submit<Core::MeshData>("assets/meshes/cube.obj", "cube");
+	m_engine.m_assetPipeline.submit<Core::MeshData>("assets/meshes/car.obj", "car");
+	m_engine.m_assetPipeline.submit<Core::ShaderData>("assets/shaders/shader.glsl", "shader");
+	m_engine.m_assetPipeline.submit<Core::TextureData>("assets/materials/textures/testTextures.jpg", "uvChecker");
+	m_engine.m_assetPipeline.submit<Core::TextureData>("assets/materials/textures/gold.jpg", "gold");
+	m_engine.m_assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0068.gif", "tileSpecular");
+	m_engine.m_assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0066.gif", "tileDiffuse");
+	m_engine.m_assetPipeline.submit<Core::TextureData>("assets/materials/textures/pic0067.gif", "tileNormal");
+	m_engine.createAssetManager();
 }
 
 
 //all debug command lambdas are setup here
 void Engine::Infra::Application::setupDebugCommands()
 {
-    std::function <std::string()> exitFunc = [&]()
-    {
-        window->closeApplication = true;
-        return "Exiting...";
-    };
+	std::function <std::string()> exitFunc = [&]()
+		{
+			m_window->m_closeApplication = true;
+			return "Exiting...";
+		};
 
 	std::function <std::string()> setFullscreen = [&]()
 		{
-			window->setFullscreen();
+			m_window->setFullscreen();
 			return "set to fullscreen...";
 		};
 
 	std::function <std::string()> setWindowed = [&]()
 		{
-			window->setWindowed();
+			m_window->setWindowed();
 			return "setting windowed";
 		};
 
 	std::function < std::string(int, int)> setWindowSize = [&](int w, int h)
 		{
-			window->setWindowSize(w, h);
+			m_window->setWindowSize(w, h);
 			return "window size set to : [ " + std::to_string(w) + ", " + std::to_string(h) + " ]";
 		};
 
 	std::function <std::string(int)> setPolygonMode = [&](int m)
 		{
-			renderer.setPolygonMode(m);
+			m_renderer.setPolygonMode(m);
 			std::string mstr = m == LINE ? "line" : "fill";
 			return "Polygon mode set to " + mstr;
 		};
 
-	debugConsoleUi->registerCommand<>("setWindowed", setWindowed);
-	debugConsoleUi->registerCommand<>("setFullscreen", setFullscreen);
-	debugConsoleUi->registerCommand<>("exit", exitFunc);
-	debugConsoleUi->registerCommand<int>("pMode", setPolygonMode);
+	m_debugConsoleUi->registerCommand<>("setWindowed", setWindowed);
+	m_debugConsoleUi->registerCommand<>("setFullscreen", setFullscreen);
+	m_debugConsoleUi->registerCommand<>("exit", exitFunc);
+	m_debugConsoleUi->registerCommand<int>("pMode", setPolygonMode);
 }
 
 //window key callback is set here
@@ -98,161 +98,161 @@ void Engine::Infra::Application::setupWindowCallbacks()
 {
 	std::function<void(int, int, int, int)> callback = [&](int _key, int _scancode, int _action, int _mods)
 		{
-			if (debugConsoleUi->isKeyboardCaptured()) return;
-			Engine::Core::KeyAction ka = keyHandler.getAction(_action);
-			Engine::Core::KeyCode k = keyHandler.getInput(_key);
+			if (m_debugConsoleUi->isKeyboardCaptured()) return;
+			Engine::Core::KeyAction ka = m_keyHandler.getAction(_action);
+			Engine::Core::KeyCode k = m_keyHandler.getInput(_key);
 			//toggleConsole(k, ka);
-			
+
 			if (k == Engine::Core::KeyCode::BackTick && ka == Engine::Core::KeyAction::Down)
 			{
-				debugConsoleUi->toggleVisibility();
-				if (debugConsoleUi->isVisible)
+				m_debugConsoleUi->toggleVisibility();
+				if (m_debugConsoleUi->isVisible)
 				{
-					window->enableCursor();
+					m_window->enableCursor();
 				}
 				else
 				{
-					window->disableCursor();
+					m_window->disableCursor();
 				}
-				std::cout << "Console Visibility: " << debugConsoleUi->isVisible << "\n";
+				std::cout << "Console Visibility: " << m_debugConsoleUi->isVisible << "\n";
 			}
 
 			else if (_action == GLFW_PRESS)
 			{
-				engine.inputHandler.setKey(k, true);
+				m_engine.m_inputHandler.setKey(k, true);
 			}
 
 			else if (_action == GLFW_RELEASE)
 			{
-				engine.inputHandler.setKey(k, false);
+				m_engine.m_inputHandler.setKey(k, false);
 			}
 
 		};
 
 	auto mouseMotionCallback = [&](double x, double y)
 		{
-			engine.inputHandler.updateMousePosition({ x,y });
+			m_engine.m_inputHandler.updateMousePosition({ x,y });
 		};
 	//window->submitMouseMotionCallback(mouseMotionCallback);
-	window->submitKeyCallback(callback);
+	m_window->submitKeyCallback(callback);
 
 }
 
 //import callback lambdas are created here
 void Engine::Infra::Application::setupImportCallbacks()
 {
-	engine.assetPipeline.registerImportCallback<Core::MeshData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::MeshData>
-	{
-		return std::make_unique<Core::MeshData>(Infra::ImportFuncs::importMeshDataTOL(path, name));
-	});
+	m_engine.m_assetPipeline.registerImportCallback<Core::MeshData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::MeshData>
+		{
+			return std::make_unique<Core::MeshData>(Infra::ImportFuncs::importMeshDataTOL(path, name));
+		});
 
-	engine.assetPipeline.registerImportCallback<Core::ShaderData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::ShaderData>
-	{
-		return std::make_unique<Core::ShaderData>(Infra::ImportFuncs::importShaderData(path, name));
-	});
+	m_engine.m_assetPipeline.registerImportCallback<Core::ShaderData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::ShaderData>
+		{
+			return std::make_unique<Core::ShaderData>(Infra::ImportFuncs::importShaderData(path, name));
+		});
 
-	engine.assetPipeline.registerImportCallback<Core::MaterialData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::MaterialData>
-	{
-		return std::make_unique<Core::MaterialData>(Infra::ImportFuncs::importMaterialData(path, name));
-	});
+	m_engine.m_assetPipeline.registerImportCallback<Core::MaterialData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::MaterialData>
+		{
+			return std::make_unique<Core::MaterialData>(Infra::ImportFuncs::importMaterialData(path, name));
+		});
 
-	engine.assetPipeline.registerImportCallback<Core::TextureData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::TextureData>
-	{
-		return std::make_unique<Core::TextureData>(Infra::ImportFuncs::importTextureDataDevIL(path, name));
-	});
+	m_engine.m_assetPipeline.registerImportCallback<Core::TextureData>([](const std::string& path, const std::string& name) -> std::unique_ptr<Core::TextureData>
+		{
+			return std::make_unique<Core::TextureData>(Infra::ImportFuncs::importTextureDataDevIL(path, name));
+		});
 }
 
 void Engine::Infra::Application::run()
 {
-	
+
 	Engine::Core::ECS::RenderDispatcher::sendRenderInfo.subscribe([&](Engine::Core::ECS::RenderOutput output)
 		{
 			RenderCommand rc = { .view = output.view, .projection = output.projection, .modelTransform = output.modelTransform, .uvScale = output.uvScale, .shader = output.shader, .mesh = output.mesh,.material = output.material };
-			renderer.submit(rc);
+			m_renderer.submit(rc);
 		});
 
-	renderer.setPolygonMode(0);
-	
+	m_renderer.setPolygonMode(0);
+
 	setupImportCallbacks();
 	importAssets();
 
-	GpuAssetLoader::fillRenderer(engine.assetManager, renderer);
-	
+	GpuAssetLoader::fillRenderer(m_engine.m_assetManager, m_renderer);
+
 	{
 		std::vector<Engine::Core::ECS::StaticPointLightRendererData> lightData{};
 		std::vector<StaticPointLightResource> pointLights{};
 
 		//TODO: Tidy this up
-		engine.setUpGame();
-		engine.fillStaticLightVector(lightData);
+		m_engine.setUpGame();
+		m_engine.fillStaticLightVector(lightData);
 
 		for (const auto& light : lightData)
 		{
 			StaticPointLightResource splr{};
-			splr.position = light.position;
-			splr.color = light.color;
+			splr.position = light.m_position;
+			splr.color = light.m_color;
 			splr.radius = light.radius;
 			splr.intensity = light.intensity;
 			pointLights.push_back(splr);
 		}
 
-		renderer.loadLights(pointLights);
+		m_renderer.loadLights(pointLights);
 	}
 
 	auto getCameraOrigin = [this]() -> glm::vec3
 		{
-			return engine.game.coordinator.getComponent<Core::ECS::TransformComponent>(engine.game.playerEntity).position;
+			return m_engine.m_game.m_coordinator.getComponent<Core::ECS::TransformComponent>(m_engine.m_game.m_playerEntity).position;
 		};
-	
-	renderer.loadShadowingLights(getCameraOrigin());
+
+	m_renderer.loadShadowingLights(getCameraOrigin());
 
 	glfwSwapInterval(0);
-	window->disableCursor();
-	renderer.prepareDepthCubemapArray();
+	m_window->disableCursor();
+	m_renderer.prepareDepthCubemapArray();
 
 	float physicsUpdateSeconds = 0.02f;
 	float physicsUpdateDuration = 0.0f;
 
-	btPhysicsEngine.loadPhysicsCommands(engine.getPhysicsCommandQueue());
-	btPhysicsEngine.evaluateCommands();
-	btPhysicsEngine.createVehicles(engine.getCoordinator());
+	m_btPhysicsEngine.loadPhysicsCommands(m_engine.getPhysicsCommandQueue());
+	m_btPhysicsEngine.evaluateCommands();
+	m_btPhysicsEngine.createVehicles(m_engine.getCoordinator());
 
-	while (!window->shouldClose())
+	while (!m_window->shouldClose())
 	{
-		window->pollEvents();
-		window->updateViewport();
-		window->updateDeltaTime();
-		float deltaTime = window->deltaTime();
+		m_window->pollEvents();
+		m_window->updateViewport();
+		m_window->updateDeltaTime();
+		float deltaTime = m_window->deltaTime();
 
-		float currentWidth = static_cast<float>(window->getWidth());
-		float currentHeight = static_cast<float>(window->getHeight());
+		float currentWidth = static_cast<float>(m_window->getWidth());
+		float currentHeight = static_cast<float>(m_window->getHeight());
 		double x{}, y{};
-		
-		window->getMousePosition(x, y);
 
-		engine.updateAspect(currentWidth / currentHeight);
-		engine.updateDeltaTime(deltaTime);
-		engine.updateMouse(x, y);
-		engine.updateGame();
-		renderer.updatePointlightSources(getCameraOrigin());
+		m_window->getMousePosition(x, y);
 
-		btPhysicsEngine.updateVehicles(engine.getCoordinator());
-		btPhysicsEngine.runSimulation(deltaTime);
+		m_engine.updateAspect(currentWidth / currentHeight);
+		m_engine.updateDeltaTime(deltaTime);
+		m_engine.updateMouse(x, y);
+		m_engine.updateGame();
+		m_renderer.updatePointlightSources(getCameraOrigin());
 
-		engine.pollPhysicsEvents(btPhysicsEngine.pollEvents());
-		engine.zeroMouse();
+		m_btPhysicsEngine.updateVehicles(m_engine.getCoordinator());
+		m_btPhysicsEngine.runSimulation(deltaTime);
 
-		renderer.flush(currentWidth, currentHeight);
+		m_engine.pollPhysicsEvents(m_btPhysicsEngine.pollEvents());
+		m_engine.zeroMouse();
+
+		m_renderer.flush(currentWidth, currentHeight);
 		//renderer.renderLights();
-		debugConsoleUi->prepareFrame();
-		debugConsoleUi->render();
+		m_debugConsoleUi->prepareFrame();
+		m_debugConsoleUi->render();
 
-		window->swapBuffers();
+		m_window->swapBuffers();
 	}
 
 	Engine::Core::ECS::RenderDispatcher::sendRenderInfo.clear();
 
-	window->terminateGlfw();
+	m_window->terminateGlfw();
 	//delete mesh;
 
 }

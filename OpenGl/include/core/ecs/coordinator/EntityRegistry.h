@@ -9,16 +9,16 @@ namespace Engine::Core::ECS
 	class EntityRegistry
 	{
 	private:
-		std::queue<Entity> availableEntities{};
-		std::array<Signature, MAX_ENTITIES> signatures{};
-		uint32_t livingEntityCount{};
+		std::queue<Entity> m_availableEntities{};
+		std::array<Signature, MAX_ENTITIES> m_signatures{};
+		uint32_t m_livingEntityCount{};
 
 	public:
 		EntityRegistry()
 		{
 			for (Entity entity{ 0 }; entity < MAX_ENTITIES; ++entity)
 			{
-				availableEntities.push(entity);
+				m_availableEntities.push(entity);
 			}
 		}
 

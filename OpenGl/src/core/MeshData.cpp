@@ -3,7 +3,7 @@
 
 void Engine::Core::MeshData::printPoints()
 {
-	for (const auto& a : attributes)
+	for (const auto& a : m_attributes)
 	{
 		std::cout << "attribute index [" << a.index << "]\n";
 		for (int i{}; i < a.data.size(); i++)
@@ -11,7 +11,7 @@ void Engine::Core::MeshData::printPoints()
 			std::cout << a.data[i];
 			if (i == a.data.size() - 1)
 				std::cout << "\n\n";
-			else if (i >= 1000) 
+			else if (i >= 1000)
 			{
 				std::cout << "...\n\n";
 				break;
@@ -24,9 +24,9 @@ void Engine::Core::MeshData::printPoints()
 
 void Engine::Core::MeshData::recomputeNormals(int vertexIndex, int normalsIndex)
 {
-	if (normalsIndex >= attributes.size() || vertexIndex >= attributes.size()) return;
+	if (normalsIndex >= m_attributes.size() || vertexIndex >= m_attributes.size()) return;
 
-	auto verts = attributes[vertexIndex].data;
+	auto verts = m_attributes[vertexIndex].data;
 	std::vector<float> norms{};
 
 	for (int i{}; i < verts.size();)
@@ -44,7 +44,7 @@ void Engine::Core::MeshData::recomputeNormals(int vertexIndex, int normalsIndex)
 			norms.push_back(norm.z);
 		}
 	}
-	attributes[normalsIndex].data = norms;
+	m_attributes[normalsIndex].data = norms;
 }
 
 void Engine::Core::MeshData::recomputeNormalsSmooth(int vertexIndex, int normalsIndex)
@@ -57,17 +57,17 @@ void Engine::Core::MeshData::computeTangents()
 {
 	Attribute tangentAttribute{};
 
-	size_t vertexCount = attributes[VERTEX_ATTRIBUTE].data.size() / 3;
-	
+	size_t vertexCount = m_attributes[VERTEX_ATTRIBUTE].data.size() / 3;
+
 	std::vector<glm::vec3> tan1{};
 	tan1.assign(vertexCount, glm::vec3(0));
 	std::vector<glm::vec3> tan2{};
 	tan2.assign(vertexCount, glm::vec3(0));
 
-	std::vector<float> vertices = attributes[VERTEX_ATTRIBUTE].data;
-	std::vector<float> normals = attributes[NORMAL_ATTRIBUTE].data;
-	std::vector<float> texCoords = attributes[TEXCOORD_ATTRIBUTE].data;
-	
+	std::vector<float> vertices = m_attributes[VERTEX_ATTRIBUTE].data;
+	std::vector<float> normals = m_attributes[NORMAL_ATTRIBUTE].data;
+	std::vector<float> texCoords = m_attributes[TEXCOORD_ATTRIBUTE].data;
+
 
 	for (int v{ 0 }, t{ 0 }; v < vertices.size(); v += 9, t += 6)
 	{
@@ -113,10 +113,10 @@ void Engine::Core::MeshData::computeTangents()
 		tan2[i1] += tdir;
 		tan2[i2] += tdir;
 		tan2[i3] += tdir;
-		
+
 	}
 
-	tangentAttribute.data.reserve(vertexCount * 4); 
+	tangentAttribute.data.reserve(vertexCount * 4);
 	tangentAttribute.index = 3;
 	tangentAttribute.size = 4;
 
@@ -135,5 +135,5 @@ void Engine::Core::MeshData::computeTangents()
 		tangentAttribute.data.push_back(w);
 	}
 
-	attributes[TANGENT_ATTRIBUTE] = tangentAttribute;
+	m_attributes[TANGENT_ATTRIBUTE] = tangentAttribute;
 }

@@ -9,9 +9,9 @@ namespace Engine::Core::ECS
 	{
 		float radius{};
 		float suspensionRestLength{};
-		glm::vec3 wheelDir{0,-1,0};
-		glm::vec3 wheelAxis{-1,0,0};
-		glm::vec3 connectionPoint{0,0,0};
+		glm::vec3 wheelDir{ 0,-1,0 };
+		glm::vec3 wheelAxis{ -1,0,0 };
+		glm::vec3 connectionPoint{ 0,0,0 };
 		bool isFrontWheel{};
 
 		float suspensionStiffness{ 50.f };

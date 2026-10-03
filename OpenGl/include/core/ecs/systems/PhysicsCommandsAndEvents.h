@@ -84,8 +84,8 @@ namespace Engine::Core::ECS
 		Entity entityA = 0;
 		Entity entityB = 0;
 
-		glm::vec3 position = {0,0,0};
-		glm::quat rotation = {1,0,0,0};
-		glm::vec3 contactPoint = {0,0,0};
+		glm::vec3 position = { 0,0,0 };
+		glm::quat rotation = { 1,0,0,0 };
+		glm::vec3 contactPoint = { 0,0,0 };
 	};
 }

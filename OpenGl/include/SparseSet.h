@@ -7,22 +7,22 @@ template <typename T, size_t SparseMax = 256, size_t Capacity = 128>
 class SparseSet
 {
 private:
-	std::vector<size_t> denseToSparse;
-	std::vector<size_t> sparse;
-	std::vector<T> dense;
+	std::vector<size_t> m_denseToSparse;
+	std::vector<size_t> m_sparse;
+	std::vector<T> m_dense;
 	size_t m_size{ 0 };
 
 public:
 	SparseSet()
 	{
-		sparse.resize(SparseMax, Capacity);
-		dense.reserve(Capacity);
-		denseToSparse.reserve(Capacity);
+		m_sparse.resize(SparseMax, Capacity);
+		m_dense.reserve(Capacity);
+		m_denseToSparse.reserve(Capacity);
 	}
 
 	bool contains(size_t index)
 	{
-		return sparse[index] != Capacity;
+		return m_sparse[index] != Capacity;
 	}
 
 	void insert(size_t index, const T& value)
@@ -34,14 +34,14 @@ public:
 			throw std::out_of_range("Index out of bounds or capacity exceeded");
 		}
 
-		if (sparse[index] != Capacity)
+		if (m_sparse[index] != Capacity)
 		{
 			throw std::runtime_error("Element already exists at this index");
 		}
 
-		dense.push_back(value);
-		denseToSparse.push_back(index);
-		sparse[index] = m_size;
+		m_dense.push_back(value);
+		m_denseToSparse.push_back(index);
+		m_sparse[index] = m_size;
 		m_size++;
 	}
 
@@ -52,94 +52,94 @@ public:
 			throw std::out_of_range("Index out of bounds or capacity exceeded");
 		}
 
-		if (sparse[index] != Capacity)
+		if (m_sparse[index] != Capacity)
 		{
 			throw std::runtime_error("Element already exists at this index");
 		}
 
-		dense.push_back(std::move(value));
-		denseToSparse.push_back(index);
-		sparse[index] = m_size;
+		m_dense.push_back(std::move(value));
+		m_denseToSparse.push_back(index);
+		m_sparse[index] = m_size;
 		m_size++;
 	}
 
 	void remove(size_t index)
 	{
-		if (index >= SparseMax || sparse[index] == Capacity)	
+		if (index >= SparseMax || m_sparse[index] == Capacity)
 		{
 			throw std::out_of_range("Index out of bounds or element does not exist");
 		}
-		size_t denseIndex = sparse[index];
-		size_t lastSparseIndex = denseToSparse[m_size - 1];
+		size_t denseIndex = m_sparse[index];
+		size_t lastSparseIndex = m_denseToSparse[m_size - 1];
 
 		if constexpr (IsUniquePtr<T>)
 		{
-			dense[denseIndex] = std::move(dense[size - 1]);
+			m_dense[denseIndex] = std::move(m_dense[size - 1]);
 		}
 
 		else
 		{
-			dense[denseIndex] = dense[size - 1];
+			m_dense[denseIndex] = m_dense[size - 1];
 		}
 
-		sparse[lastSparseIndex] = denseIndex;
-		denseToSparse[denseIndex] = lastSparseIndex;
-		
-		sparse[index] = Capacity;
-		dense.pop_back();
-		denseToSparse.pop_back();
+		m_sparse[lastSparseIndex] = denseIndex;
+		m_denseToSparse[denseIndex] = lastSparseIndex;
+
+		m_sparse[index] = Capacity;
+		m_dense.pop_back();
+		m_denseToSparse.pop_back();
 		m_size--;
 	}
 
 	T& get(size_t index)
 	{
-		if (index >= SparseMax || sparse[index] == Capacity)
+		if (index >= SparseMax || m_sparse[index] == Capacity)
 		{
 			throw std::out_of_range("Index out of bounds or element does not exist");
 		}
-		return dense[sparse[index]];
+		return m_dense[m_sparse[index]];
 	}
 
 	const T& get(size_t index) const
 	{
-		if (index >= SparseMax || sparse[index] == Capacity)
+		if (index >= SparseMax || m_sparse[index] == Capacity)
 		{
 			throw std::out_of_range("Index out of bounds or element does not exist");
 		}
-		return dense[sparse[index]];
+		return m_dense[m_sparse[index]];
 	}
 
-	auto begin() 
-	{ 
-		return dense.begin(); 
+	auto begin()
+	{
+		return m_dense.begin();
 	}
 
-	auto end() 
-	{ 
-		return dense.end(); 
+	auto end()
+	{
+		return m_dense.end();
 	}
 
-	auto begin() const 
-	{ 
-		return dense.begin(); 
-	}
-	
-	auto end() const 
-	{ 
-		return dense.end(); 
+	auto begin() const
+	{
+		return m_dense.begin();
 	}
 
-	auto cbegin() const 
-	{ 
-		return dense.cbegin(); 
-	}
-	
-	auto cend() const 
-	{ 
-		return dense.cend(); 
+	auto end() const
+	{
+		return m_dense.end();
 	}
 
-	size_t size() 
+	auto cbegin() const
+	{
+		return m_dense.cbegin();
+	}
+
+	auto cend() const
+	{
+		return m_dense.cend();
+	}
+
+	size_t size()
 	{
 		return m_size;
 	}

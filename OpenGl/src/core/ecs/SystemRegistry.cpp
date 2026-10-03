@@ -2,26 +2,26 @@
 
 void Engine::Core::ECS::SystemRegistry::entityDestroyed(Entity entity)
 {
-	for (const auto& [type, system] : systems)
+	for (const auto& [type, system] : m_systems)
 	{
-		system->entities.erase(entity);
+		system->m_entities.erase(entity);
 	}
 
 }
 
 void Engine::Core::ECS::SystemRegistry::entitySignatureChanged(Entity entity, Signature entitySignature)
 {
-	for (const auto& [type, system] : systems)
+	for (const auto& [type, system] : m_systems)
 	{
-		const auto& systemSignature = signatures[type];
+		const auto& systemSignature = m_signatures[type];
 
 		if ((entitySignature & systemSignature) == systemSignature)
 		{
-			system->entities.insert(entity);
+			system->m_entities.insert(entity);
 		}
 		else
 		{
-			system->entities.erase(entity);
+			system->m_entities.erase(entity);
 		}
 	}
 

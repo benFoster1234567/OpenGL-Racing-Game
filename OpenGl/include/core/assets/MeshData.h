@@ -18,14 +18,14 @@ namespace Engine::Core
 
 	struct ExtremeMeasurements
 	{
-		float minX{	std::numeric_limits<float>::max() }, maxX{ std::numeric_limits<float>::min() };
+		float minX{ std::numeric_limits<float>::max() }, maxX{ std::numeric_limits<float>::min() };
 		float minY{ std::numeric_limits<float>::max() }, maxY{ std::numeric_limits<float>::min() };
 		float minZ{ std::numeric_limits<float>::max() }, maxZ{ std::numeric_limits<float>::min() };
 	};
 
 	enum class MeshType
 	{
-		Wireframe, 
+		Wireframe,
 		Fill
 	};
 
@@ -33,18 +33,18 @@ namespace Engine::Core
 	{
 	private:
 
-		const size_t VERTEX_ATTRIBUTE	= 0;
-		const size_t NORMAL_ATTRIBUTE	= 1;
-		const size_t TEXCOORD_ATTRIBUTE	= 2;
-		const size_t TANGENT_ATTRIBUTE	= 3;
+		const size_t VERTEX_ATTRIBUTE = 0;
+		const size_t NORMAL_ATTRIBUTE = 1;
+		const size_t TEXCOORD_ATTRIBUTE = 2;
+		const size_t TANGENT_ATTRIBUTE = 3;
 
 	public:
 		MeshData() = default;
-		MeshData(std::vector<Attribute> as) : attributes(std::move(as)) {}
+		MeshData(std::vector<Attribute> as) : m_attributes(std::move(as)) {}
 		~MeshData() = default;
-		std::string name;
-		MeshType meshType{ MeshType::Fill };
-		std::vector<Attribute> attributes{};
+		std::string m_name;
+		MeshType m_meshType{ MeshType::Fill };
+		std::vector<Attribute> m_attributes{};
 
 		void printPoints(); //for debugging purposes...
 
@@ -52,7 +52,7 @@ namespace Engine::Core
 		void recomputeNormalsSmooth(int vertexIndex = 0, int normalsIndex = 1);
 
 		void computeTangents();
-		
+
 		ExtremeMeasurements getMinMaxes()
 		{
 			ExtremeMeasurements minMax;
@@ -60,7 +60,7 @@ namespace Engine::Core
 			minMax.minX = minMax.minY = minMax.minZ = std::numeric_limits<float>::max();
 			minMax.maxX = minMax.maxY = minMax.maxZ = std::numeric_limits<float>::lowest();
 
-			const auto& vertices = attributes[VERTEX_ATTRIBUTE].data;
+			const auto& vertices = m_attributes[VERTEX_ATTRIBUTE].data;
 
 			for (size_t i = 0; i < vertices.size(); i += 3)
 			{
@@ -94,7 +94,7 @@ namespace Engine::Core
 	public:
 		GridData()
 		{
-			meshType = MeshType::Wireframe;
+			m_meshType = MeshType::Wireframe;
 			std::vector<float> vertices;
 			std::vector<float> norms;
 			Attribute verts{};
@@ -121,7 +121,7 @@ namespace Engine::Core
 			}
 
 			verts.data = vertices;
-			
+
 			verts.index = 0;
 			verts.size = 3;
 
@@ -129,7 +129,7 @@ namespace Engine::Core
 			normals.size = 3;
 			normals.index = 1;
 
-			attributes.push_back(verts);
+			m_attributes.push_back(verts);
 		}
 
 

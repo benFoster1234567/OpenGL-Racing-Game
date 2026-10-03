@@ -33,7 +33,7 @@ flat out int LightIndex; // we needed this for proper fragment shader.
 
 void main()
 {
-    unsigned int numFaces = 6 * ub.activeLightCount;  
+    int numFaces = 6 * ub.activeLightCount;  
 
     for ( int l = 0 ; l < ub.activeLightCount ; l++ )
     {

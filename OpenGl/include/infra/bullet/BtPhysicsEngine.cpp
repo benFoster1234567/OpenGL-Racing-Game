@@ -9,72 +9,72 @@ namespace Engine::Infra
 {
 	void BtPhysicsEngine::destroy()
 	{
-        if (dynamicsWorld)
-        {
+		if (m_dynamicsWorld)
+		{
 
-            for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
-            {
-                btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
-                btRigidBody* body = btRigidBody::upcast(obj);
+			for (int i = m_dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
+			{
+				btCollisionObject* obj = m_dynamicsWorld->getCollisionObjectArray()[i];
+				btRigidBody* body = btRigidBody::upcast(obj);
 
-                if (body && body->getMotionState())
-                {
-                    delete body->getMotionState();
-                }
+				if (body && body->getMotionState())
+				{
+					delete body->getMotionState();
+				}
 
-                dynamicsWorld->removeCollisionObject(obj);
-                delete obj;
-            }
-        }
+				m_dynamicsWorld->removeCollisionObject(obj);
+				delete obj;
+			}
+		}
 
-        for (auto& collisionShape : collisionShapes)
-        {
-            delete collisionShape;
-        }
-        
-        delete dynamicsWorld;
-        delete solver;
-        delete broadPhase;
-        delete dispatcher;
-        delete collisionConfiguration;
+		for (auto& collisionShape : m_collisionShapes)
+		{
+			delete collisionShape;
+		}
 
-		dynamicsWorld = nullptr;
-        solver = nullptr;
-        broadPhase = nullptr;
-        dispatcher = nullptr;
-        collisionConfiguration = nullptr;
+		delete m_dynamicsWorld;
+		delete m_solver;
+		delete m_broadPhase;
+		delete m_dispatcher;
+		delete m_collisionConfiguration;
+
+		m_dynamicsWorld = nullptr;
+		m_solver = nullptr;
+		m_broadPhase = nullptr;
+		m_dispatcher = nullptr;
+		m_collisionConfiguration = nullptr;
 	}
 
 
 	void BtPhysicsEngine::loadPhysicsCommands(Core::ECS::PhysicsEngineCommandBuffer commandList)
 	{
-		commandQueue = commandList;
-        std::cout << commandList.createBodies.size() << " physics  create bodies commands loaded\n";
+		m_commandQueue = commandList;
+		std::cout << commandList.createBodies.size() << " physics  create bodies commands loaded\n";
 	}
 
-    void BtPhysicsEngine::evaluateCommands()
-    {
-        for (auto& command : commandQueue.createBoxes)
-        {
-            evaluateCreateBoxColliderCommand(command);
-        }
-        for (auto& command : commandQueue.createBodies)
-        {
-            evaluateCreateRigidbodyCommand(command);
-        }
-        for (auto& command : commandQueue.deleteBodies)
-        {
-            evaluateDeleteRigidbodyCommand(command);
-        }
-        for (auto& command : commandQueue.manualMotion)
-        {
-            evaluateMotionCommand(command);
-        }
-    }
+	void BtPhysicsEngine::evaluateCommands()
+	{
+		for (auto& command : m_commandQueue.createBoxes)
+		{
+			evaluateCreateBoxColliderCommand(command);
+		}
+		for (auto& command : m_commandQueue.createBodies)
+		{
+			evaluateCreateRigidbodyCommand(command);
+		}
+		for (auto& command : m_commandQueue.deleteBodies)
+		{
+			evaluateDeleteRigidbodyCommand(command);
+		}
+		for (auto& command : m_commandQueue.manualMotion)
+		{
+			evaluateMotionCommand(command);
+		}
+	}
 
 	void BtPhysicsEngine::runSimulation(float deltaTime)
 	{
-        dynamicsWorld->stepSimulation(deltaTime, 10);
+		m_dynamicsWorld->stepSimulation(deltaTime, 10);
 	}
 
 	std::vector<Core::ECS::PhysicsEvent> Engine::Infra::BtPhysicsEngine::pollEvents()
@@ -82,155 +82,155 @@ namespace Engine::Infra
 		return std::vector<Core::ECS::PhysicsEvent>();
 	}
 
-    void BtPhysicsEngine::evaluateMotionCommand(const Core::ECS::MotionCommand& motionCommand)
-    {
-        Core::ECS::PhysicsEvent newEvent;
-    }
+	void BtPhysicsEngine::evaluateMotionCommand(const Core::ECS::MotionCommand& motionCommand)
+	{
+		Core::ECS::PhysicsEvent newEvent;
+	}
 
-    void BtPhysicsEngine::evaluateCreateRigidbodyCommand(const Core::ECS::CreateRigidbodyCommand& command)
-    {
-        Core::ECS::Entity entity = command.entity;
+	void BtPhysicsEngine::evaluateCreateRigidbodyCommand(const Core::ECS::CreateRigidbodyCommand& command)
+	{
+		Core::ECS::Entity entity = command.entity;
 
-        Core::ECS::TransformComponent* transform = command.transform;
-        btVector3 startOrigin(glmToBt(transform->position));
+		Core::ECS::TransformComponent* transform = command.transform;
+		btVector3 startOrigin(glmToBt(transform->position));
 
-        btCollisionShape* collisionShape = collisionShapes.get(command.entity);
-        btVector3 momentOfInertia = glmToBt(command.momentOfInertia);
+		btCollisionShape* collisionShape = m_collisionShapes.get(command.entity);
+		btVector3 momentOfInertia = glmToBt(command.momentOfInertia);
 
-        float mass = command.mass;
+		float mass = command.mass;
 
-        collisionShape->calculateLocalInertia(mass, momentOfInertia);
-        MotionStateForECS* motionState = new MotionStateForECS();
-        motionState->transform = transform;
-        
-        if (command.isKinematic)
-        {
-            mass = 0.0f;
-            momentOfInertia = { 0,0,0 };
-        }
+		collisionShape->calculateLocalInertia(mass, momentOfInertia);
+		MotionStateForECS* motionState = new MotionStateForECS();
+		motionState->m_transform = transform;
 
-        btRigidBody::btRigidBodyConstructionInfo rbInfo{ mass, motionState, collisionShape, momentOfInertia };
-        btRigidBody* rigidBody = new btRigidBody(rbInfo);
+		if (command.isKinematic)
+		{
+			mass = 0.0f;
+			momentOfInertia = { 0,0,0 };
+		}
 
-        if (command.isKinematic)
-        {
-            rigidBody->setCollisionFlags(rigidBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
-            rigidBody->setActivationState(DISABLE_DEACTIVATION);
-        }
+		btRigidBody::btRigidBodyConstructionInfo rbInfo{ mass, motionState, collisionShape, momentOfInertia };
+		btRigidBody* rigidBody = new btRigidBody(rbInfo);
 
-        std::cout << "Rigidbody created for entity " << entity << "/n";
+		if (command.isKinematic)
+		{
+			rigidBody->setCollisionFlags(rigidBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+			rigidBody->setActivationState(DISABLE_DEACTIVATION);
+		}
 
-        rigidbodies.insert(command.entity, rigidBody);
+		std::cout << "Rigidbody created for entity " << entity << "/n";
 
-        dynamicsWorld->addRigidBody(rigidBody);
-    }
+		m_rigidbodies.insert(command.entity, rigidBody);
 
-    void BtPhysicsEngine::evaluateDeleteRigidbodyCommand(const Core::ECS::DeleteRigidbodyCommand& command)
-    {
-        dynamicsWorld->removeRigidBody(rigidbodies.get(command.entity));
-    }
+		m_dynamicsWorld->addRigidBody(rigidBody);
+	}
 
-    void BtPhysicsEngine::evaluateCreateBoxColliderCommand(const Core::ECS::CreateBoxColliderCommand& command)
-    {
-        btVector3 bounds = glmToBt(command.bounds);
-        btCollisionShape* box = new btBoxShape(bounds);
-        collisionShapes.insert(command.entity, box);
-    }
+	void BtPhysicsEngine::evaluateDeleteRigidbodyCommand(const Core::ECS::DeleteRigidbodyCommand& command)
+	{
+		m_dynamicsWorld->removeRigidBody(m_rigidbodies.get(command.entity));
+	}
 
-    void BtPhysicsEngine::createVehicles(Core::ECS::Coordinator& coordinator)
-    {
-        const auto& entities = coordinator.getSystem<Core::ECS::VehicleSystem>()->entities;
+	void BtPhysicsEngine::evaluateCreateBoxColliderCommand(const Core::ECS::CreateBoxColliderCommand& command)
+	{
+		btVector3 bounds = glmToBt(command.bounds);
+		btCollisionShape* box = new btBoxShape(bounds);
+		m_collisionShapes.insert(command.entity, box);
+	}
 
-        if (vehicleRaycaster == nullptr)
-        {
-            vehicleRaycaster = new btDefaultVehicleRaycaster(dynamicsWorld);
-        }
+	void BtPhysicsEngine::createVehicles(Core::ECS::Coordinator& coordinator)
+	{
+		const auto& entities = coordinator.getSystem<Core::ECS::VehicleSystem>()->m_entities;
 
-        for (const auto& entity : entities)
-        {
-            btRaycastVehicle::btVehicleTuning tuning;
+		if (m_vehicleRaycaster == nullptr)
+		{
+			m_vehicleRaycaster = new btDefaultVehicleRaycaster(m_dynamicsWorld);
+		}
 
-            auto vehicleComponent = coordinator.getComponent<Core::ECS::VehicleComponent>(entity);
-            auto transformComponent = coordinator.getComponent<Core::ECS::TransformComponent>(entity);
-            transformComponent.rotation = glm::identity<glm::quat>();
+		for (const auto& entity : entities)
+		{
+			btRaycastVehicle::btVehicleTuning tuning;
 
-            btTransform startTransform{};
+			auto vehicleComponent = coordinator.getComponent<Core::ECS::VehicleComponent>(entity);
+			auto transformComponent = coordinator.getComponent<Core::ECS::TransformComponent>(entity);
+			transformComponent.rotation = glm::identity<glm::quat>();
 
-            startTransform.setIdentity();
-            startTransform.setOrigin(glmToBt(transformComponent.position));
-            startTransform.setRotation(glmToBt(transformComponent.rotation));
-            
-            btScalar mass(vehicleComponent.mass);
-            btVector3 localInertia{ 0,0,0 };
+			btTransform startTransform{};
 
-            btCollisionShape* chassisShape = new btBoxShape(glmToBt(vehicleComponent.collisionBounds));
-            chassisShape->calculateLocalInertia(mass, localInertia);
-            collisionShapes.insert(entity, chassisShape);
+			startTransform.setIdentity();
+			startTransform.setOrigin(glmToBt(transformComponent.position));
+			startTransform.setRotation(glmToBt(transformComponent.rotation));
 
-            MotionStateForECSNew* motionState = new MotionStateForECSNew{ coordinator, entity };
+			btScalar mass(vehicleComponent.mass);
+			btVector3 localInertia{ 0,0,0 };
 
-            btRigidBody::btRigidBodyConstructionInfo cinfo{ mass, motionState, chassisShape, localInertia };
-            btRigidBody* chassisBody = new btRigidBody{ cinfo };
-            chassisBody->setActivationState(DISABLE_DEACTIVATION);
+			btCollisionShape* chassisShape = new btBoxShape(glmToBt(vehicleComponent.collisionBounds));
+			chassisShape->calculateLocalInertia(mass, localInertia);
+			m_collisionShapes.insert(entity, chassisShape);
 
-            rigidbodies.insert(entity, chassisBody);
-            dynamicsWorld->addRigidBody(chassisBody);
-            
-            btRaycastVehicle* vehicle = new btRaycastVehicle{ tuning, chassisBody, vehicleRaycaster };
-            vehicles.insert(entity, vehicle);
-            vehicle->setCoordinateSystem(0, 1, 2);
-            dynamicsWorld->addAction(vehicle);
+			MotionStateForECSNew* motionState = new MotionStateForECSNew{ coordinator, entity };
 
-            for (int i = 0; i < vehicleComponent.wheels.size(); i++)
-            {
-                const auto& wheelInfo = vehicleComponent.wheels[i];
-                vehicle->addWheel(glmToBt(wheelInfo.connectionPoint),
-                    glmToBt(wheelInfo.wheelDir),
-                    glmToBt(wheelInfo.wheelAxis),
-                    wheelInfo.suspensionRestLength,
-                    wheelInfo.radius,
-                    tuning,
-                    wheelInfo.isFrontWheel);
+			btRigidBody::btRigidBodyConstructionInfo cinfo{ mass, motionState, chassisShape, localInertia };
+			btRigidBody* chassisBody = new btRigidBody{ cinfo };
+			chassisBody->setActivationState(DISABLE_DEACTIVATION);
 
-                btWheelInfo& wheel = vehicle->getWheelInfo(i);
-                
-                wheel.m_suspensionStiffness = wheelInfo.suspensionStiffness;
-                wheel.m_wheelsDampingRelaxation = wheelInfo.wheelsDampingRelaxation;
-                wheel.m_wheelsDampingCompression = wheelInfo.wheelsDampingCompression;
-                wheel.m_frictionSlip = wheelInfo.frictionSlip;
-                wheel.m_rollInfluence = wheelInfo.rollInfluence;
+			m_rigidbodies.insert(entity, chassisBody);
+			m_dynamicsWorld->addRigidBody(chassisBody);
 
-            }
+			btRaycastVehicle* vehicle = new btRaycastVehicle{ tuning, chassisBody, m_vehicleRaycaster };
+			m_vehicles.insert(entity, vehicle);
+			vehicle->setCoordinateSystem(0, 1, 2);
+			m_dynamicsWorld->addAction(vehicle);
 
-        }
-    }
+			for (int i = 0; i < vehicleComponent.wheels.size(); i++)
+			{
+				const auto& wheelInfo = vehicleComponent.wheels[i];
+				vehicle->addWheel(glmToBt(wheelInfo.connectionPoint),
+					glmToBt(wheelInfo.wheelDir),
+					glmToBt(wheelInfo.wheelAxis),
+					wheelInfo.suspensionRestLength,
+					wheelInfo.radius,
+					tuning,
+					wheelInfo.isFrontWheel);
 
-    void BtPhysicsEngine::updateVehicles(Core::ECS::Coordinator& coordinator)
-    {
-        const auto& entities = coordinator.getSystem<Core::ECS::VehicleSystem>()->entities;
-        
-        for (const auto& entity : entities)
-        {
-            auto transformComponent = coordinator.getComponent<Core::ECS::TransformComponent>(entity);
-            auto& vehicleComponent = coordinator.getComponent<Core::ECS::VehicleComponent>(entity);
-            btRaycastVehicle* vehicle = vehicles.get(entity);
+				btWheelInfo& wheel = vehicle->getWheelInfo(i);
 
-            for (int i{ 0 }; i < vehicle->getNumWheels(); i++)
-            {
-                vehicle->applyEngineForce(vehicleComponent.engineForce, i);
-                vehicle->setBrake(vehicleComponent.breakingForce, i);
-                if (vehicle->getWheelInfo(i).m_bIsFrontWheel)
-                {
-                    vehicle->setSteeringValue(vehicleComponent.steeringValue, i);
-                }
+				wheel.m_suspensionStiffness = wheelInfo.suspensionStiffness;
+				wheel.m_wheelsDampingRelaxation = wheelInfo.wheelsDampingRelaxation;
+				wheel.m_wheelsDampingCompression = wheelInfo.wheelsDampingCompression;
+				wheel.m_frictionSlip = wheelInfo.frictionSlip;
+				wheel.m_rollInfluence = wheelInfo.rollInfluence;
 
-                //vehicleComponent.wheels[i].currentSuspensionLength = vehicle->getWheelInfo(i).m_suspensionRestLength1 - vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
-                vehicleComponent.wheels[i].currentSuspensionLength =  vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
+			}
 
-            }
+		}
+	}
 
-        }
+	void BtPhysicsEngine::updateVehicles(Core::ECS::Coordinator& coordinator)
+	{
+		const auto& entities = coordinator.getSystem<Core::ECS::VehicleSystem>()->m_entities;
 
-    }
+		for (const auto& entity : entities)
+		{
+			auto transformComponent = coordinator.getComponent<Core::ECS::TransformComponent>(entity);
+			auto& vehicleComponent = coordinator.getComponent<Core::ECS::VehicleComponent>(entity);
+			btRaycastVehicle* vehicle = m_vehicles.get(entity);
+
+			for (int i{ 0 }; i < vehicle->getNumWheels(); i++)
+			{
+				vehicle->applyEngineForce(vehicleComponent.engineForce, i);
+				vehicle->setBrake(vehicleComponent.breakingForce, i);
+				if (vehicle->getWheelInfo(i).m_bIsFrontWheel)
+				{
+					vehicle->setSteeringValue(vehicleComponent.steeringValue, i);
+				}
+
+				//vehicleComponent.wheels[i].currentSuspensionLength = vehicle->getWheelInfo(i).m_suspensionRestLength1 - vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
+				vehicleComponent.wheels[i].currentSuspensionLength = vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
+
+			}
+
+		}
+
+	}
 
 }

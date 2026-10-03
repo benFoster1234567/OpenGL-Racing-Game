@@ -215,12 +215,6 @@
     <ClInclude Include="include\core\ecs\Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\Physics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\infra\engine\AssetImporter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\core\assets\AssetPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -290,6 +284,7 @@
     <None Include="assets\materials\cubeMaterial.mtl" />
     <None Include="assets\shaders\pointShadow.glsl" />
     <None Include="assets\shaders\depthCubeShader.glsl" />
+    <None Include="..\.editorconfig" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\materials\textures\testTextures.jpg">

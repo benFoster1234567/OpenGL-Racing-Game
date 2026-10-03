@@ -2,11 +2,11 @@
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec2.hpp>
-#include "core/assets/MeshData.h"
-#include "core/assets/ShaderData.h"
-#include "core/assets/MaterialData.h"
-#include "core/events/EventDispatcher.h"
-#include "core/ecs/coordinator/System.h"
+#include "../../assets/MeshData.h"
+#include "../../assets/ShaderData.h"
+#include "../../assets/MaterialData.h"
+#include "../../events/EventDispatcher.h"
+#include "../../ecs/coordinator/System.h"
 
 namespace Engine::Core::ECS
 {

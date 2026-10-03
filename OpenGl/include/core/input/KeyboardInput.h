@@ -64,32 +64,32 @@ namespace Engine::Core
 
 	class InputBridge
 	{
-	public:	
-		KeyboardInputResource inputState{};
-		MouseInputResource mouseState{};
+	public:
+		KeyboardInputResource m_inputState{};
+		MouseInputResource m_mouseState{};
 		void setKey(KeyCode k, bool pressed);
 
 		void updateKeyboard();
-		void updateMousePosition(glm::vec2 pos) { mouseState.updateMouseState(pos); }
+		void updateMousePosition(glm::vec2 pos) { m_mouseState.updateMouseState(pos); }
 
 		void printDebugInfo();
 
 		bool keyPressed(int key) const
 		{
 			//if (key >= 512) throw std::runtime_error("invalid key!");
-			return inputState.currentFrameInputData.test(key) && !inputState.previousFrameInputData.test(key);
+			return m_inputState.currentFrameInputData.test(key) && !m_inputState.previousFrameInputData.test(key);
 		}
 
 		bool keyReleased(int key) const
 		{
 			//if (key >= 512) throw std::runtime_error("invalid key!");
-			return inputState.currentFrameInputData.test(key) == false && inputState.previousFrameInputData.test(key) == true;
+			return m_inputState.currentFrameInputData.test(key) == false && m_inputState.previousFrameInputData.test(key) == true;
 		}
 
 		bool keyHeld(int key) const
 		{
 			//if (key >= 512) throw std::runtime_error("invalid key!");
-			return inputState.currentFrameInputData.test(key) && inputState.previousFrameInputData.test(key);
+			return m_inputState.currentFrameInputData.test(key) && m_inputState.previousFrameInputData.test(key);
 		}
 
 	};

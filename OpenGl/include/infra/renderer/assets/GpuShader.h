@@ -10,17 +10,17 @@ class GpuShader
 public:
 	GpuShader(Engine::Core::ShaderData* _data);
 
-	std::string getName() const { return name; }
+	std::string getName() const { return m_name; }
 
-	void use() const { glUseProgram(Id);  };
+	void use() const { glUseProgram(m_id); };
 
 	void compileShaders();
 
-	GLuint getId() const { return Id; }
-	GLuint Id;
+	GLuint getId() const { return m_id; }
+	GLuint m_id;
 
 private:
-	std::string name;
-	Engine::Core::ShaderData* data;
+	std::string m_name;
+	Engine::Core::ShaderData* m_data;
 
 };

@@ -15,13 +15,13 @@ Engine::Infra::Window::Window(
 	, int _x
 	, int _y
 )
-	: width(_width)
-	, height(_height)
-	, windowTitle(_windowTitle.c_str())
-	, isFullscreen(_isFullscreen)
+	: m_width(_width)
+	, m_height(_height)
+	, m_windowTitle(_windowTitle.c_str())
+	, m_isFullscreen(_isFullscreen)
 {
 	saveWindowState(_x, _y, _width, _height);
-	
+
 	if (!glfwInit())
 	{
 		throw std::runtime_error("Failed to initialize GLFW");
@@ -32,36 +32,36 @@ Engine::Infra::Window::Window(
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	if (isFullscreen)
+	if (m_isFullscreen)
 	{
 		auto vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		width = vidMode->width;
-		height = vidMode->height;
+		m_width = vidMode->width;
+		m_height = vidMode->height;
 		auto monitor = glfwGetPrimaryMonitor();
-		glfwWindow = glfwCreateWindow(width, height, _windowTitle.c_str(), monitor, nullptr);
+		m_glfwWindow = glfwCreateWindow(m_width, m_height, _windowTitle.c_str(), monitor, nullptr);
 	}
 
 	else
 	{
-		glfwWindow = glfwCreateWindow(width, height, windowTitle, nullptr, nullptr);
+		m_glfwWindow = glfwCreateWindow(m_width, m_height, m_windowTitle, nullptr, nullptr);
 	}
 
-	if (!glfwWindow)
+	if (!m_glfwWindow)
 	{
 		throw std::runtime_error("Failed to create GLFW window");
 	}
 
-	glfwMakeContextCurrent(glfwWindow);
+	glfwMakeContextCurrent(m_glfwWindow);
 
-	glfwSetFramebufferSizeCallback(glfwWindow, [](GLFWwindow* win, int w, int h) 
-	{
-		glViewport(0, 0, w, h);
-	});
-	
+	glfwSetFramebufferSizeCallback(m_glfwWindow, [](GLFWwindow* win, int w, int h)
+		{
+			glViewport(0, 0, w, h);
+		});
+
 
 
 	int initialWidth, initialHeight;
-	glfwGetFramebufferSize(glfwWindow, &initialWidth, &initialHeight);
+	glfwGetFramebufferSize(m_glfwWindow, &initialWidth, &initialHeight);
 	glViewport(0, 0, initialWidth, initialHeight);
 	glEnable(GL_MULTISAMPLE);
 	glewExperimental = GL_TRUE;
@@ -71,25 +71,25 @@ Engine::Infra::Window::Window(
 		std::cerr << "GLEW Initialization Failed: " << glewGetErrorString(err) << "\n";
 		return;
 	}
-	glfwSetWindowUserPointer(glfwWindow, this);
+	glfwSetWindowUserPointer(m_glfwWindow, this);
 
-	glfwSetCursorPosCallback(glfwWindow, glfwMouseMotionCallback);
+	glfwSetCursorPosCallback(m_glfwWindow, glfwMouseMotionCallback);
 
 
 }
 
 void Engine::Infra::Window::saveWindowState(int x, int y, int w, int h)
 {
-	savedWindowState.x = x;
-	savedWindowState.y = y;
-	savedWindowState.h = h;
-	savedWindowState.w = w;
+	m_savedWindowState.x = x;
+	m_savedWindowState.y = y;
+	m_savedWindowState.h = h;
+	m_savedWindowState.w = w;
 }
 
 void Engine::Infra::Window::saveWindowState()
 {
-	glfwGetWindowPos(glfwWindow, &savedWindowState.x, &savedWindowState.y);
-	glfwGetWindowSize(glfwWindow, &savedWindowState.w, &savedWindowState.h);
+	glfwGetWindowPos(m_glfwWindow, &m_savedWindowState.x, &m_savedWindowState.y);
+	glfwGetWindowSize(m_glfwWindow, &m_savedWindowState.w, &m_savedWindowState.h);
 }
 
 Window::~Window()
@@ -100,55 +100,55 @@ Window::~Window()
 //We submit this in the application, since the applicaation is what owns the inputhandler.
 void Window::submitKeyCallback(std::function<void(int, int, int, int)> callback)
 {
-	keyPressedDispatcher.subscribe(callback);
-	glfwSetKeyCallback(glfwWindow, glfwKeyCallback);
-	glfwSetWindowUserPointer(glfwWindow, this);
+	m_keyPressedDispatcher.subscribe(callback);
+	glfwSetKeyCallback(m_glfwWindow, glfwKeyCallback);
+	glfwSetWindowUserPointer(m_glfwWindow, this);
 }
 
 void Engine::Infra::Window::enableCursor()
 {
-	glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetInputMode(m_glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 void Engine::Infra::Window::disableCursor()
 {
-	glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(m_glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 std::tuple<float, float> Engine::Infra::Window::getCurrentCursor()
 {
 
-	return cursorState;
+	return m_cursorState;
 }
 
 void Engine::Infra::Window::setFullscreen()
 {
-	isFullscreen = true;
-	glfwGetWindowPos(glfwWindow, &savedWindowState.x, &savedWindowState.y);
-	glfwGetWindowSize(glfwWindow, &savedWindowState.w, &savedWindowState.h);
+	m_isFullscreen = true;
+	glfwGetWindowPos(m_glfwWindow, &m_savedWindowState.x, &m_savedWindowState.y);
+	glfwGetWindowSize(m_glfwWindow, &m_savedWindowState.w, &m_savedWindowState.h);
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-	const GLFWvidmode* mode = glfwGetVideoMode(monitor); 
-	glfwSetWindowMonitor(glfwWindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	glfwSetWindowMonitor(m_glfwWindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 }
 
 void Engine::Infra::Window::setWindowed()
 {
-	isFullscreen = false;
-	glfwSetWindowMonitor(glfwWindow, nullptr, savedWindowState.x, savedWindowState.y, savedWindowState.w, savedWindowState.h, 0);
+	m_isFullscreen = false;
+	glfwSetWindowMonitor(m_glfwWindow, nullptr, m_savedWindowState.x, m_savedWindowState.y, m_savedWindowState.w, m_savedWindowState.h, 0);
 }
 
 void Engine::Infra::Window::setWindowSize(int w, int h)
 {
-	if (isFullscreen)
+	if (m_isFullscreen)
 	{
 		return; //maybe fix in the future so I can change the resolution or something
 	}
 
 	else
 	{
-		glfwGetWindowPos(glfwWindow, &savedWindowState.x, &savedWindowState.y);
-		glfwGetWindowSize(glfwWindow, &savedWindowState.w, &savedWindowState.h);
-		glfwSetWindowMonitor(glfwWindow, nullptr, savedWindowState.x, savedWindowState.y, w, h, 0);
+		glfwGetWindowPos(m_glfwWindow, &m_savedWindowState.x, &m_savedWindowState.y);
+		glfwGetWindowSize(m_glfwWindow, &m_savedWindowState.w, &m_savedWindowState.h);
+		glfwSetWindowMonitor(m_glfwWindow, nullptr, m_savedWindowState.x, m_savedWindowState.y, w, h, 0);
 	}
 
 }
@@ -156,41 +156,41 @@ void Engine::Infra::Window::setWindowSize(int w, int h)
 void Engine::Infra::Window::updateDeltaTime()
 {
 	float currentFrame = static_cast<float>(glfwGetTime());
-	times.deltaTime = currentFrame - times.lastTime;
-	times.lastTime = currentFrame;
-	
+	m_times.deltaTime = currentFrame - m_times.lastTime;
+	m_times.lastTime = currentFrame;
+
 	static float interval = 0.0f;
 
-	interval += times.deltaTime;
+	interval += m_times.deltaTime;
 
 	if (interval >= 5.0f)
 	{
 
-	float deltaT = times.deltaTime != 0 ? times.deltaTime: 1.0f;
+		float deltaT = m_times.deltaTime != 0 ? m_times.deltaTime : 1.0f;
 
-	std::cout << "fps: " << 1/deltaT << "\n";
-	interval = 0.0f;
+		std::cout << "fps: " << 1 / deltaT << "\n";
+		interval = 0.0f;
 	}
 }
 
 void Window::onKey(int key, int scancode, int action, int mods)
 {
-	keyPressedDispatcher.invoke(key, scancode, action, mods);
+	m_keyPressedDispatcher.invoke(key, scancode, action, mods);
 }
 
 void Engine::Infra::Window::onMouseMotion(double xpos, double ypos)
 {
 	//std::cout << "mouse motion detected\n";
-	mouseMotionDispatcher.invoke(xpos, ypos);
+	m_mouseMotionDispatcher.invoke(xpos, ypos);
 }
 
 void Engine::Infra::Window::getMousePosition(double& xpos, double& ypos)
 {
-	glfwGetCursorPos(glfwWindow, &xpos, &ypos);
+	glfwGetCursorPos(m_glfwWindow, &xpos, &ypos);
 }
 
 void Engine::Infra::Window::submitMouseMotionCallback(std::function<void(double, double)> func)
 {
-	mouseMotionDispatcher.subscribe(func);
+	m_mouseMotionDispatcher.subscribe(func);
 }
 

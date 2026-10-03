@@ -21,7 +21,7 @@
 #include "SparseSet.h"
 #include "PointlightLoader.h"
 
-namespace Engine::Infra 
+namespace Engine::Infra
 {
 	struct RenderCommand
 	{
@@ -48,26 +48,26 @@ namespace Engine::Infra
 	private:
 
 		friend class GpuAssetLoader;
-		std::vector<RenderCommand> renderQueue;
-		
-		SparseSet<std::unique_ptr<GpuTexture>, Core::AssetIdMax, Core::AssetCapacity> gpuTextureCache{};
-		SparseSet<std::unique_ptr<GpuMesh>, Core::AssetIdMax, Core::AssetCapacity> gpuMeshCache{};
-		SparseSet<std::unique_ptr<GpuShader>, Core::AssetIdMax, Core::AssetCapacity> gpuShaderCache{};
-		
-		std::vector<StaticPointLightResource> staticPointLights{};
-		
+		std::vector<RenderCommand> m_renderQueue;
+
+		SparseSet<std::unique_ptr<GpuTexture>, Core::AssetIdMax, Core::AssetCapacity> m_gpuTextureCache{};
+		SparseSet<std::unique_ptr<GpuMesh>, Core::AssetIdMax, Core::AssetCapacity> m_gpuMeshCache{};
+		SparseSet<std::unique_ptr<GpuShader>, Core::AssetIdMax, Core::AssetCapacity> m_gpuShaderCache{};
+
+		std::vector<StaticPointLightResource> m_staticPointLights{};
+
 		void cacheShader(Core::ShaderId shaderId, Core::ShaderData* shaderData);
 		void cacheTexture(Core::TextureId textureId, Core::TextureData* textureData);
 		void cacheMesh(Core::MeshId meshId, Core::MeshData* meshData);
-		
+
 		void drawLights(Core::ShaderId shaderId, size_t lightCount);
-		
-		unsigned int renderMode = 0;
+
+		unsigned int m_renderMode = 0;
 
 
-		int polygonMode = LINE;
+		int m_polygonMode = LINE;
 
-		Quad screenQuad{};
+		Quad m_screenQuad{};
 
 		glm::mat4 getLightProjectionMatrix() const
 		{
@@ -80,22 +80,22 @@ namespace Engine::Infra
 			size_t numLights{ 0 }; // <= 16
 			std::vector<glm::vec3> lightPositions{};
 			std::vector<glm::mat4> shadowTransforms{};
-		}staticPointlightData;
+		}m_staticPointlightData;
 
-		size_t activeLightCount = 0;
-		GLuint emptyVao{ 0 }; // for debug positions and such
-		GLuint ubo{ 0 };
-		GpuShader* DebugLightShader = nullptr;
+		size_t m_activeLightCount = 0;
+		GLuint m_emptyVao{ 0 }; // for debug positions and such
+		GLuint m_ubo{ 0 };
+		GpuShader* m_debugLightShader = nullptr;
 
-		GpuShader* shadowCubemapShader = nullptr;
-		GLuint depthCubemapId = 0;
-		GLuint depthMapFBO = 0;
+		GpuShader* m_shadowCubemapShader = nullptr;
+		GLuint m_depthCubemapId = 0;
+		GLuint m_depthMapFbo = 0;
 
-		glm::vec3 lightPos{};
+		glm::vec3 m_lightPos{};
 
-		float nnear{};
-		float ffar{};
-		std::vector<glm::mat4> shadowTransforms;
+		float m_near{};
+		float m_far{};
+		std::vector<glm::mat4> m_shadowTransforms;
 
 		glm::mat4 getLightSpaceMatrix(const Engine::Infra::RenderCommand& command, const StaticPointLightResource& light)
 		{
@@ -114,29 +114,27 @@ namespace Engine::Infra
 			const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 			float aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
 
-			glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, nnear, ffar);
+			glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, m_near, m_far);
 
-			transforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-			transforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-			transforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-			transforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
-			transforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
-			transforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
+			transforms.push_back(shadowProj * glm::lookAt(m_lightPos, m_lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+			transforms.push_back(shadowProj * glm::lookAt(m_lightPos, m_lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+			transforms.push_back(shadowProj * glm::lookAt(m_lightPos, m_lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+			transforms.push_back(shadowProj * glm::lookAt(m_lightPos, m_lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+			transforms.push_back(shadowProj * glm::lookAt(m_lightPos, m_lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+			transforms.push_back(shadowProj * glm::lookAt(m_lightPos, m_lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 			return transforms;
 		}
 
-		std::vector<glm::mat4> getTransformCubemapArray(const std::vector<glm::vec3>& lightPositions);
-
 	public:
-		
+
 		Renderer()
 		{
 			ilInit();
 			iluInit();
 			ilutRenderer(ILUT_OPENGL);
 
-			nnear = 1.0f;
-			ffar = 25.0f;
+			m_near = 1.0f;
+			m_far = 25.0f;
 		}
 
 		void prepareDepthCubemapArray();
@@ -149,21 +147,21 @@ namespace Engine::Infra
 
 		void setShadowCubemapShader(Core::ShaderId shader)
 		{
-			shadowCubemapShader = gpuShaderCache.get(shader).get();
+			m_shadowCubemapShader = m_gpuShaderCache.get(shader).get();
 		}
 
 		void loadLights(std::vector<StaticPointLightResource> staticLights);
 		void loadShadowingLights(glm::vec3 cameraOrigin);
 		void updatePointlightSources(glm::vec3 cameraOrigin)
 		{
-			pointlightLoader.updatePointShadowSources(cameraOrigin, nnear, ffar);
+			pointlightLoader.updatePointShadowSources(cameraOrigin, m_near, m_far);
 		}
 
 		void submit(RenderCommand command);
 
 		void flush(size_t w = 800, size_t h = 600);
 
-		void setPolygonMode(int m) { polygonMode = m; }
+		void setPolygonMode(int m) { m_polygonMode = m; }
 
 		void clear() const
 		{
@@ -171,6 +169,5 @@ namespace Engine::Infra
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
 
-		
 	};
 }

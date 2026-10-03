@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/vec3.hpp>
-#include "core/input/Keys.h"
+#include "../../input/Keys.h"
 #include "../coordinator/ECS.h"
 
 namespace Engine::Core::ECS

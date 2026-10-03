@@ -14,14 +14,14 @@ namespace Engine::Core::ECS
 	private:
 		std::unordered_map <std::type_index, std::unique_ptr<IComponentArray>> componentArrays{};
 		std::unordered_map <std::type_index, ComponentType> componentTypes{};
-		ComponentType nextComponentType{};
+		ComponentType m_nextComponentType{};
 
 		template<typename T>
 		ComponentArray<T>* getComponentArray()
 		{
 			auto typeIdx = std::type_index(typeid(T));
 			assert(componentTypes.find(typeIdx) != componentTypes.end() && "Component not registered before use.");
-			return static_cast<ComponentArray<T>*>(componentArrays[typeIdx].get()); 
+			return static_cast<ComponentArray<T>*>(componentArrays[typeIdx].get());
 		}
 
 	public:
@@ -31,9 +31,9 @@ namespace Engine::Core::ECS
 			auto typeIdx = std::type_index(typeid(T));
 			assert(componentTypes.find(typeIdx) == componentTypes.end() && "Registering component type more than once.");
 
-			componentTypes[typeIdx] = nextComponentType;
+			componentTypes[typeIdx] = m_nextComponentType;
 			componentArrays[typeIdx] = std::make_unique<ComponentArray<T>>();
-			nextComponentType++;
+			m_nextComponentType++;
 		}
 
 		template <class T>

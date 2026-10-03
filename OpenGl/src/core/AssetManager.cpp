@@ -13,7 +13,7 @@ Engine::Core::AssetManager::~AssetManager() = default;
 
 void Engine::Core::AssetManager::get(MeshData*& meshOut, const std::string& name)
 {
-	if (meshes.contains(name)) meshOut = meshes.get(name);
+	if (m_meshes.contains(name)) meshOut = m_meshes.get(name);
 	else
 	{
 		std::cout << "No mesh found!\n";
@@ -23,7 +23,7 @@ void Engine::Core::AssetManager::get(MeshData*& meshOut, const std::string& name
 
 void Engine::Core::AssetManager::get(MaterialData*& matOut, const std::string& name)
 {
-	if (materials.contains(name)) matOut = materials.get(name);
+	if (m_materials.contains(name)) matOut = m_materials.get(name);
 	else
 	{
 		std::cout << "No material found!\n";
@@ -33,12 +33,12 @@ void Engine::Core::AssetManager::get(MaterialData*& matOut, const std::string& n
 
 void Engine::Core::AssetManager::get(ShaderData*& shaderOut, const std::string& name)
 {
-	if (shaders.contains(name))
+	if (m_shaders.contains(name))
 	{
 		std::cout << "Shader " << name << "found!\n";
-		shaderOut = shaders.get(name);
+		shaderOut = m_shaders.get(name);
 	}
-	else 
+	else
 	{
 		std::cout << "No shader found : " << name << "\n";
 		shaderOut = nullptr;
@@ -47,35 +47,35 @@ void Engine::Core::AssetManager::get(ShaderData*& shaderOut, const std::string& 
 
 void Engine::Core::AssetManager::get(TextureData*& texOut, const std::string& name)
 {
-	if (!textures.contains(name))
+	if (!m_textures.contains(name))
 	{
 		std::cout << "No texture found : " << name << "\n";
 		texOut = nullptr;
 		return;
 	}
 
-	texOut = textures.get(name);
+	texOut = m_textures.get(name);
 	std::cout << "Texture found: " << name << "\n";
 }
 
 Engine::Core::MeshData* Engine::Core::AssetManager::getMesh(MeshId meshId)
 {
-	return meshes.get(meshId);
+	return m_meshes.get(meshId);
 }
 
 Engine::Core::MaterialData* Engine::Core::AssetManager::getMaterial(MaterialId materialId)
 {
-	return materials.get(materialId);
+	return m_materials.get(materialId);
 }
 
 Engine::Core::ShaderData* Engine::Core::AssetManager::getShader(ShaderId shaderId)
 {
-	return shaders.get(shaderId);
+	return m_shaders.get(shaderId);
 }
 
 Engine::Core::TextureData* Engine::Core::AssetManager::getTexture(TextureId textureId)
 {
-	return textures.get(textureId);
+	return m_textures.get(textureId);
 }
 
 void Engine::Core::AssetManager::addAsset(const std::string& name, AssetVariant&& asset)
@@ -86,22 +86,22 @@ void Engine::Core::AssetManager::addAsset(const std::string& name, AssetVariant&
 
 			if constexpr (std::is_same_v < T, std::unique_ptr<MeshData>>)
 			{
-				meshes.add(std::move(arg), name);
+				m_meshes.add(std::move(arg), name);
 			}
 
 			if constexpr (std::is_same_v<T, std::unique_ptr<ShaderData>>)
 			{
-				shaders.add(std::move(arg), name);
+				m_shaders.add(std::move(arg), name);
 			}
 
 			if constexpr (std::is_same_v<T, std::unique_ptr<MaterialData>>)
 			{
-				materials.add(std::move(arg), name);
+				m_materials.add(std::move(arg), name);
 			}
 
 			if constexpr (std::is_same_v<T, std::unique_ptr<TextureData>>)
 			{
-				textures.add(std::move(arg), name);
+				m_textures.add(std::move(arg), name);
 			}
 
 			else if constexpr (std::is_same_v<T, std::monostate>) { /* do nothing */ }
@@ -111,22 +111,22 @@ void Engine::Core::AssetManager::addAsset(const std::string& name, AssetVariant&
 
 std::vector<Engine::Core::ShaderData*> Engine::Core::AssetManager::shaderList()
 {
-	return shaders.getRawPointerList();
+	return m_shaders.getRawPointerList();
 }
 
 std::vector<Engine::Core::MaterialData*> Engine::Core::AssetManager::materialList()
 {
-	return materials.getRawPointerList();
+	return m_materials.getRawPointerList();
 }
 
 std::vector<Engine::Core::MeshData*> Engine::Core::AssetManager::meshList()
 {
-	return meshes.getRawPointerList();
+	return m_meshes.getRawPointerList();
 }
 
 std::vector<Engine::Core::TextureData*> Engine::Core::AssetManager::textureList()
 {
-	return textures.getRawPointerList();;
+	return m_textures.getRawPointerList();;
 }
 
 

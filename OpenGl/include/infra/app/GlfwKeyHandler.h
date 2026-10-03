@@ -11,7 +11,7 @@ namespace Engine::Infra
 	{
 	private:
 
-		std::unordered_map<int, Core::KeyCode> glfwKeyToKeyCode{};
+		std::unordered_map<int, Core::KeyCode> m_glfwKeyToKeyCode{};
 
 	public:
 		GlfwKeyHandler();

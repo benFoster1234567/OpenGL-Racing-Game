@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/coordinator/System.h"
+#include "../coordinator/System.h"
 //#include "../coordinator/ECS.h"
 #include "PhysicsCommandsAndEvents.h"
 
@@ -15,16 +15,16 @@ namespace Engine::Core::ECS
 	class PhysicsSystem : public System
 	{
 	private:
-		PhysicsEngineCommandBuffer commandBuffer{};
-		std::vector<PhysicsEvent> eventQueue{};
+		PhysicsEngineCommandBuffer m_commandBuffer{};
+		std::vector<PhysicsEvent> m_eventQueue{};
 
 	public:
 		void update(Coordinator& coordinator, float deltaTime);
 
 		void fillInitialCommandBuffer(Coordinator& coordinator);
 
-		PhysicsEngineCommandBuffer& getCommandBuffer() { return commandBuffer; }
-		const PhysicsEngineCommandBuffer& getCommandBuffer() const { return commandBuffer; } 
+		PhysicsEngineCommandBuffer& getCommandBuffer() { return m_commandBuffer; }
+		const PhysicsEngineCommandBuffer& getCommandBuffer() const { return m_commandBuffer; }
 
 		void pollPhysicsEngine(const std::vector<PhysicsEvent>& eventList);
 

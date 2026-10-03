@@ -17,7 +17,7 @@ namespace Tester {
 
 	bool testInputHandler()
 	{
-		
+
 
 		return true;
 	}

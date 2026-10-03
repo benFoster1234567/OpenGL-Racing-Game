@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-namespace Engine::Core 
+namespace Engine::Core
 {
 	enum class KeyCode : uint8_t
 	{

@@ -9,57 +9,57 @@ namespace Engine::Infra
 	{
 	public:
 		GLuint id{ 0 };
-		Core::TextureData* texture = nullptr;
+		Core::TextureData* m_texture = nullptr;
 		void genTexture()
 		{
-			if (texture->pixels.empty())
+			if (m_texture->pixels.empty())
 			{
 				return;
 			}
 
-            glGenTextures(1, &id);
-            glBindTexture(GL_TEXTURE_2D, id);
+			glGenTextures(1, &id);
+			glBindTexture(GL_TEXTURE_2D, id);
 
-            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-            glTexImage2D(
-                GL_TEXTURE_2D,
-                0,            
-                GL_RGBA8,     
-                static_cast<GLsizei>(texture->width),
-                static_cast<GLsizei>(texture->height),
-                0,                  
-                GL_RGBA,            
-                GL_UNSIGNED_BYTE,   
-                texture->pixels.data()  
-            );
+			glTexImage2D(
+				GL_TEXTURE_2D,
+				0,
+				GL_RGBA8,
+				static_cast<GLsizei>(m_texture->width),
+				static_cast<GLsizei>(m_texture->height),
+				0,
+				GL_RGBA,
+				GL_UNSIGNED_BYTE,
+				m_texture->pixels.data()
+			);
 
-            glGenerateMipmap(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D, 0);
+			glGenerateMipmap(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, 0);
 
-        }
+		}
 
-		GpuTexture(Core::TextureData* _texture) : texture{ _texture } 
+		GpuTexture(Core::TextureData* _texture) : m_texture{ _texture }
 		{
 		}
 
-        ~GpuTexture()
-        {
-            if (id != 0) {
-                glDeleteTextures(1, &id); // Cleanup VRAM leak
-            }
-        }
+		~GpuTexture()
+		{
+			if (id != 0) {
+				glDeleteTextures(1, &id); // Cleanup VRAM leak
+			}
+		}
 
-        void bind(GLuint slot = 0)
-        {
-            glActiveTexture(GL_TEXTURE0 + slot); // Select texture slot (GL_TEXTURE0, GL_TEXTURE1, etc.)
-            glBindTexture(GL_TEXTURE_2D, id);
-        }
+		void bind(GLuint slot = 0)
+		{
+			glActiveTexture(GL_TEXTURE0 + slot); // Select texture slot (GL_TEXTURE0, GL_TEXTURE1, etc.)
+			glBindTexture(GL_TEXTURE_2D, id);
+		}
 	};
 }

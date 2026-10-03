@@ -3,7 +3,7 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/trigonometric.hpp>
-#include "core/ecs/coordinator/ECS.h"
+#include "../coordinator/ECS.h"
 
 namespace Engine::Core::ECS
 {

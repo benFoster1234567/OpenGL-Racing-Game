@@ -1,6 +1,6 @@
 #include "PhysicsSystem.h"
 
-#include "core/ecs/coordinator/Coordinator.h"
+#include "../coordinator/Coordinator.h"
 #include "../components/MotionPropertiesComponent.h"
 #include "../components/TransformComponent.h"
 #include "../components/RigidBodyComponent.h"
@@ -11,9 +11,9 @@ namespace Engine::Core::ECS
 {
 	void PhysicsSystem::update(Coordinator& coordinator, float deltaTime)
 	{
-		commandBuffer.clear();
+		m_commandBuffer.clear();
 
-		for (Entity entity : entities)
+		for (Entity entity : m_entities)
 		{
 			auto transform = coordinator.getComponent<TransformComponent>(entity);
 			MotionCommand pec
@@ -22,14 +22,14 @@ namespace Engine::Core::ECS
 				.position = transform.position,
 				.rotation = transform.rotation
 			};
-			commandBuffer.manualMotion.push_back(pec);
+			m_commandBuffer.manualMotion.push_back(pec);
 		}
 	}
 
 	void PhysicsSystem::fillInitialCommandBuffer(Coordinator& coordinator)
 	{
-		std::cout << "Physics: Filling initial command buffer: " << entities.size() << " entities\n";
-		for (auto& entity : entities)
+		std::cout << "Physics: Filling initial command buffer: " << m_entities.size() << " entities\n";
+		for (auto& entity : m_entities)
 		{
 			auto& rigidBodyComponent = coordinator.getComponent<RigidBodyComponent>(entity);
 			auto& meshComponent = coordinator.getComponent<MeshComponent>(entity);
@@ -52,15 +52,15 @@ namespace Engine::Core::ECS
 				.bounds = boxColliderComponent.halfBounds,
 			};
 
-			commandBuffer.createBoxes.push_back(cbcc);
-			commandBuffer.createBodies.push_back(crc);
+			m_commandBuffer.createBoxes.push_back(cbcc);
+			m_commandBuffer.createBodies.push_back(crc);
 
 		}
 	}
 
 	void PhysicsSystem::pollPhysicsEngine(const std::vector<PhysicsEvent>& eventList)
 	{
-		eventQueue = eventList;
+		m_eventQueue = eventList;
 	}
 
 }

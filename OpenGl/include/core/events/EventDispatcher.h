@@ -31,33 +31,33 @@ namespace Engine::Core {
 
 		TokenId subscribe(CallBackFunc func)
 		{
-			auto id = curid++;
-			callbacks.emplace_back(Listener{ id, func });
+			auto id = m_curid++;
+			m_callbacks.emplace_back(Listener{ id, func });
 			return id;
 		}
 
 		void unsubscribe(TokenId id)
 		{
-			std::erase_if(callbacks, [id](const Listener& l) { return l.id == id; });
+			std::erase_if(m_callbacks, [id](const Listener& l) { return l.id == id; });
 		}
 
 		void clear()
 		{
-			callbacks.clear();
-			curid = 0;
+			m_callbacks.clear();
+			m_curid = 0;
 		}
 
 		void invoke(Args... args)
 		{
-			for (const auto& l : callbacks)
+			for (const auto& l : m_callbacks)
 			{
 				l.f(args...);
 			}
 		}
 
 	private:
-		size_t curid{ 0 };
-		std::vector<Listener> callbacks{};
+		size_t m_curid{ 0 };
+		std::vector<Listener> m_callbacks{};
 	};
 
-} 
+}

@@ -8,14 +8,12 @@
 #include <stack>
 #include <functional>
 
-
 #include <variant>
-#include <optional>
 #include <chrono>
 
 namespace Engine::Core {
 
-	
+
 	struct ImportCommand
 	{
 		std::string path{};
@@ -31,8 +29,8 @@ namespace Engine::Core {
 	class AssetPipeline
 	{
 	private:
-		std::stack<ImportCommand> queue;
-		std::unordered_map<std::type_index, std::function<AssetVariant(const std::string&, const std::string&)>> import;
+		std::stack<ImportCommand> m_queue;
+		std::unordered_map<std::type_index, std::function<AssetVariant(const std::string&, const std::string&)>> m_import;
 
 		static void createSolidColorTexture(TextureData*& texOut, glm::vec3 color)
 		{
@@ -46,9 +44,9 @@ namespace Engine::Core {
 			pixelData.push_back(static_cast<uint8_t>(color.z * 255.0f));
 		}
 
-		static std::string addSolidColorTexMap( MaterialData* material
+		static std::string addSolidColorTexMap(MaterialData* material
 			, MaterialData::MapType type
-			, AssetManager& assetManager )
+			, AssetManager& assetManager)
 		{
 			std::string textureName = material->name + "_" + std::to_string(int(type));
 			glm::vec3 color = material->getMatColor(type);
@@ -68,30 +66,30 @@ namespace Engine::Core {
 	public:
 		AssetPipeline() = default;
 
-		const std::string assetFilePath = "assets/";
+		const std::string m_assetFilePath = "assets/";
 
 		template<typename T>
 		void submit(const std::string& path, const std::string& assetName)
 		{
 			std::type_index ti = typeid(T);
-			assert(import.contains(ti) && "no import func found for type");
-			queue.push({ .path = path, .assetName = assetName, .typeId = typeid(T) });
+			assert(m_import.contains(ti) && "no import func found for type");
+			m_queue.push({ .path = path, .assetName = assetName, .typeId = typeid(T) });
 		}
 
 		template<typename T>
 		void registerImportCallback(std::function<std::unique_ptr<T>(const std::string&, const std::string&)> func)
 		{
-			import[typeid(T)] = [func](const std::string& path, const std::string& name) -> AssetVariant
-			{
-				return AssetVariant(func(path, name));
-			};
+			m_import[typeid(T)] = [func](const std::string& path, const std::string& name) -> AssetVariant
+				{
+					return AssetVariant(func(path, name));
+				};
 		}
 
 		bool processCommand(const ImportCommand& cmd, AssetManager& am)
 		{
-			auto it = import.find(cmd.typeId);
-			
-			if (it == import.end())
+			auto it = m_import.find(cmd.typeId);
+
+			if (it == m_import.end())
 			{
 				std::cerr << "No import function found for type. " << cmd.assetName << " not imported.\n";
 				return false;
@@ -102,8 +100,8 @@ namespace Engine::Core {
 			bool assetNull = std::visit([](const auto& ptr) {
 				using T = std::decay_t<decltype(ptr)>;
 				if constexpr (std::is_same_v<T, std::monostate>) return true;
-				else return ptr == nullptr; 
-			}, asset);
+				else return ptr == nullptr;
+				}, asset);
 
 			if (assetNull)
 			{
@@ -112,7 +110,7 @@ namespace Engine::Core {
 			}
 
 			else
-			{ 
+			{
 				am.addAsset(cmd.assetName, std::move(asset));
 				std::cout << "Asset successfully imported: " << cmd.assetName << " | " << cmd.path << "\n";
 				return true;
@@ -127,16 +125,16 @@ namespace Engine::Core {
 
 			auto start = std::chrono::high_resolution_clock::now();
 
-			while (!queue.empty())
+			while (!m_queue.empty())
 			{
-				Engine::Core::ImportCommand icmd = queue.top();
-				queue.pop();
+				Engine::Core::ImportCommand icmd = m_queue.top();
+				m_queue.pop();
 
 				bool imported = processCommand(icmd, am);
 
 				if (imported && icmd.typeId == textureType)
 				{
-					am.textureFilePathToNameMap[icmd.path] = icmd.assetName;
+					am.m_textureFilePathToNameMap[icmd.path] = icmd.assetName;
 				}
 			}
 
@@ -156,28 +154,28 @@ namespace Engine::Core {
 						std::cout << "No map found, creating new texture";
 						textureName = addSolidColorTexMap(mat, mapType, am);
 					}
-					
+
 					else
 					{
 						std::string filePath = "assets/materials/" + partialPath;
 						std::cout << mat->name << ": file path for map " << i << ": " << filePath << "\n";
 
-						if (!am.textureFilePathToNameMap.contains(filePath))
+						if (!am.m_textureFilePathToNameMap.contains(filePath))
 						{
 							std::cerr << "Texture name not found for filepath: " << filePath << "\n";
 							continue;
 						}
 
-						textureName = am.textureFilePathToNameMap[filePath];
+						textureName = am.m_textureFilePathToNameMap[filePath];
 					}
 
-					if (!am.textures.contains(textureName))
+					if (!am.m_textures.contains(textureName))
 					{
 						std::cerr << "Texture with name " << textureName << "not found\n";
 						continue;
 					}
 
-					TextureId tid = am.textures.getId(textureName);
+					TextureId tid = am.m_textures.getId(textureName);
 
 					mat->mapTextures[i] = tid;
 

@@ -16,7 +16,7 @@ namespace Engine::Infra
 				Core::TextureId id = am.getTextureId(textureName);
 
 				renderer.cacheTexture(id, textureData);
-				renderer.gpuTextureCache.get(id).get()->genTexture();
+				renderer.m_gpuTextureCache.get(id).get()->genTexture();
 			}
 
 			int c = 0;
@@ -25,26 +25,26 @@ namespace Engine::Infra
 				c++;
 				meshData->recomputeNormalsAndTangents();
 				std::cout << c << " meshes loaded!\n";
-				std::string meshName = meshData->name;
+				std::string meshName = meshData->m_name;
 				Core::MeshId id = am.getMeshId(meshName);
 
 				renderer.cacheMesh(id, meshData);
-				renderer.gpuMeshCache.get(id)->genBuffers();
+				renderer.m_gpuMeshCache.get(id)->genBuffers();
 			}
-			
-			renderer.screenQuad.create();
-			
+
+			renderer.m_screenQuad.create();
+
 			for (auto shaderData : am.shaderList())
 			{
 				std::string shaderName = shaderData->name;
 				Core::ShaderId id = am.getShaderId(shaderName);
 
 				renderer.cacheShader(id, shaderData);
-				renderer.gpuShaderCache.get(id).get()->compileShaders();
+				renderer.m_gpuShaderCache.get(id).get()->compileShaders();
 
 				if (shaderName == "depthCubemap")
 				{
-					renderer.shadowCubemapShader = renderer.gpuShaderCache.get(id).get();
+					renderer.m_shadowCubemapShader = renderer.m_gpuShaderCache.get(id).get();
 					std::cout << "depth cube map found!\n";
 				}
 			}

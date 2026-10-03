@@ -13,7 +13,7 @@ namespace Engine::Core::ECS
 	public:
 		void updateWheels(Coordinator& coordinator)
 		{
-			for (const auto& entity : entities)
+			for (const auto& entity : m_entities)
 			{
 				auto& vehicleComponent = coordinator.getComponent<VehicleComponent>(entity);
 				const auto& transform = coordinator.getComponent<TransformComponent>(entity);
@@ -26,8 +26,8 @@ namespace Engine::Core::ECS
 					auto wheelInfo = vehicleComponent.wheels[i];
 
 					auto& wheelTransform = coordinator.getComponent<TransformComponent>(wheelEntity);
-				
-					wheelTransform.position = transform.position + transform.rotation * wheelInfo.connectionPoint ;
+
+					wheelTransform.position = transform.position + transform.rotation * wheelInfo.connectionPoint;
 					wheelTransform.position.y -= wheelInfo.currentSuspensionLength;
 					wheelTransform.rotation = transform.rotation;
 
@@ -48,10 +48,10 @@ namespace Engine::Core::ECS
 			float maxSteeringValue = 0.5f;
 			float steeringSpeed = 1.5f;
 
-			for (const auto& entity : entities)
+			for (const auto& entity : m_entities)
 			{
 				auto& vehicleComponent = coordinator.getComponent<VehicleComponent>(entity);
-				
+
 				if (input.keyPressed(int(KeyCode::A)))
 				{
 					vehicleComponent.steeringValue += steeringSpeed * deltaTime;
@@ -62,7 +62,7 @@ namespace Engine::Core::ECS
 					vehicleComponent.steeringValue -= steeringSpeed * deltaTime;
 				}
 
-				else if (std::abs(vehicleComponent.steeringValue) > 0.01f )
+				else if (std::abs(vehicleComponent.steeringValue) > 0.01f)
 				{
 					vehicleComponent.steeringValue = glm::mix(vehicleComponent.steeringValue, 0.f, 5 * deltaTime);
 				}
@@ -79,7 +79,7 @@ namespace Engine::Core::ECS
 
 				else
 				{
-					vehicleComponent.engineForce = vehicleComponent.engineForce < 10? 0 : vehicleComponent.engineForce/5;
+					vehicleComponent.engineForce = vehicleComponent.engineForce < 10 ? 0 : vehicleComponent.engineForce / 5;
 				}
 
 				if (input.keyPressed(int(KeyCode::S)))

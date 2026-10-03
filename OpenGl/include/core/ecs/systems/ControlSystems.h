@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/coordinator/System.h"
+#include "../coordinator/System.h"
 
 namespace Engine::Core
 {

@@ -7,15 +7,15 @@ namespace Engine::Infra
 	class GpuMesh
 	{
 	private:
-		GLuint VAO = 0;
-		GLsizei vertexCount = 0;
-		Engine::Core::MeshData* meshData;
+		GLuint m_vao = 0;
+		GLsizei m_vertexCount = 0;
+		Engine::Core::MeshData* m_meshData;
 	public:
 
 		GpuMesh(Engine::Core::MeshData* meshData);
-		GpuMesh() : meshData(nullptr) {}
+		GpuMesh() : m_meshData(nullptr) {}
 		GpuMesh(GpuMesh&&) = default;
-		
+
 		GpuMesh(const GpuMesh&) = delete; //non copyable because of opengl buffer ids
 
 		~GpuMesh() = default;

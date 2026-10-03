@@ -13,37 +13,37 @@ namespace Engine::Core
 	class AssetStorage
 	{
 	private:
-		SparseSet<std::unique_ptr<T>, maxIndex, capacity> assets{};
+		SparseSet<std::unique_ptr<T>, maxIndex, capacity> m_assets{};
 
-		std::unordered_map<std::string, size_t> nameToId{};
-		std::unordered_map<size_t, std::string> idToName{};
+		std::unordered_map<std::string, size_t> m_nameToId{};
+		std::unordered_map<size_t, std::string> m_idToName{};
 
-		size_t nextAvailableIndex = 0;
+		size_t m_nextAvailableIndex = 0;
 
 	public:
 		AssetStorage() = default;
 
 		bool contains(size_t index) const
 		{
-			return assets.contains(index);
+			return m_assets.contains(index);
 		}
 
 		bool contains(const std::string& name)
 		{
-			auto it = nameToId.find(name);
-			if (it == nameToId.end())
+			auto it = m_nameToId.find(name);
+			if (it == m_nameToId.end())
 			{
 				return false;
 			}
 
-			return assets.contains(it->second);
+			return m_assets.contains(it->second);
 		}
 
 		size_t getId(std::string name)
 		{
 
-			auto it = nameToId.find(name);
-			if (it == nameToId.end())
+			auto it = m_nameToId.find(name);
+			if (it == m_nameToId.end())
 			{
 				throw std::runtime_error("Asset with name '" + name + "' does not exist.");
 			}
@@ -52,74 +52,74 @@ namespace Engine::Core
 
 		size_t add(T asset, const std::string& name)
 		{
-			if (nameToId.contains(name))
+			if (m_nameToId.contains(name))
 			{
 				throw std::runtime_error("Asset with name " + name + " already exists.");
 			}
 
-			size_t newIdx = nextAvailableIndex;
+			size_t newIdx = m_nextAvailableIndex;
 
-			if (idToName.contains(newIdx))
+			if (m_idToName.contains(newIdx))
 			{
 				throw std::runtime_error("Asset with index " + std::to_string(newIdx) + " already exists.");
 			}
 
-			assets.insert(newIdx, std::make_unique<T>(std::move(asset)));
+			m_assets.insert(newIdx, std::make_unique<T>(std::move(asset)));
 
-			nameToId[name] = newIdx;
-			idToName[newIdx] = name;
+			m_nameToId[name] = newIdx;
+			m_idToName[newIdx] = name;
 
-			nextAvailableIndex++;
+			m_nextAvailableIndex++;
 			return newIdx;
 		}
 
 		size_t add(std::unique_ptr<T> asset, const std::string& name)
 		{
-			if (nameToId.contains(name))
+			if (m_nameToId.contains(name))
 			{
 				throw std::runtime_error("Asset with name " + name + " already exists.");
 			}
 
-			size_t newIdx = nextAvailableIndex;
+			size_t newIdx = m_nextAvailableIndex;
 
-			if (idToName.contains(newIdx))
+			if (m_idToName.contains(newIdx))
 			{
 				throw std::runtime_error("Asset with index " + std::to_string(newIdx) + " already exists.");
 			}
 
-			assets.insert(newIdx, std::move(asset));
+			m_assets.insert(newIdx, std::move(asset));
 
-			nameToId[name] = newIdx;
-			idToName[newIdx] = name;
+			m_nameToId[name] = newIdx;
+			m_idToName[newIdx] = name;
 
-			nextAvailableIndex++;
+			m_nextAvailableIndex++;
 			return newIdx;
 		}
 
 		T* get(size_t index)
 		{
-			if (!assets.contains(index))
+			if (!m_assets.contains(index))
 			{
 				return nullptr;
 			}
 
-			return assets.get(index).get();
+			return m_assets.get(index).get();
 		}
 
 		const T* get(size_t index) const
 		{
-			if (!assets.contains(index))
+			if (!m_assets.contains(index))
 			{
 				return nullptr;
 			}
 
-			return assets.get(index).get();
+			return m_assets.get(index).get();
 		}
 
 		T* get(const std::string& name)
 		{
-			auto it = nameToId.find(name);
-			if (it == nameToId.end())
+			auto it = m_nameToId.find(name);
+			if (it == m_nameToId.end())
 			{
 				return nullptr;
 			}
@@ -129,8 +129,8 @@ namespace Engine::Core
 
 		const T* get(const std::string& name) const
 		{
-			auto it = nameToId.find(name);
-			if (it == nameToId.end())
+			auto it = m_nameToId.find(name);
+			if (it == m_nameToId.end())
 			{
 				return nullptr;
 			}
@@ -140,15 +140,15 @@ namespace Engine::Core
 
 		std::string getName(size_t index) const
 		{
-			auto it = idToName.find(index);
-			return it != idToName.end() ? it->second : "";
+			auto it = m_idToName.find(index);
+			return it != m_idToName.end() ? it->second : "";
 		}
 
 		std::vector<T*> getRawPointerList()
 		{
 			std::vector<T*> list{};
 
-			for (const auto& v : assets)
+			for (const auto& v : m_assets)
 			{
 				list.push_back(v.get());
 			}
@@ -158,7 +158,7 @@ namespace Engine::Core
 
 		size_t size()
 		{
-			return assets.size();
+			return m_assets.size();
 		}
 
 	};

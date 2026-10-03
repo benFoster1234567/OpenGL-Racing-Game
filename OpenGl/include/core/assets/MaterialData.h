@@ -1,5 +1,5 @@
 #pragma once
-#include "core/assets/TextureData.h"
+#include "../assets/TextureData.h"
 #include <string>
 #include "ShaderData.h"
 #include "AssetIds.h"
@@ -9,7 +9,7 @@
 #include <array>
 #include <algorithm>
 
-namespace Engine::Core 
+namespace Engine::Core
 {
 	struct MaterialData
 	{

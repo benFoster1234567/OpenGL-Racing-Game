@@ -32,20 +32,20 @@ namespace Engine::Core::Game
 
 	struct PlayerEntityCommand
 	{
-		ECS::Entity entity{};
+		ECS::Entity m_entity{};
 	};
 
 	class Scene
 	{
 	public:
-		ECS::Coordinator coordinator{};
-		AssetManager& assetManager;
-		InputBridge& inputHandler;
+		ECS::Coordinator m_coordinator{};
+		AssetManager& m_assetManager;
+		InputBridge& m_inputHandler;
 
 	public:
 		Scene(AssetManager& _assetManager, InputBridge& _inputHandler) :
-			assetManager(_assetManager),
-			inputHandler(_inputHandler)
+			m_assetManager(_assetManager),
+			m_inputHandler(_inputHandler)
 		{
 			static SceneId currentId = 0;
 			id = currentId;
@@ -71,108 +71,108 @@ namespace Engine::Core::Game
 	class TestScene : public Scene
 	{
 	public:
-		ECS::Entity playerEntity{};
+		ECS::Entity m_playerEntity{};
 	private:
-		ECS::Entity gridEntity{};
-		ECS::Entity lightEntity{};
+		ECS::Entity m_gridEntity{};
+		ECS::Entity m_lightEntity{};
 
 		void registerSystems()
 		{
-			coordinator.registerSystem<ECS::RenderDispatcherOrbitalCamera>();
-			coordinator.registerSystem<ECS::RenderDispatcherExternalCamera>();
-			coordinator.registerSystem<ECS::KeyControlSystem>();
-			coordinator.registerSystem<ECS::MouseControlSystem>();
-			coordinator.registerSystem<ECS::StaticLightRenderSetupSystem>();
-			coordinator.registerSystem<ECS::ShadowPointSystem>();
-			coordinator.registerSystem<ECS::PhysicsSystem>();
-			coordinator.registerSystem<ECS::VehicleSystem>();
+			m_coordinator.registerSystem<ECS::RenderDispatcherOrbitalCamera>();
+			m_coordinator.registerSystem<ECS::RenderDispatcherExternalCamera>();
+			m_coordinator.registerSystem<ECS::KeyControlSystem>();
+			m_coordinator.registerSystem<ECS::MouseControlSystem>();
+			m_coordinator.registerSystem<ECS::StaticLightRenderSetupSystem>();
+			m_coordinator.registerSystem<ECS::ShadowPointSystem>();
+			m_coordinator.registerSystem<ECS::PhysicsSystem>();
+			m_coordinator.registerSystem<ECS::VehicleSystem>();
 		}
 
 		void registerComponents()
 		{
-			coordinator.registerComponent<ECS::CameraComponent>();
-			coordinator.registerComponent<ECS::MeshComponent>();
-			coordinator.registerComponent<ECS::ShaderComponent>();
-			coordinator.registerComponent<ECS::TransformComponent>();
-			coordinator.registerComponent<ECS::OrbitalCameraComponent>();
-			coordinator.registerComponent<ECS::MouseInputSettings>();
-			coordinator.registerComponent<ECS::PlayerController>();
-			coordinator.registerComponent<ECS::StaticPointLightComponent>();
-			coordinator.registerComponent<ECS::ExternalCameraComponent>();
-			coordinator.registerComponent<ECS::MaterialDataComponent>();
-			coordinator.registerComponent<ECS::ShadowCastComponent>();
-			coordinator.registerComponent<ECS::PhysicsComponent>();
-			coordinator.registerComponent<ECS::BoxColliderComponent>();
-			coordinator.registerComponent<ECS::RigidBodyComponent>();
-			coordinator.registerComponent<ECS::VehicleComponent>();
+			m_coordinator.registerComponent<ECS::CameraComponent>();
+			m_coordinator.registerComponent<ECS::MeshComponent>();
+			m_coordinator.registerComponent<ECS::ShaderComponent>();
+			m_coordinator.registerComponent<ECS::TransformComponent>();
+			m_coordinator.registerComponent<ECS::OrbitalCameraComponent>();
+			m_coordinator.registerComponent<ECS::MouseInputSettings>();
+			m_coordinator.registerComponent<ECS::PlayerController>();
+			m_coordinator.registerComponent<ECS::StaticPointLightComponent>();
+			m_coordinator.registerComponent<ECS::ExternalCameraComponent>();
+			m_coordinator.registerComponent<ECS::MaterialDataComponent>();
+			m_coordinator.registerComponent<ECS::ShadowCastComponent>();
+			m_coordinator.registerComponent<ECS::PhysicsComponent>();
+			m_coordinator.registerComponent<ECS::BoxColliderComponent>();
+			m_coordinator.registerComponent<ECS::RigidBodyComponent>();
+			m_coordinator.registerComponent<ECS::VehicleComponent>();
 		}
 
 		void defineSystemSignatures()
 		{
 			ECS::Signature playerSignature{};
 
-			playerSignature.set(coordinator.getComponentType<ECS::CameraComponent>());
-			playerSignature.set(coordinator.getComponentType<ECS::TransformComponent>());
-			playerSignature.set(coordinator.getComponentType<ECS::ShaderComponent>());
-			playerSignature.set(coordinator.getComponentType<ECS::MeshComponent>());
-			playerSignature.set(coordinator.getComponentType<ECS::OrbitalCameraComponent>());
-			playerSignature.set(coordinator.getComponentType<ECS::MouseInputSettings>());
-			playerSignature.set(coordinator.getComponentType<ECS::PlayerController>());
+			playerSignature.set(m_coordinator.getComponentType<ECS::CameraComponent>());
+			playerSignature.set(m_coordinator.getComponentType<ECS::TransformComponent>());
+			playerSignature.set(m_coordinator.getComponentType<ECS::ShaderComponent>());
+			playerSignature.set(m_coordinator.getComponentType<ECS::MeshComponent>());
+			playerSignature.set(m_coordinator.getComponentType<ECS::OrbitalCameraComponent>());
+			playerSignature.set(m_coordinator.getComponentType<ECS::MouseInputSettings>());
+			playerSignature.set(m_coordinator.getComponentType<ECS::PlayerController>());
 
-			coordinator.setSystemSignature<ECS::RenderDispatcherOrbitalCamera>(playerSignature);
-			coordinator.setSystemSignature<ECS::MouseControlSystem>(playerSignature);
-			coordinator.setSystemSignature<ECS::KeyControlSystem>(playerSignature);
+			m_coordinator.setSystemSignature<ECS::RenderDispatcherOrbitalCamera>(playerSignature);
+			m_coordinator.setSystemSignature<ECS::MouseControlSystem>(playerSignature);
+			m_coordinator.setSystemSignature<ECS::KeyControlSystem>(playerSignature);
 
 			ECS::Signature externalCamSig{};
 
-			externalCamSig.set(coordinator.getComponentType<ECS::MaterialDataComponent>());
-			externalCamSig.set(coordinator.getComponentType<ECS::TransformComponent>());
-			externalCamSig.set(coordinator.getComponentType<ECS::MeshComponent>());
-			externalCamSig.set(coordinator.getComponentType<ECS::ShaderComponent>());
-			externalCamSig.set(coordinator.getComponentType<ECS::ExternalCameraComponent>());
+			externalCamSig.set(m_coordinator.getComponentType<ECS::MaterialDataComponent>());
+			externalCamSig.set(m_coordinator.getComponentType<ECS::TransformComponent>());
+			externalCamSig.set(m_coordinator.getComponentType<ECS::MeshComponent>());
+			externalCamSig.set(m_coordinator.getComponentType<ECS::ShaderComponent>());
+			externalCamSig.set(m_coordinator.getComponentType<ECS::ExternalCameraComponent>());
 
-			coordinator.setSystemSignature<ECS::RenderDispatcherExternalCamera>(externalCamSig);
+			m_coordinator.setSystemSignature<ECS::RenderDispatcherExternalCamera>(externalCamSig);
 
 			ECS::Signature lightSignature{};
-			lightSignature.set(coordinator.getComponentType<ECS::TransformComponent>());
-			lightSignature.set(coordinator.getComponentType<ECS::StaticPointLightComponent>());
+			lightSignature.set(m_coordinator.getComponentType<ECS::TransformComponent>());
+			lightSignature.set(m_coordinator.getComponentType<ECS::StaticPointLightComponent>());
 
-			coordinator.setSystemSignature<ECS::StaticLightRenderSetupSystem>(lightSignature);
+			m_coordinator.setSystemSignature<ECS::StaticLightRenderSetupSystem>(lightSignature);
 
 			ECS::Signature shadowCastingSignature{};
 
-			shadowCastingSignature.set(coordinator.getComponentType<ECS::ShadowCastComponent>());
-			shadowCastingSignature.set(coordinator.getComponentType<ECS::TransformComponent>());
-			shadowCastingSignature.set(coordinator.getComponentType<ECS::StaticPointLightComponent>());
+			shadowCastingSignature.set(m_coordinator.getComponentType<ECS::ShadowCastComponent>());
+			shadowCastingSignature.set(m_coordinator.getComponentType<ECS::TransformComponent>());
+			shadowCastingSignature.set(m_coordinator.getComponentType<ECS::StaticPointLightComponent>());
 
-			coordinator.setSystemSignature<ECS::ShadowPointSystem>(shadowCastingSignature);
+			m_coordinator.setSystemSignature<ECS::ShadowPointSystem>(shadowCastingSignature);
 
 			ECS::Signature physicsSystemSig{};
 
-			physicsSystemSig.set(coordinator.getComponentType<ECS::PhysicsComponent>());
-			physicsSystemSig.set(coordinator.getComponentType<ECS::BoxColliderComponent>());
-			physicsSystemSig.set(coordinator.getComponentType<ECS::RigidBodyComponent>());
-			physicsSystemSig.set(coordinator.getComponentType<ECS::TransformComponent>());
-			physicsSystemSig.set(coordinator.getComponentType<ECS::MeshComponent>());
+			physicsSystemSig.set(m_coordinator.getComponentType<ECS::PhysicsComponent>());
+			physicsSystemSig.set(m_coordinator.getComponentType<ECS::BoxColliderComponent>());
+			physicsSystemSig.set(m_coordinator.getComponentType<ECS::RigidBodyComponent>());
+			physicsSystemSig.set(m_coordinator.getComponentType<ECS::TransformComponent>());
+			physicsSystemSig.set(m_coordinator.getComponentType<ECS::MeshComponent>());
 
-			coordinator.setSystemSignature<ECS::PhysicsSystem>(physicsSystemSig);
+			m_coordinator.setSystemSignature<ECS::PhysicsSystem>(physicsSystemSig);
 
 			ECS::Signature vehicleSystemSig{};
 
-			vehicleSystemSig.set(coordinator.getComponentType<ECS::VehicleComponent>());
-			vehicleSystemSig.set(coordinator.getComponentType<ECS::TransformComponent>());
+			vehicleSystemSig.set(m_coordinator.getComponentType<ECS::VehicleComponent>());
+			vehicleSystemSig.set(m_coordinator.getComponentType<ECS::TransformComponent>());
 
-			coordinator.setSystemSignature<ECS::VehicleSystem>(vehicleSystemSig);
+			m_coordinator.setSystemSignature<ECS::VehicleSystem>(vehicleSystemSig);
 		}
 
-		
+
 
 		ECS::Entity setupGridEntity(ECS::Entity cameraEntity)
 		{
-			ECS::Entity entity = coordinator.createEntity();
+			ECS::Entity entity = m_coordinator.createEntity();
 
-			ECS::ShaderComponent shader{ assetManager.getShaderId("gridShader") };
-			ECS::MeshComponent gridMesh{ assetManager.getMeshId("grid") };
+			ECS::ShaderComponent shader{ m_assetManager.getShaderId("gridShader") };
+			ECS::MeshComponent gridMesh{ m_assetManager.getMeshId("grid") };
 
 			ECS::TransformComponent gridTransform{};
 			gridTransform.position = { 0.0f, -1.0f, 0.0f };
@@ -181,13 +181,13 @@ namespace Engine::Core::Game
 			extCamComp.entityWithCamera = cameraEntity;
 
 			ECS::MaterialDataComponent matComp{};
-			assetManager.get(matComp.material, "testMaterial");
+			m_assetManager.get(matComp.material, "testMaterial");
 
-			coordinator.addComponent(entity, gridMesh);
-			coordinator.addComponent(entity, shader);
-			coordinator.addComponent(entity, gridTransform);
-			coordinator.addComponent(entity, extCamComp);
-			coordinator.addComponent(entity, matComp);
+			m_coordinator.addComponent(entity, gridMesh);
+			m_coordinator.addComponent(entity, shader);
+			m_coordinator.addComponent(entity, gridTransform);
+			m_coordinator.addComponent(entity, extCamComp);
+			m_coordinator.addComponent(entity, matComp);
 
 
 			return entity;
@@ -195,34 +195,34 @@ namespace Engine::Core::Game
 
 		ECS::Entity setupCubeEntity(ECS::Entity cameraEntity
 			, ECS::TransformComponent transform
-			, glm::vec2 uvScale = {10,10}
+			, glm::vec2 uvScale = { 10,10 }
 			, bool isKinematic = false
 			, std::string material = "cubeMaterial"
 			, bool addPhysics = true)
 		{
-			
-			ECS::Entity entity = coordinator.createEntity();
 
-			ECS::MeshComponent mesh{ assetManager.getMeshId("cube") };
+			ECS::Entity entity = m_coordinator.createEntity();
+
+			ECS::MeshComponent mesh{ m_assetManager.getMeshId("cube") };
 			mesh.uvScale = uvScale;
 
-			ECS::ShaderComponent shader{ assetManager.getShaderId("shader") };
+			ECS::ShaderComponent shader{ m_assetManager.getShaderId("shader") };
 
 			ECS::ExternalCameraComponent extCamComp{};
 			extCamComp.entityWithCamera = cameraEntity;
 
 			ECS::MaterialDataComponent matComp{};
-			assetManager.get(matComp.material, "cubeMaterial");
+			m_assetManager.get(matComp.material, "cubeMaterial");
 
-			coordinator.addComponent(entity, transform);
-			coordinator.addComponent(entity, mesh);
-			coordinator.addComponent(entity, shader);
-			coordinator.addComponent(entity, extCamComp);
-			coordinator.addComponent(entity, matComp);
+			m_coordinator.addComponent(entity, transform);
+			m_coordinator.addComponent(entity, mesh);
+			m_coordinator.addComponent(entity, shader);
+			m_coordinator.addComponent(entity, extCamComp);
+			m_coordinator.addComponent(entity, matComp);
 
 			if (addPhysics)
 			{
-				auto minsMaxes = assetManager.getMesh(mesh.meshId)->getMinMaxes();
+				auto minsMaxes = m_assetManager.getMesh(mesh.meshId)->getMinMaxes();
 
 				float xSize = (minsMaxes.maxX - minsMaxes.minX) / 2 * transform.scale.x;
 				float ySize = (minsMaxes.maxY - minsMaxes.minY) / 2 * transform.scale.y;
@@ -236,11 +236,11 @@ namespace Engine::Core::Game
 				rbComp.mass = 1.0f;
 				rbComp.momentOfInertia = { 1,1,1 };
 
-				coordinator.addComponent(entity, collider);
-				coordinator.addComponent(entity, rbComp);
-				coordinator.addComponent(entity, ECS::PhysicsComponent{});
+				m_coordinator.addComponent(entity, collider);
+				m_coordinator.addComponent(entity, rbComp);
+				m_coordinator.addComponent(entity, ECS::PhysicsComponent{});
 			}
-			
+
 			return entity;
 
 		}
@@ -249,7 +249,7 @@ namespace Engine::Core::Game
 			, glm::vec3 position
 			, glm::vec3 eulerAngles
 			, glm::vec3 scale
-			, glm::vec2 uvScale = {10,10}
+			, glm::vec2 uvScale = { 10,10 }
 			, bool isKinematic = false
 			, std::string material = "cubeMaterial")
 		{
@@ -261,7 +261,7 @@ namespace Engine::Core::Game
 			transform.rotation = quaternion;
 			transform.scale = scale;
 
-			ECS::Entity entity = setupCubeEntity(cameraEntity , transform, uvScale, isKinematic, material);
+			ECS::Entity entity = setupCubeEntity(cameraEntity, transform, uvScale, isKinematic, material);
 
 			return entity;
 
@@ -271,7 +271,7 @@ namespace Engine::Core::Game
 
 		ECS::Entity setupGroundEntity(ECS::Entity cameraEntity)
 		{
-			
+
 			ECS::TransformComponent transform{};
 			transform.scale = { 15.5f, 0.2f, 15.5f };
 			transform.position = { 0.0f, -1.0f, 0.0f };
@@ -283,10 +283,10 @@ namespace Engine::Core::Game
 
 		ECS::Entity setupPlayerEntity()
 		{
-			ECS::Entity entity = coordinator.createEntity();
+			ECS::Entity entity = m_coordinator.createEntity();
 
-			ECS::MeshComponent mesh{ assetManager.getMeshId("cube") };
-			ECS::ShaderComponent shader{ assetManager.getShaderId("shader") };
+			ECS::MeshComponent mesh{ m_assetManager.getMeshId("cube") };
+			ECS::ShaderComponent shader{ m_assetManager.getShaderId("shader") };
 
 			ECS::PlayerController playerController{};
 			playerController.turnSensitivity = 100;
@@ -296,7 +296,7 @@ namespace Engine::Core::Game
 			mis.sensitivity = { 20, 15 };
 
 			ECS::MaterialDataComponent matComp{};
-			assetManager.get(matComp.material, "testMaterial");
+			m_assetManager.get(matComp.material, "testMaterial");
 			ECS::TransformComponent transform{};
 
 
@@ -307,15 +307,15 @@ namespace Engine::Core::Game
 				throw std::runtime_error("MaterialDataComponent is null for entity " + std::to_string(entity));
 			}
 
-			coordinator.addComponent(entity, mesh);
-			coordinator.addComponent(entity, transform);
-			coordinator.addComponent(entity, ECS::CameraComponent{});
+			m_coordinator.addComponent(entity, mesh);
+			m_coordinator.addComponent(entity, transform);
+			m_coordinator.addComponent(entity, ECS::CameraComponent{});
 
-			coordinator.addComponent(entity, shader);
-			coordinator.addComponent(entity, ECS::OrbitalCameraComponent{});
-			coordinator.addComponent(entity, mis);
-			coordinator.addComponent(entity, playerController);
-			coordinator.addComponent(entity, matComp);
+			m_coordinator.addComponent(entity, shader);
+			m_coordinator.addComponent(entity, ECS::OrbitalCameraComponent{});
+			m_coordinator.addComponent(entity, mis);
+			m_coordinator.addComponent(entity, playerController);
+			m_coordinator.addComponent(entity, matComp);
 
 			return entity;
 		}
@@ -324,10 +324,10 @@ namespace Engine::Core::Game
 		{
 			ECS::Entity entity = setupPlayerEntity();
 
-			auto& transformComponent = coordinator.getComponent<ECS::TransformComponent>(entity);
-			auto& meshComponent = coordinator.getComponent<ECS::MeshComponent>(entity);
+			auto& transformComponent = m_coordinator.getComponent<ECS::TransformComponent>(entity);
+			auto& meshComponent = m_coordinator.getComponent<ECS::MeshComponent>(entity);
 
-			auto meshMinsMaxes = assetManager.getMesh(meshComponent.meshId)->getMinMaxes();
+			auto meshMinsMaxes = m_assetManager.getMesh(meshComponent.meshId)->getMinMaxes();
 
 			transformComponent.position = { -3,2,-3 };
 
@@ -377,23 +377,23 @@ namespace Engine::Core::Game
 
 			vehicleComponent.wheelEntities = wheelEntities;
 
-			coordinator.addComponent(entity, vehicleComponent);
+			m_coordinator.addComponent(entity, vehicleComponent);
 			return entity;
 		}
 
 
 		ECS::Entity setupLightEntity(ECS::TransformComponent transform, float radius = 20.0f, float intensity = 50.0f)
 		{
-			ECS::Entity entity = coordinator.createEntity();
+			ECS::Entity entity = m_coordinator.createEntity();
 
 			ECS::StaticPointLightComponent lightComp{};
 			lightComp.color = { 1, 1, 1 };
 			lightComp.radius = radius;
 			lightComp.intensity = intensity;
 
-			coordinator.addComponent(entity, transform);
-			coordinator.addComponent(entity, lightComp);
-			coordinator.addComponent(entity, ECS::ShadowCastComponent{});
+			m_coordinator.addComponent(entity, transform);
+			m_coordinator.addComponent(entity, lightComp);
+			m_coordinator.addComponent(entity, ECS::ShadowCastComponent{});
 
 			return entity;
 		}
@@ -415,8 +415,8 @@ namespace Engine::Core::Game
 			registerComponents();
 			defineSystemSignatures();
 
-			playerEntity = setupPlayerVehicleEntity();
-			auto cubeEntity = setupGroundEntity(playerEntity);
+			m_playerEntity = setupPlayerVehicleEntity();
+			auto cubeEntity = setupGroundEntity(m_playerEntity);
 
 			ECS::TransformComponent t2{};
 
@@ -424,7 +424,7 @@ namespace Engine::Core::Game
 			t2.position = { 0,0,0 };
 			t2.rotation = { 0,0,0,1 };
 
-			setupCubeEntity( playerEntity, t2, { 1,2 }, true );
+			setupCubeEntity(m_playerEntity, t2, { 1,2 }, true);
 
 			ECS::TransformComponent t{};
 			ECS::TransformComponent t3{};
@@ -435,9 +435,9 @@ namespace Engine::Core::Game
 			ECS::TransformComponent t8{};
 
 			t5.position = { 0,10,0 };
-			auto fallingCubeEntity = setupCubeEntity(playerEntity, t5, {1,1});
+			auto fallingCubeEntity = setupCubeEntity(m_playerEntity, t5, { 1,1 });
 			t6.position = { 1,14,0 };
-			auto fallingCubeEntity2 = setupCubeEntity(playerEntity, t6, {1,1});
+			auto fallingCubeEntity2 = setupCubeEntity(m_playerEntity, t6, { 1,1 });
 
 			t.position = { 9, 7, -1 };
 			t3.position = { -18, 7, -1 };
@@ -454,31 +454,31 @@ namespace Engine::Core::Game
 
 
 
-			coordinator.getSystem<ECS::PhysicsSystem>()->fillInitialCommandBuffer(coordinator);
+			m_coordinator.getSystem<ECS::PhysicsSystem>()->fillInitialCommandBuffer(m_coordinator);
 
 		}
 
-		ECS::Entity setupPlayerEntity() const { return playerEntity; }
+		ECS::Entity setupPlayerEntity() const { return m_playerEntity; }
 
 		void pollPhysicsEvents(const std::vector<ECS::PhysicsEvent>& eventQueue)
 		{
-			coordinator.getSystem<ECS::PhysicsSystem>()->pollPhysicsEngine(eventQueue);
+			m_coordinator.getSystem<ECS::PhysicsSystem>()->pollPhysicsEngine(eventQueue);
 		}
 
 		ECS::PhysicsEngineCommandBuffer& getPhysicsEngineCommands()
 		{
-			return coordinator.getSystem<ECS::PhysicsSystem>()->getCommandBuffer();
+			return m_coordinator.getSystem<ECS::PhysicsSystem>()->getCommandBuffer();
 		}
 
 
 		void setupLights(std::vector<ECS::StaticPointLightRendererData>& lightSetupQueueOut)
 		{
-			coordinator.getSystem<ECS::StaticLightRenderSetupSystem>()->fill(coordinator, lightSetupQueueOut);
+			m_coordinator.getSystem<ECS::StaticLightRenderSetupSystem>()->fill(m_coordinator, lightSetupQueueOut);
 		}
 
 		std::vector<ECS::StaticPointLightRendererData> getShadowCastingPointlights()
 		{
-			return coordinator.getSystem<ECS::ShadowPointSystem>()->getShadowCastingPointlights(coordinator);
+			return m_coordinator.getSystem<ECS::ShadowPointSystem>()->getShadowCastingPointlights(m_coordinator);
 		}
 
 		void shutdown() override
@@ -488,16 +488,16 @@ namespace Engine::Core::Game
 
 		void updatePhysics(float deltaTime) override
 		{
-			coordinator.getSystem<ECS::PhysicsSystem>()->update(coordinator, deltaTime);
+			m_coordinator.getSystem<ECS::PhysicsSystem>()->update(m_coordinator, deltaTime);
 
 		}
 
 		void update(float aspect, MouseInputResource mouseState, float deltaTime) override
 		{
-			coordinator.getSystem<ECS::MouseControlSystem>()->update(coordinator, mouseState);
-			coordinator.getSystem<ECS::RenderDispatcherExternalCamera>()->update(coordinator, aspect);
-			coordinator.getSystem<ECS::RenderDispatcherOrbitalCamera>()->update(coordinator, aspect);
-			coordinator.getSystem<ECS::VehicleSystem>()->update(coordinator, inputHandler, deltaTime);
+			m_coordinator.getSystem<ECS::MouseControlSystem>()->update(m_coordinator, mouseState);
+			m_coordinator.getSystem<ECS::RenderDispatcherExternalCamera>()->update(m_coordinator, aspect);
+			m_coordinator.getSystem<ECS::RenderDispatcherOrbitalCamera>()->update(m_coordinator, aspect);
+			m_coordinator.getSystem<ECS::VehicleSystem>()->update(m_coordinator, m_inputHandler, deltaTime);
 		}
 	};
 }

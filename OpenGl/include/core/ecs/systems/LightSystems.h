@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <glm/vec3.hpp>
-#include "core/ecs/coordinator/System.h"
+#include "../coordinator/System.h"
 
 namespace Engine::Core::ECS
 {
@@ -10,8 +10,8 @@ namespace Engine::Core::ECS
 
 	struct StaticPointLightRendererData
 	{
-		glm::vec3 position{ 0.0f };
-		glm::vec3 color{ 0.0f };
+		glm::vec3 m_position{ 0.0f };
+		glm::vec3 m_color{ 0.0f };
 		float radius{ 0.0f };
 		float intensity{ 1.0f };
 	};

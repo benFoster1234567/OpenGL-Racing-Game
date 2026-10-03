@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/vec2.hpp>
-#include "core/assets/MeshData.h"
+#include "../../assets/MeshData.h"
 #include "../coordinator/ECS.h"
 #include "../../assets/AssetIds.h"
 

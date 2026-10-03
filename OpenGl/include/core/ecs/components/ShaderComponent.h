@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/assets/ShaderData.h"
+#include "../../assets/ShaderData.h"
 #include "../coordinator/ECS.h"
 #include "../../assets/AssetIds.h"
 

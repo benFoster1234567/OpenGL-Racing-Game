@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/assets/MaterialData.h"
+#include "../../assets/MaterialData.h"
 #include "../coordinator/ECS.h"
 
 

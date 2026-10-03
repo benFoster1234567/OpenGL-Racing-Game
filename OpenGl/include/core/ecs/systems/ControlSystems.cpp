@@ -6,7 +6,7 @@
 #include <glm/common.hpp>
 
 #include "../coordinator/Coordinator.h"
-#include "core/input/KeyboardInput.h"
+#include "../../input/KeyboardInput.h"
 #include "../components/CameraComponents.h"
 #include "../components/MouseInputSettingsComponent.h"
 #include "../components/PlayerControllerComponent.h"
@@ -16,7 +16,7 @@ namespace Engine::Core::ECS
 {
 	void MouseControlSystem::update(Coordinator& coordinator, MouseInputResource& mouse)
 	{
-		for (auto entity : entities)
+		for (auto entity : m_entities)
 		{
 			auto& cameraComp = coordinator.getComponent<CameraComponent>(entity);
 			auto& orbitalCam = coordinator.getComponent<OrbitalCameraComponent>(entity);
@@ -32,7 +32,7 @@ namespace Engine::Core::ECS
 			float camx = r * glm::cos(glm::radians(orbitalCam.pitch)) * glm::sin(glm::radians(orbitalCam.yaw));
 			float camy = r * glm::sin(glm::radians(orbitalCam.pitch));
 			float camz = r * glm::cos(glm::radians(orbitalCam.pitch)) * glm::cos(glm::radians(orbitalCam.yaw));
-			
+
 			glm::vec3 camPos{ camx, camy, camz };
 			cameraComp.position = camPos;
 		}
@@ -40,7 +40,7 @@ namespace Engine::Core::ECS
 
 	void KeyControlSystem::update(Coordinator& coordinator, const InputBridge& inputHandler, float deltaTime)
 	{
-		for (auto entity : entities)
+		for (auto entity : m_entities)
 		{
 			auto& inputKeys = coordinator.getComponent<PlayerController>(entity);
 			auto& transform = coordinator.getComponent<TransformComponent>(entity);
