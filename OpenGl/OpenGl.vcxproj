@@ -162,15 +162,15 @@
     <ClCompile Include="src\core\Engine.cpp" />
     <ClCompile Include="src\infrastructure\app\Application.cpp" />
     <ClCompile Include="src\infrastructure\engine\DebugConsoleUI.cpp" />
-    <ClCompile Include="src\infrastructure\renderer\assets\GPUMesh.cpp" />
-    <ClCompile Include="src\infrastructure\renderer\assets\ImportFuncs.cpp" />
+    <ClCompile Include="include\infra\renderer\assets\GPUMesh.cpp" />
+    <ClCompile Include="include\infra\renderer\assets\ImportFuncs.cpp" />
     <ClCompile Include="src\infrastructure\app\GlfwKeyHandler.cpp" />
     <ClCompile Include="src\core\KeyboardInput.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\infrastructure\app\Window.cpp" />
     <ClCompile Include="include\infra\renderer\Renderer.cpp" />
     <ClCompile Include="tests\RunTests.cpp" />
-    <ClCompile Include="src\infrastructure\renderer\assets\GpuShader.cpp" />
+    <ClCompile Include="include\infra\renderer\assets\GpuShader.cpp" />
     <ClCompile Include="tests\Tester.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -229,7 +229,6 @@
     <None Include="assets\materials\cubeMaterial.mtl" />
     <None Include="assets\shaders\depthCubeShader.glsl" />
     <None Include="assets\shaders\gridShader.glsl" />
-    <None Include="assets\shaders\pointShadow.glsl" />
     <None Include="assets\shaders\shader.glsl" />
     <None Include="shaders\shader.glsl" />
   </ItemGroup>
