@@ -5,7 +5,7 @@
 #include <glm/mat4x4.hpp>
 #include <vector>
 #include <utility>
-#include <limits> 
+#include <limits>
 
 namespace Engine::Core
 {
@@ -49,7 +49,7 @@ namespace Engine::Core
 		void printPoints(); //for debugging purposes...
 
 		void recomputeNormals(int vertexIndex = 0, int normalsIndex = 1);
-		void recomputeNormalsSmooth(int vertexIndex = 0, int normalsIndex = 1);
+		void recomputeNormalsSmooth();
 
 		void computeTangents();
 
@@ -83,7 +83,7 @@ namespace Engine::Core
 
 		void recomputeNormalsAndTangents()
 		{
-			recomputeNormals();
+			recomputeNormalsSmooth();
 			computeTangents();
 		}
 

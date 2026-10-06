@@ -1,4 +1,5 @@
 #include "core/assets/MeshData.h"
+#include <glm/gtx/hash.hpp>
 
 
 void Engine::Core::MeshData::printPoints()
@@ -47,10 +48,51 @@ void Engine::Core::MeshData::recomputeNormals(int vertexIndex, int normalsIndex)
 	m_attributes[normalsIndex].data = norms;
 }
 
-void Engine::Core::MeshData::recomputeNormalsSmooth(int vertexIndex, int normalsIndex)
+void Engine::Core::MeshData::recomputeNormalsSmooth()
 {
+	recomputeNormals();
 	//TODO: Implement this
-	throw std::logic_error("Method not implemented");
+	//throw std::logic_error("Method not implemented");
+	const auto& posData = m_attributes[VERTEX_ATTRIBUTE].data;
+	auto& normData = m_attributes[NORMAL_ATTRIBUTE].data;
+
+	std::unordered_map<glm::vec3, glm::vec3> posToNormal{};
+
+
+	for (int index{}; index < posData.size(); index += 3)
+	{
+		glm::vec3 pos{
+			  posData[index + 0]
+			, posData[index + 1]
+			, posData[index + 2] };
+		glm::vec3 norm{
+			  normData[index + 0]
+			, normData[index + 1]
+			, normData[index + 2] };
+
+		auto iter = posToNormal.find(pos);
+		if (iter == posToNormal.end())
+		{
+			posToNormal[pos] = glm::vec3{ 0.f };
+		}
+
+		posToNormal[pos] += norm;
+	}
+
+	for (int index{}; index < posData.size(); index += 3)
+	{
+		glm::vec3 pos{
+			  posData[index + 0]
+			, posData[index + 1]
+			, posData[index + 2] };
+
+		glm::vec3 norm = posToNormal[pos];
+
+		normData[index + 0] = norm.x;
+		normData[index + 1] = norm.y;
+		normData[index + 2] = norm.z;
+	}
+
 }
 
 void Engine::Core::MeshData::computeTangents()
