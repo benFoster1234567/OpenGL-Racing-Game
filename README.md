@@ -1,5 +1,8 @@
 OpenGL Racing Game Engine (In Progress)
 =
+
+![Vehicle driving demo](resources/images/Screenshot%202026-08-23%20162436.png)
+
 Building a racing game in C++/OpenGL to explore software development techniques and learn more about implementing graphics into a functioning program.
 ## Built with
 - OpenGL: rendering
@@ -18,8 +21,6 @@ Building a racing game in C++/OpenGL to explore software development techniques 
 If more than four point lights cast shadows, the program automatically selects the four closest light sources to the camera
 Vehicle physics and rigid body physics are implemented through bullet physics
 
-
-https://github.com/user-attachments/assets/54832993-7daa-4d37-a868-233ab1efeebf
-
+https://github.com/user-attachments/assets/dc39f2c1-a60f-47f2-9915-6a2387ff80dc
 
 https://benfoster1234567.github.io/OpenGL-Racing-Game/
