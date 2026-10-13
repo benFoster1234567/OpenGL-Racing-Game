@@ -107,23 +107,6 @@ namespace Engine::Infra
 			return lightSpaceMatrix;
 		}
 
-		std::vector<glm::mat4> getTransforms(glm::vec3 lp)
-		{
-			std::vector<glm::mat4> transforms{};
-
-			const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-			float aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
-
-			glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, m_near, m_far);
-
-			transforms.push_back(shadowProj * glm::lookAt(m_lightPos, m_lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-			transforms.push_back(shadowProj * glm::lookAt(m_lightPos, m_lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-			transforms.push_back(shadowProj * glm::lookAt(m_lightPos, m_lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-			transforms.push_back(shadowProj * glm::lookAt(m_lightPos, m_lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
-			transforms.push_back(shadowProj * glm::lookAt(m_lightPos, m_lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
-			transforms.push_back(shadowProj * glm::lookAt(m_lightPos, m_lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
-			return transforms;
-		}
 
 	public:
 
@@ -136,6 +119,8 @@ namespace Engine::Infra
 			m_near = 1.0f;
 			m_far = 25.0f;
 		}
+
+		//void RenderFromECS(Core::)
 
 		void prepareDepthCubemapArray();
 

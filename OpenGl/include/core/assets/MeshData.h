@@ -83,7 +83,8 @@ namespace Engine::Core
 
 		void recomputeNormalsAndTangents()
 		{
-			recomputeNormalsSmooth();
+			recomputeNormals();
+			//recomputeNormalsSmooth();
 			computeTangents();
 		}
 
