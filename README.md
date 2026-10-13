@@ -1,4 +1,5 @@
-#OpenGL Racing Game Engine (In Progress)
+OpenGL Racing Game Engine (In Progress)
+=
 Building a racing game in C++/OpenGL to explore software development techniques and learn more about implementing graphics into a functioning program.
 ##Built with
 - OpenGL: rendering
