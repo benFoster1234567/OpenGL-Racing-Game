@@ -18,6 +18,8 @@ Building a racing game in C++/OpenGL to explore software development techniques 
 If more than four point lights cast shadows, the program automatically selects the four closest light sources to the camera
 Vehicle physics and rigid body physics are implemented through bullet physics
 
-![Vehicle driving demo](resources/car%20gif.gif)
+
+https://github.com/user-attachments/assets/54832993-7daa-4d37-a868-233ab1efeebf
+
 
 https://benfoster1234567.github.io/OpenGL-Racing-Game/
