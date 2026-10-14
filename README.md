@@ -22,6 +22,7 @@ Vehicle physics and rigid body physics are implemented through bullet physics
 
 <img width="1243" height="793" alt="image" src="https://github.com/user-attachments/assets/f4fa634e-4ba7-44a9-ab36-996279217308" />
 
+### Normal mapping and specular mapping enabled:
 <img width="1589" height="889" alt="image" src="https://github.com/user-attachments/assets/7640c248-37b3-4df7-a9c8-40dd87ef287f" />
 
 
