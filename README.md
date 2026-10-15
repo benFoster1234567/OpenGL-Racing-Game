@@ -28,3 +28,9 @@ Vehicle physics and rigid body physics are implemented through bullet physics
 
 
 https://benfoster1234567.github.io/OpenGL-Racing-Game/
+
+## Building the Project
+Dependencies: C++20, glew, GLFW3, Bullet Physics 3, Dear ImGui, tinyobjloader, DeVIL, glm
+
+### In Visual Studio
+- In project properties OpenGl/include should be added as an additional include directory
