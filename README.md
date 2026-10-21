@@ -4,7 +4,6 @@ OpenGL Racing Game Engine (In Progress)
 
 https://github.com/user-attachments/assets/dc39f2c1-a60f-47f2-9915-6a2387ff80dc
 
-Building a racing game in C++/OpenGL to explore software development techniques and learn more about implementing graphics into a functioning program.
 ## Built with
 - OpenGL: rendering
 - Bullet: physics
