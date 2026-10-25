@@ -4,13 +4,6 @@ OpenGL Racing Game Engine (In Progress)
 
 https://github.com/user-attachments/assets/dc39f2c1-a60f-47f2-9915-6a2387ff80dc
 
-## Built with
-- OpenGL: rendering
-- Bullet: physics
-- Dear ImGui: debug UI
-- tinyobjloader: .obj parsing
-- DevIL: image loading
-
 ## Features
 - ECS (Entity Component System) architecture for core gameplay logic
 - Custom OpenGL renderer featuring soft shadows and pointlights
