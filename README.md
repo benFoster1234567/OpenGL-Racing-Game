@@ -1,5 +1,8 @@
 OpenGL Racing Game Engine (In Progress)
 =
+
+I started my engine because I wanted to make a variation of Tron that would incorporate free turning, and arcade-style vehicle movement. When I realized the magnitude of work that this would be, especially for someone with not much C++ experience at the time, I ended up rebuilding it as a general purpose racing game engine. Over the summer I spent countless hours writing truly awful code, fixing it and learning from my mistakes. This project has since served as my sandbox for learning and implementing additional computer graphics techniques. It’s still a work in progress, but I’ve learned so much about C++ programming and fundamentals, such as the importance of cache locality, RAII, and how to write code that is extensible. I’ve had to pause it this quarter for school, and I plan to return to it after graduation. 
+
 <img width="1243" height="793" alt="image" src="https://github.com/user-attachments/assets/f4fa634e-4ba7-44a9-ab36-996279217308" />
 
 https://github.com/user-attachments/assets/dc39f2c1-a60f-47f2-9915-6a2387ff80dc
